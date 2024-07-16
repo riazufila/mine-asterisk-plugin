@@ -1,0 +1,5 @@
+name: Mine-asterisk
+version: 1.0.0
+main: net.mineasterisk.mc.MineAsterisk
+author: riazufila
+api-version: '1.21'
