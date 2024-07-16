@@ -1,6 +1,7 @@
 plugins {
     id("java")
     id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("xyz.jpenilla.run-paper") version "2.3.0"
 }
 
 group = "net.mine-asterisk.mc"
@@ -25,4 +26,10 @@ dependencies {
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(21))
+}
+
+tasks {
+    runServer {
+        minecraftVersion("1.21")
+    }
 }
