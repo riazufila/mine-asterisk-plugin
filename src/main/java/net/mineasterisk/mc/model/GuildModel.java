@@ -34,7 +34,7 @@ public class GuildModel {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)
-  private GuildStatus guildStatus;
+  private GuildStatus status;
 
   @OneToMany(mappedBy = "guild")
   private Set<PlayerModel> players = new HashSet<>();
@@ -81,12 +81,12 @@ public class GuildModel {
     this.owner = owner;
   }
 
-  public @NotNull GuildStatus getGuildStatus() {
-    return guildStatus;
+  public @NotNull GuildStatus getStatus() {
+    return status;
   }
 
-  public void setGuildStatus(@NotNull GuildStatus guildStatus) {
-    this.guildStatus = guildStatus;
+  public void setStatus(@NotNull GuildStatus status) {
+    this.status = status;
   }
 
   public @NotNull Set<PlayerModel> getPlayers() {

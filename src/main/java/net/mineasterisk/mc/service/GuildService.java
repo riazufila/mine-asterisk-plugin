@@ -44,7 +44,7 @@ public final class GuildService {
                 return CompletableFuture.completedFuture(null);
               }
 
-              if (playerGuild.getGuildStatus() == GuildStatus.INACTIVE) {
+              if (playerGuild.getStatus() == GuildStatus.INACTIVE) {
                 MineAsterisk.getPluginLogger().info("Unable to update Guild: Guild is inactive.");
 
                 return CompletableFuture.completedFuture(null);
