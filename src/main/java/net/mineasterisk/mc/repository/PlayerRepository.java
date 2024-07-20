@@ -15,7 +15,7 @@ import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class PlayerRepository {
+public class PlayerRepository {
   public static <T> @NotNull CompletableFuture<@Nullable PlayerModel> get(
       @NotNull PlayerRepositoryOptionAttribute attribute, @NotNull T value) {
     return PlayerRepository.get(attribute, value, null);
@@ -24,7 +24,7 @@ public final class PlayerRepository {
   public static <T> @NotNull CompletableFuture<@Nullable PlayerModel> get(
       @NotNull PlayerRepositoryOptionAttribute attribute,
       @NotNull T value,
-      @Nullable Set<PlayerRepositoryOptionForceFetch> forceFetches) {
+      @Nullable Set<@NotNull PlayerRepositoryOptionForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
         () -> {
           try (Session session = HibernateUtil.getSessionFactory().openSession()) {

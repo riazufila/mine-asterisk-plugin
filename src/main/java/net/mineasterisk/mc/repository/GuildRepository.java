@@ -15,7 +15,7 @@ import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class GuildRepository {
+public class GuildRepository {
   public static <T> @NotNull CompletableFuture<@Nullable GuildModel> get(
       @NotNull GuildRepositoryOptionAttribute attribute, @NotNull T value) {
     return GuildRepository.get(attribute, value, null);
@@ -24,7 +24,7 @@ public final class GuildRepository {
   public static <T> @NotNull CompletableFuture<@Nullable GuildModel> get(
       @NotNull GuildRepositoryOptionAttribute attribute,
       @NotNull T value,
-      @Nullable Set<GuildRepositoryOptionForceFetch> forceFetches) {
+      @Nullable Set<@NotNull GuildRepositoryOptionForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
         () -> {
           try (Session session = HibernateUtil.getSessionFactory().openSession()) {

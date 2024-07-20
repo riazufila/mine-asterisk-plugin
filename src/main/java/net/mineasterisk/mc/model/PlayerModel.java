@@ -21,7 +21,15 @@ public class PlayerModel {
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "guild_id")
-  private GuildModel guild;
+  private @Nullable GuildModel guild;
+
+  private PlayerModel() {}
+
+  public PlayerModel(@NotNull Instant createdAt, @NotNull UUID uuid, @Nullable GuildModel guild) {
+    this.createdAt = createdAt;
+    this.uuid = uuid;
+    this.guild = guild;
+  }
 
   public int getId() {
     return id;

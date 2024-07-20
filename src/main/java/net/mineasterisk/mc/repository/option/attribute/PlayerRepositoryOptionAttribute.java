@@ -8,7 +8,7 @@ public enum PlayerRepositoryOptionAttribute {
   UUID("uuid"),
   GUILD("guild");
 
-  private final String attribute;
+  private final @NotNull String attribute;
 
   PlayerRepositoryOptionAttribute(@NotNull String attribute) {
     this.attribute = attribute;

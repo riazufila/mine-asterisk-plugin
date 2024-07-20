@@ -2,7 +2,6 @@ package net.mineasterisk.mc.model;
 
 import jakarta.persistence.*;
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.Set;
 import net.mineasterisk.mc.constant.GuildStatus;
 import org.jetbrains.annotations.NotNull;
@@ -37,9 +36,24 @@ public class GuildModel {
   private GuildStatus status;
 
   @OneToMany(mappedBy = "guild")
-  private Set<PlayerModel> players = new HashSet<>();
+  private Set<@NotNull PlayerModel> players;
 
-  public GuildModel() {}
+  private GuildModel() {}
+
+  public GuildModel(
+      @NotNull Instant createdAt,
+      @NotNull PlayerModel createdBy,
+      @NotNull String name,
+      @NotNull PlayerModel owner,
+      @NotNull GuildStatus status,
+      @NotNull Set<@NotNull PlayerModel> players) {
+    this.createdAt = createdAt;
+    this.createdBy = createdBy;
+    this.name = name;
+    this.owner = owner;
+    this.status = status;
+    this.players = players;
+  }
 
   public int getId() {
     return id;
@@ -89,11 +103,11 @@ public class GuildModel {
     this.status = status;
   }
 
-  public @NotNull Set<PlayerModel> getPlayers() {
+  public @NotNull Set<@NotNull PlayerModel> getPlayers() {
     return players;
   }
 
-  public void setPlayers(@NotNull Set<PlayerModel> players) {
+  public void setPlayers(@NotNull Set<@NotNull PlayerModel> players) {
     for (PlayerModel player : players) {
       player.setGuild(this);
     }

@@ -13,7 +13,7 @@ import net.mineasterisk.mc.repository.option.forcefetch.PlayerRepositoryOptionFo
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public final class GuildService {
+public class GuildService {
   public static @NotNull CompletableFuture<@NotNull Void> add(
       @NotNull Player performedBy, @NotNull GuildModel guildToAdd) {
 

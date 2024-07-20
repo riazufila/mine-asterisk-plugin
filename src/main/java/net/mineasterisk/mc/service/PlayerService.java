@@ -8,7 +8,7 @@ import net.mineasterisk.mc.repository.option.attribute.PlayerRepositoryOptionAtt
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public final class PlayerService {
+public class PlayerService {
   public static @NotNull CompletableFuture<@NotNull Void> add(
       @NotNull Player performedBy, @NotNull PlayerModel playerToAdd) {
     if (performedBy.getUniqueId() != playerToAdd.getUuid()) {

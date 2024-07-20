@@ -10,7 +10,7 @@ public enum GuildRepositoryOptionAttribute {
   OWNER("owner"),
   GUILD_STATUS("status");
 
-  private final String attribute;
+  private final @NotNull String attribute;
 
   GuildRepositoryOptionAttribute(@NotNull String attribute) {
     this.attribute = attribute;

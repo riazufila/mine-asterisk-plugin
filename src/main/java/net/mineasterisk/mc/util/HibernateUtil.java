@@ -5,9 +5,10 @@ import net.mineasterisk.mc.model.PlayerModel;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public final class HibernateUtil {
-  private static SessionFactory sessionFactory = null;
+public class HibernateUtil {
+  private static @Nullable SessionFactory sessionFactory = null;
 
   public static void loadSessionFactory() {
     sessionFactory =
