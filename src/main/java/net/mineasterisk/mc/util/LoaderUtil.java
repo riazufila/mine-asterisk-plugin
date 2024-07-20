@@ -1,9 +1,8 @@
-package net.mineasterisk.mc.loader;
+package net.mineasterisk.mc.util;
 
 import net.mineasterisk.mc.MineAsterisk;
-import net.mineasterisk.mc.util.HibernateUtil;
 
-public class Loader {
+public class LoaderUtil {
   public static boolean startup() {
     try {
       HibernateUtil.loadSessionFactory();

@@ -1,7 +1,7 @@
 package net.mineasterisk.mc;
 
 import java.util.logging.Logger;
-import net.mineasterisk.mc.loader.Loader;
+import net.mineasterisk.mc.util.LoaderUtil;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,7 +12,7 @@ public class MineAsterisk extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    if (!Loader.startup()) {
+    if (!LoaderUtil.startup()) {
       this.getServer().getPluginManager().disablePlugin(this);
 
       return;
