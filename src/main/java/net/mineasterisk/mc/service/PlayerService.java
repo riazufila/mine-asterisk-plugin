@@ -9,6 +9,27 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public final class PlayerService {
+  public static @NotNull CompletableFuture<@NotNull Void> add(
+      @NotNull Player performedBy, @NotNull PlayerModel playerToAdd) {
+    if (performedBy.getUniqueId() != playerToAdd.getUuid()) {
+      MineAsterisk.getPluginLogger().info("Unable to add Player: Not allowed to add other Player.");
+
+      return CompletableFuture.completedFuture(null);
+    }
+
+    return PlayerRepository.get(PlayerRepositoryOptionAttribute.UUID, performedBy.getUniqueId())
+        .thenCompose(
+            player -> {
+              if (player != null) {
+                MineAsterisk.getPluginLogger().info("Unable to add Player: Player already exist.");
+
+                return CompletableFuture.completedFuture(null);
+              }
+
+              return PlayerRepository.add(playerToAdd);
+            });
+  }
+
   public static @NotNull CompletableFuture<@NotNull Void> update(
       @NotNull Player performedBy, @NotNull PlayerModel updatedPlayer) {
     return PlayerRepository.get(PlayerRepositoryOptionAttribute.UUID, performedBy.getUniqueId())
