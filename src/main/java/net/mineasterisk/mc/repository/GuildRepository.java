@@ -58,9 +58,11 @@ public final class GuildRepository {
         });
   }
 
-  public static @NotNull CompletableFuture<@NotNull Void> add(@NotNull GuildModel guild) {
+  public static @NotNull CompletableFuture<@NotNull Void> add(@NotNull GuildModel guildToAdd) {
     return CompletableFuture.runAsync(
-        () -> HibernateUtil.getSessionFactory().inTransaction(session -> session.persist(guild)));
+        () ->
+            HibernateUtil.getSessionFactory()
+                .inTransaction(session -> session.persist(guildToAdd)));
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(@NotNull GuildModel updatedGuild) {

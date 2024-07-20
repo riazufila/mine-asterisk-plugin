@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 
 public final class GuildService {
   public static @NotNull CompletableFuture<@NotNull Void> add(
-      @NotNull Player performedBy, @NotNull GuildModel guild) {
+      @NotNull Player performedBy, @NotNull GuildModel guildToAdd) {
 
     return PlayerRepository.get(
             PlayerRepositoryOptionAttribute.UUID,
@@ -35,7 +35,7 @@ public final class GuildService {
                 return CompletableFuture.completedFuture(null);
               }
 
-              return GuildRepository.add(guild);
+              return GuildRepository.add(guildToAdd);
             });
   }
 

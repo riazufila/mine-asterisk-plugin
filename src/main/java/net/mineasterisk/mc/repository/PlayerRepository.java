@@ -50,9 +50,11 @@ public final class PlayerRepository {
         });
   }
 
-  public static @NotNull CompletableFuture<@NotNull Void> add(@NotNull PlayerModel player) {
+  public static @NotNull CompletableFuture<@NotNull Void> add(@NotNull PlayerModel playerToAdd) {
     return CompletableFuture.runAsync(
-        () -> HibernateUtil.getSessionFactory().inTransaction(session -> session.persist(player)));
+        () ->
+            HibernateUtil.getSessionFactory()
+                .inTransaction(session -> session.persist(playerToAdd)));
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
