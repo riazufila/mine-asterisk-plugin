@@ -1,5 +1,6 @@
 package net.mineasterisk.mc.service;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.constant.GuildStatus;
@@ -8,12 +9,34 @@ import net.mineasterisk.mc.repository.GuildRepository;
 import net.mineasterisk.mc.repository.PlayerRepository;
 import net.mineasterisk.mc.repository.option.attribute.GuildRepositoryOptionAttribute;
 import net.mineasterisk.mc.repository.option.attribute.PlayerRepositoryOptionAttribute;
+import net.mineasterisk.mc.repository.option.forcefetch.PlayerRepositoryOptionForceFetch;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public final class GuildService {
-  public static @NotNull CompletableFuture<@NotNull Void> add(@NotNull GuildModel guild) {
-    return GuildRepository.add(guild);
+  public static @NotNull CompletableFuture<@NotNull Void> add(
+      @NotNull Player performedBy, @NotNull GuildModel guild) {
+
+    return PlayerRepository.get(
+            PlayerRepositoryOptionAttribute.UUID,
+            performedBy.getUniqueId(),
+            Set.of(PlayerRepositoryOptionForceFetch.GUILD))
+        .thenCompose(
+            player -> {
+              if (player == null) {
+                MineAsterisk.getPluginLogger().info("Unable to add Guild: Player doesn't exist.");
+
+                return CompletableFuture.completedFuture(null);
+              }
+
+              if (player.getGuild() != null) {
+                MineAsterisk.getPluginLogger().info("Unable to add Guild: Already on a Guild.");
+
+                return CompletableFuture.completedFuture(null);
+              }
+
+              return GuildRepository.add(guild);
+            });
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
