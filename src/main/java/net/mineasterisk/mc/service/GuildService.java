@@ -7,7 +7,6 @@ import net.mineasterisk.mc.constant.GuildStatus;
 import net.mineasterisk.mc.model.GuildModel;
 import net.mineasterisk.mc.repository.GuildRepository;
 import net.mineasterisk.mc.repository.PlayerRepository;
-import net.mineasterisk.mc.repository.option.attribute.GuildRepositoryOptionAttribute;
 import net.mineasterisk.mc.repository.option.attribute.PlayerRepositoryOptionAttribute;
 import net.mineasterisk.mc.repository.option.forcefetch.PlayerRepositoryOptionForceFetch;
 import org.bukkit.entity.Player;
@@ -73,8 +72,7 @@ public class GuildService {
                 return CompletableFuture.completedFuture(null);
               }
 
-              return GuildRepository.get(GuildRepositoryOptionAttribute.ID, playerGuild.getId())
-                  .thenCompose(guild -> GuildRepository.update(updatedGuild));
+              return GuildRepository.update(updatedGuild);
             });
   }
 }
