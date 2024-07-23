@@ -7,22 +7,30 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 @Entity(name = "player")
-public class PlayerModel {
+public final class PlayerModel {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false)
   private int id;
 
+  @SuppressWarnings("NotNullFieldNotInitialized")
   @Column(name = "created_at", nullable = false, columnDefinition = "DATETIME")
-  private Instant createdAt;
+  private @NotNull Instant createdAt;
 
+  @SuppressWarnings("NotNullFieldNotInitialized")
   @Column(name = "uuid", unique = true, nullable = false)
-  private UUID uuid;
+  private @NotNull UUID uuid;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "guild_id")
   private @Nullable GuildModel guild;
 
+  /**
+   * This no argument constructor is deprecated and should not be used. It exists solely for the
+   * purpose of Hibernate requiring a no argument constructor. Use {@link
+   * PlayerModel#PlayerModel(Instant, UUID, GuildModel)} instead.
+   */
+  @Deprecated
   private PlayerModel() {}
 
   public PlayerModel(@NotNull Instant createdAt, @NotNull UUID uuid, @Nullable GuildModel guild) {

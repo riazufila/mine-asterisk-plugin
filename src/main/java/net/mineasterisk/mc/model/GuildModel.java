@@ -7,37 +7,49 @@ import net.mineasterisk.mc.constant.GuildStatus;
 import org.jetbrains.annotations.NotNull;
 
 @Entity(name = "guild")
-public class GuildModel {
+public final class GuildModel {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false)
   private int id;
 
+  @SuppressWarnings("NotNullFieldNotInitialized")
   @Column(name = "created_at", nullable = false, columnDefinition = "DATETIME")
-  private Instant createdAt;
+  private @NotNull Instant createdAt;
 
+  @SuppressWarnings("NotNullFieldNotInitialized")
   @ManyToOne(
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "created_by", referencedColumnName = "id", nullable = false)
-  private PlayerModel createdBy;
+  private @NotNull PlayerModel createdBy;
 
+  @SuppressWarnings("NotNullFieldNotInitialized")
   @Column(name = "name", unique = true, nullable = false, length = 10)
-  private String name;
+  private @NotNull String name;
 
+  @SuppressWarnings("NotNullFieldNotInitialized")
   @ManyToOne(
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   @JoinColumn(name = "owner", referencedColumnName = "id", nullable = false)
-  private PlayerModel owner;
+  private @NotNull PlayerModel owner;
 
+  @SuppressWarnings("NotNullFieldNotInitialized")
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)
-  private GuildStatus status;
+  private @NotNull GuildStatus status;
 
+  @SuppressWarnings("NotNullFieldNotInitialized")
   @OneToMany(mappedBy = "guild")
-  private Set<@NotNull PlayerModel> players;
+  private @NotNull Set<@NotNull PlayerModel> players;
 
+  /**
+   * This no argument constructor is deprecated and should not be used. It exists solely for the
+   * purpose of Hibernate requiring a no argument constructor. Use {@link
+   * GuildModel#GuildModel(Instant, PlayerModel, String, PlayerModel, GuildStatus, Set)} instead.
+   */
+  @Deprecated
   private GuildModel() {}
 
   public GuildModel(
