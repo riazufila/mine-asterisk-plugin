@@ -2,13 +2,13 @@ package net.mineasterisk.mc.service;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.constant.GuildStatus;
 import net.mineasterisk.mc.model.GuildModel;
 import net.mineasterisk.mc.repository.GuildRepository;
 import net.mineasterisk.mc.repository.PlayerRepository;
 import net.mineasterisk.mc.repository.option.attribute.PlayerRepositoryOptionAttribute;
 import net.mineasterisk.mc.repository.option.forcefetch.PlayerRepositoryOptionForceFetch;
+import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,13 +23,13 @@ public class GuildService {
         .thenCompose(
             player -> {
               if (player == null) {
-                MineAsterisk.getPluginLogger().info("Unable to add Guild: Player doesn't exist.");
+                PluginUtil.getLogger().info("Unable to add Guild: Player doesn't exist.");
 
                 return CompletableFuture.completedFuture(null);
               }
 
               if (player.getGuild() != null) {
-                MineAsterisk.getPluginLogger().info("Unable to add Guild: Already on a Guild.");
+                PluginUtil.getLogger().info("Unable to add Guild: Already on a Guild.");
 
                 return CompletableFuture.completedFuture(null);
               }
@@ -44,8 +44,7 @@ public class GuildService {
         .thenCompose(
             player -> {
               if (player == null) {
-                MineAsterisk.getPluginLogger()
-                    .info("Unable to update Guild: Player doesn't exist.");
+                PluginUtil.getLogger().info("Unable to update Guild: Player doesn't exist.");
 
                 return CompletableFuture.completedFuture(null);
               }
@@ -53,21 +52,20 @@ public class GuildService {
               GuildModel playerGuild = player.getGuild();
 
               if (playerGuild == null) {
-                MineAsterisk.getPluginLogger()
-                    .info("Unable to update Guild: Player doesn't have a Guild.");
+                PluginUtil.getLogger().info("Unable to update Guild: Player doesn't have a Guild.");
 
                 return CompletableFuture.completedFuture(null);
               }
 
               if (playerGuild.getOwner().getId() != player.getId()) {
-                MineAsterisk.getPluginLogger()
+                PluginUtil.getLogger()
                     .info("Unable to update Guild: Player is not the Guild owner.");
 
                 return CompletableFuture.completedFuture(null);
               }
 
               if (playerGuild.getStatus() == GuildStatus.INACTIVE) {
-                MineAsterisk.getPluginLogger().info("Unable to update Guild: Guild is inactive.");
+                PluginUtil.getLogger().info("Unable to update Guild: Guild is inactive.");
 
                 return CompletableFuture.completedFuture(null);
               }

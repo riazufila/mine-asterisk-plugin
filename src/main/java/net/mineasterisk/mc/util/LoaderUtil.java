@@ -1,7 +1,5 @@
 package net.mineasterisk.mc.util;
 
-import net.mineasterisk.mc.MineAsterisk;
-
 public class LoaderUtil {
   public static boolean startup() {
     try {
@@ -9,7 +7,7 @@ public class LoaderUtil {
 
       return true;
     } catch (Exception exception) {
-      MineAsterisk.getPluginLogger()
+      PluginUtil.getLogger()
           .severe(String.format("Unable to load startup configurations: %s", exception));
 
       return false;

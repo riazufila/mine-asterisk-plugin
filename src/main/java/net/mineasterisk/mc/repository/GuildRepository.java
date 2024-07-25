@@ -6,11 +6,11 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.model.GuildModel;
 import net.mineasterisk.mc.repository.option.attribute.GuildRepositoryOptionAttribute;
 import net.mineasterisk.mc.repository.option.forcefetch.GuildRepositoryOptionForceFetch;
 import net.mineasterisk.mc.util.HibernateUtil;
+import net.mineasterisk.mc.util.PluginUtil;
 import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +51,7 @@ public class GuildRepository {
 
             return session.createQuery(query).getSingleResult();
           } catch (NoResultException exception) {
-            MineAsterisk.getPluginLogger().info("Unable to get Guild: No result found.");
+            PluginUtil.getLogger().info("Unable to get Guild: No result found.");
 
             return null;
           }
