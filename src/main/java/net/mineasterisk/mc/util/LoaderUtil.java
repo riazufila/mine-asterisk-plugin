@@ -4,6 +4,7 @@ public class LoaderUtil {
   public static boolean startup() {
     try {
       HibernateUtil.loadSessionFactory();
+      CommandUtil.register();
 
       return true;
     } catch (Exception exception) {
