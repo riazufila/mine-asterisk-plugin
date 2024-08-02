@@ -6,9 +6,9 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import net.mineasterisk.mc.constant.attribute.GuildAttribute;
+import net.mineasterisk.mc.constant.forcefetch.GuildForceFetch;
 import net.mineasterisk.mc.model.GuildModel;
-import net.mineasterisk.mc.repository.option.attribute.GuildRepositoryOptionAttribute;
-import net.mineasterisk.mc.repository.option.forcefetch.GuildRepositoryOptionForceFetch;
 import net.mineasterisk.mc.util.HibernateUtil;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.hibernate.Session;
@@ -17,14 +17,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class GuildRepository {
   public static <T> @NotNull CompletableFuture<@Nullable GuildModel> get(
-      final @NotNull GuildRepositoryOptionAttribute attribute, final @NotNull T value) {
+      final @NotNull GuildAttribute attribute, final @NotNull T value) {
     return GuildRepository.get(attribute, value, null);
   }
 
   public static <T> @NotNull CompletableFuture<@Nullable GuildModel> get(
-      final @NotNull GuildRepositoryOptionAttribute attribute,
+      final @NotNull GuildAttribute attribute,
       final @NotNull T value,
-      final @Nullable Set<@NotNull GuildRepositoryOptionForceFetch> forceFetches) {
+      final @Nullable Set<@NotNull GuildForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
         () -> {
           try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -33,16 +33,16 @@ public class GuildRepository {
             Root<GuildModel> root = query.from(GuildModel.class);
 
             if (forceFetches != null) {
-              if (forceFetches.contains(GuildRepositoryOptionForceFetch.CREATED_BY)) {
-                root.fetch(GuildRepositoryOptionAttribute.CREATED_BY.getAttribute());
+              if (forceFetches.contains(GuildForceFetch.CREATED_BY)) {
+                root.fetch(GuildAttribute.CREATED_BY.getAttribute());
               }
 
-              if (forceFetches.contains(GuildRepositoryOptionForceFetch.OWNER)) {
-                root.fetch(GuildRepositoryOptionAttribute.OWNER.getAttribute());
+              if (forceFetches.contains(GuildForceFetch.OWNER)) {
+                root.fetch(GuildAttribute.OWNER.getAttribute());
               }
 
-              if (forceFetches.contains(GuildRepositoryOptionForceFetch.PLAYERS)) {
-                root.fetch(GuildRepositoryOptionAttribute.PLAYERS.getAttribute());
+              if (forceFetches.contains(GuildForceFetch.PLAYERS)) {
+                root.fetch(GuildAttribute.PLAYERS.getAttribute());
               }
             }
 

@@ -2,12 +2,12 @@ package net.mineasterisk.mc.service;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import net.mineasterisk.mc.constant.GuildStatus;
+import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
+import net.mineasterisk.mc.constant.forcefetch.PlayerForceFetch;
+import net.mineasterisk.mc.constant.status.GuildStatus;
 import net.mineasterisk.mc.model.GuildModel;
 import net.mineasterisk.mc.repository.GuildRepository;
 import net.mineasterisk.mc.repository.PlayerRepository;
-import net.mineasterisk.mc.repository.option.attribute.PlayerRepositoryOptionAttribute;
-import net.mineasterisk.mc.repository.option.forcefetch.PlayerRepositoryOptionForceFetch;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -16,9 +16,7 @@ public class GuildService {
   public static @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull Player performedBy, final @NotNull GuildModel guildToAdd) {
     return PlayerRepository.get(
-            PlayerRepositoryOptionAttribute.UUID,
-            performedBy.getUniqueId(),
-            Set.of(PlayerRepositoryOptionForceFetch.GUILD))
+            PlayerAttribute.UUID, performedBy.getUniqueId(), Set.of(PlayerForceFetch.GUILD))
         .thenCompose(
             player -> {
               if (player == null) {
@@ -39,7 +37,7 @@ public class GuildService {
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull Player performedBy, final @NotNull GuildModel updatedGuild) {
-    return PlayerRepository.get(PlayerRepositoryOptionAttribute.UUID, performedBy.getUniqueId())
+    return PlayerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId())
         .thenCompose(
             player -> {
               if (player == null) {

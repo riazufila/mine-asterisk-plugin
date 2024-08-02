@@ -1,9 +1,9 @@
 package net.mineasterisk.mc.service;
 
 import java.util.concurrent.CompletableFuture;
+import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
 import net.mineasterisk.mc.model.PlayerModel;
 import net.mineasterisk.mc.repository.PlayerRepository;
-import net.mineasterisk.mc.repository.option.attribute.PlayerRepositoryOptionAttribute;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +17,7 @@ public class PlayerService {
       return CompletableFuture.completedFuture(null);
     }
 
-    return PlayerRepository.get(PlayerRepositoryOptionAttribute.UUID, performedBy.getUniqueId())
+    return PlayerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId())
         .thenCompose(
             player -> {
               if (player != null) {
@@ -32,7 +32,7 @@ public class PlayerService {
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull Player performedBy, final @NotNull PlayerModel updatedPlayer) {
-    return PlayerRepository.get(PlayerRepositoryOptionAttribute.UUID, performedBy.getUniqueId())
+    return PlayerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId())
         .thenCompose(
             player -> {
               if (player == null) {

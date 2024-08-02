@@ -1,8 +1,8 @@
-package net.mineasterisk.mc.repository.option.attribute;
+package net.mineasterisk.mc.constant.attribute;
 
 import org.jetbrains.annotations.NotNull;
 
-public enum PlayerRepositoryOptionAttribute {
+public enum PlayerAttribute {
   ID("id"),
   CREATED_AT("createdAt"),
   UUID("uuid"),
@@ -10,7 +10,7 @@ public enum PlayerRepositoryOptionAttribute {
 
   private final @NotNull String attribute;
 
-  PlayerRepositoryOptionAttribute(final @NotNull String attribute) {
+  PlayerAttribute(final @NotNull String attribute) {
     this.attribute = attribute;
   }
 

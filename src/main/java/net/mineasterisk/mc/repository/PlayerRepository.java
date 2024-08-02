@@ -6,9 +6,9 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
+import net.mineasterisk.mc.constant.forcefetch.PlayerForceFetch;
 import net.mineasterisk.mc.model.PlayerModel;
-import net.mineasterisk.mc.repository.option.attribute.PlayerRepositoryOptionAttribute;
-import net.mineasterisk.mc.repository.option.forcefetch.PlayerRepositoryOptionForceFetch;
 import net.mineasterisk.mc.util.HibernateUtil;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.hibernate.Session;
@@ -17,14 +17,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class PlayerRepository {
   public static <T> @NotNull CompletableFuture<@Nullable PlayerModel> get(
-      final @NotNull PlayerRepositoryOptionAttribute attribute, final @NotNull T value) {
+      final @NotNull PlayerAttribute attribute, final @NotNull T value) {
     return PlayerRepository.get(attribute, value, null);
   }
 
   public static <T> @NotNull CompletableFuture<@Nullable PlayerModel> get(
-      final @NotNull PlayerRepositoryOptionAttribute attribute,
+      final @NotNull PlayerAttribute attribute,
       final @NotNull T value,
-      final @Nullable Set<@NotNull PlayerRepositoryOptionForceFetch> forceFetches) {
+      final @Nullable Set<@NotNull PlayerForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
         () -> {
           try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -33,8 +33,8 @@ public class PlayerRepository {
             Root<PlayerModel> root = query.from(PlayerModel.class);
 
             if (forceFetches != null) {
-              if (forceFetches.contains(PlayerRepositoryOptionForceFetch.GUILD)) {
-                root.fetch(PlayerRepositoryOptionAttribute.GUILD.getAttribute());
+              if (forceFetches.contains(PlayerForceFetch.GUILD)) {
+                root.fetch(PlayerAttribute.GUILD.getAttribute());
               }
             }
 

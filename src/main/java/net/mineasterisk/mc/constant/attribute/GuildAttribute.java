@@ -1,8 +1,8 @@
-package net.mineasterisk.mc.repository.option.attribute;
+package net.mineasterisk.mc.constant.attribute;
 
 import org.jetbrains.annotations.NotNull;
 
-public enum GuildRepositoryOptionAttribute {
+public enum GuildAttribute {
   ID("id"),
   CREATED_AT("createdAt"),
   CREATED_BY("createdBy"),
@@ -13,7 +13,7 @@ public enum GuildRepositoryOptionAttribute {
 
   private final @NotNull String attribute;
 
-  GuildRepositoryOptionAttribute(final @NotNull String attribute) {
+  GuildAttribute(final @NotNull String attribute) {
     this.attribute = attribute;
   }
 

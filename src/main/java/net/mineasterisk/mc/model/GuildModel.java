@@ -3,7 +3,7 @@ package net.mineasterisk.mc.model;
 import jakarta.persistence.*;
 import java.time.Instant;
 import java.util.Set;
-import net.mineasterisk.mc.constant.GuildStatus;
+import net.mineasterisk.mc.constant.status.GuildStatus;
 import org.jetbrains.annotations.NotNull;
 
 @Entity(name = "guild")
