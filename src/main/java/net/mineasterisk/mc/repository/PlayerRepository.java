@@ -34,7 +34,7 @@ public class PlayerRepository {
 
             if (forceFetches != null) {
               if (forceFetches.contains(PlayerRepositoryOptionForceFetch.GUILD)) {
-                root.fetch("guild");
+                root.fetch(PlayerRepositoryOptionAttribute.GUILD.getAttribute());
               }
             }
 

@@ -8,7 +8,8 @@ public enum GuildRepositoryOptionAttribute {
   CREATED_BY("createdBy"),
   NAME("name"),
   OWNER("owner"),
-  GUILD_STATUS("status");
+  GUILD_STATUS("status"),
+  PLAYERS("players");
 
   private final @NotNull String attribute;
 

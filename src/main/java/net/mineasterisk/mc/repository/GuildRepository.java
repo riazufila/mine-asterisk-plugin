@@ -34,15 +34,15 @@ public class GuildRepository {
 
             if (forceFetches != null) {
               if (forceFetches.contains(GuildRepositoryOptionForceFetch.CREATED_BY)) {
-                root.fetch("createdBy");
+                root.fetch(GuildRepositoryOptionAttribute.CREATED_BY.getAttribute());
               }
 
               if (forceFetches.contains(GuildRepositoryOptionForceFetch.OWNER)) {
-                root.fetch("owner");
+                root.fetch(GuildRepositoryOptionAttribute.OWNER.getAttribute());
               }
 
               if (forceFetches.contains(GuildRepositoryOptionForceFetch.PLAYERS)) {
-                root.fetch("players");
+                root.fetch(GuildRepositoryOptionAttribute.PLAYERS.getAttribute());
               }
             }
 
