@@ -22,10 +22,12 @@ public class GuildCommand {
 
   private static @NotNull Builder<@NotNull CommandSourceStack> createCommand(
       final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
+    final String nameArgument = "name";
+
     return manager
         .commandBuilder(GuildCommand.rootCommandName)
         .literal("create")
-        .required("name", StringParser.greedyStringParser())
+        .required(nameArgument, StringParser.greedyStringParser())
         .handler(
             context -> {
               // TODO: Create Guild.
@@ -45,11 +47,13 @@ public class GuildCommand {
 
   private static @NotNull Builder<@NotNull CommandSourceStack> sendInviteCommand(
       final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
+    final String playerArgument = "player";
+
     return manager
         .commandBuilder(GuildCommand.rootCommandName)
         .literal("invite")
         .literal("send")
-        .required("player", StringParser.stringParser())
+        .required(playerArgument, StringParser.stringParser())
         .handler(
             context -> {
               // TODO: Send Guild invite.
@@ -58,11 +62,13 @@ public class GuildCommand {
 
   private static @NotNull Builder<@NotNull CommandSourceStack> inviteRemovalCommand(
       final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
+    final String playerArgument = "player";
+
     return manager
         .commandBuilder(GuildCommand.rootCommandName)
         .literal("invite")
         .literal("remove")
-        .required("player", StringParser.stringParser())
+        .required(playerArgument, StringParser.stringParser())
         .handler(
             context -> {
               // TODO: Remove Guild invite.
@@ -71,10 +77,12 @@ public class GuildCommand {
 
   private static @NotNull Builder<@NotNull CommandSourceStack> kickCommand(
       final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
+    final String playerArgument = "player";
+
     return manager
         .commandBuilder(GuildCommand.rootCommandName)
         .literal("kick")
-        .required("player", StringParser.stringParser())
+        .required(playerArgument, StringParser.stringParser())
         .handler(
             context -> {
               // TODO: Guild kick.

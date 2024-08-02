@@ -35,10 +35,12 @@ public class HelpCommand {
   private static @NotNull Builder<@NotNull CommandSourceStack> helpCommand(
       final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager,
       final @NotNull HelpHandler<@NotNull CommandSourceStack> help) {
+    final String commandArgument = "command";
+
     return manager
         .commandBuilder(HelpCommand.rootCommandName)
         .optional(
-            "command",
+            commandArgument,
             StringParser.greedyStringParser(),
             DefaultValue.constant(""),
             (context, input) ->
@@ -51,9 +53,9 @@ public class HelpCommand {
         .handler(
             context -> {
               HelpQueryResult<CommandSourceStack> result =
-                  help.query(HelpQuery.of(context.sender(), context.get("command")));
+                  help.query(HelpQuery.of(context.sender(), context.get(commandArgument)));
 
-              HelpCommand.printHelp(context.sender(), context.get("command"), result);
+              HelpCommand.printHelp(context.sender(), context.get(commandArgument), result);
             });
   }
 
