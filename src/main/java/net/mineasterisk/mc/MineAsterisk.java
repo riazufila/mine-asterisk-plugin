@@ -12,11 +12,11 @@ public class MineAsterisk extends JavaPlugin {
       return;
     }
 
-    this.getLogger().info("Plugin enabled.");
+    this.getLogger().info("Plugin enabled");
   }
 
   @Override
   public void onDisable() {
-    this.getLogger().severe("Plugin disabled.");
+    this.getLogger().severe("Plugin disabled");
   }
 }

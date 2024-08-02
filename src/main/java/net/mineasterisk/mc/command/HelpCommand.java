@@ -70,7 +70,7 @@ public class HelpCommand {
           HelpCommand.printVerboseHelp(sender, verboseCommandResult);
       default ->
           throw new IllegalArgumentException(
-              "Unable to display help: Unknown help query result type.");
+              "Unable to display help: Unknown help query result type");
     }
   }
 
@@ -79,7 +79,7 @@ public class HelpCommand {
     sender
         .getSender()
         .sendMessage(
-            Component.text(String.format("Command %s is not found.", command))
+            Component.text(String.format("Command %s is not found", command))
                 .color(NamedTextColor.RED));
   }
 

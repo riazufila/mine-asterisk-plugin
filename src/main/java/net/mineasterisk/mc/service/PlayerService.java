@@ -12,7 +12,7 @@ public class PlayerService {
   public static @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull Player performedBy, final @NotNull PlayerModel playerToAdd) {
     if (performedBy.getUniqueId() != playerToAdd.getUuid()) {
-      PluginUtil.getLogger().info("Unable to add Player: Not allowed to add other Player.");
+      PluginUtil.getLogger().info("Unable to add Player: Not allowed to add other Player");
 
       return CompletableFuture.completedFuture(null);
     }
@@ -21,7 +21,7 @@ public class PlayerService {
         .thenCompose(
             player -> {
               if (player != null) {
-                PluginUtil.getLogger().info("Unable to add Player: Player already exist.");
+                PluginUtil.getLogger().info("Unable to add Player: Player already exist");
 
                 return CompletableFuture.completedFuture(null);
               }
@@ -36,13 +36,13 @@ public class PlayerService {
         .thenCompose(
             player -> {
               if (player == null) {
-                PluginUtil.getLogger().info("Unable to update Player: Player doesn't exist.");
+                PluginUtil.getLogger().info("Unable to update Player: Player doesn't exist");
 
                 return CompletableFuture.completedFuture(null);
               }
 
               if (performedBy.getUniqueId() != player.getUuid()) {
-                PluginUtil.getLogger().info("Unable to update Player: Cannot update other Player.");
+                PluginUtil.getLogger().info("Unable to update Player: Cannot update other Player");
 
                 return CompletableFuture.completedFuture(null);
               }

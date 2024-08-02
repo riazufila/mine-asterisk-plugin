@@ -22,13 +22,13 @@ public class GuildService {
         .thenCompose(
             player -> {
               if (player == null) {
-                PluginUtil.getLogger().info("Unable to add Guild: Player doesn't exist.");
+                PluginUtil.getLogger().info("Unable to add Guild: Player doesn't exist");
 
                 return CompletableFuture.completedFuture(null);
               }
 
               if (player.getGuild() != null) {
-                PluginUtil.getLogger().info("Unable to add Guild: Already on a Guild.");
+                PluginUtil.getLogger().info("Unable to add Guild: Already on a Guild");
 
                 return CompletableFuture.completedFuture(null);
               }
@@ -43,7 +43,7 @@ public class GuildService {
         .thenCompose(
             player -> {
               if (player == null) {
-                PluginUtil.getLogger().info("Unable to update Guild: Player doesn't exist.");
+                PluginUtil.getLogger().info("Unable to update Guild: Player doesn't exist");
 
                 return CompletableFuture.completedFuture(null);
               }
@@ -51,20 +51,20 @@ public class GuildService {
               GuildModel playerGuild = player.getGuild();
 
               if (playerGuild == null) {
-                PluginUtil.getLogger().info("Unable to update Guild: Player doesn't have a Guild.");
+                PluginUtil.getLogger().info("Unable to update Guild: Player doesn't have a Guild");
 
                 return CompletableFuture.completedFuture(null);
               }
 
               if (playerGuild.getOwner().getId() != player.getId()) {
                 PluginUtil.getLogger()
-                    .info("Unable to update Guild: Player is not the Guild owner.");
+                    .info("Unable to update Guild: Player is not the Guild owner");
 
                 return CompletableFuture.completedFuture(null);
               }
 
               if (playerGuild.getStatus() == GuildStatus.INACTIVE) {
-                PluginUtil.getLogger().info("Unable to update Guild: Guild is inactive.");
+                PluginUtil.getLogger().info("Unable to update Guild: Guild is inactive");
 
                 return CompletableFuture.completedFuture(null);
               }

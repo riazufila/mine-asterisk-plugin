@@ -51,7 +51,7 @@ public class GuildRepository {
 
             return session.createQuery(query).getSingleResult();
           } catch (NoResultException exception) {
-            PluginUtil.getLogger().info("Unable to get Guild: No result found.");
+            PluginUtil.getLogger().info("Unable to get Guild: No result found");
 
             return null;
           }

@@ -43,7 +43,7 @@ public class PlayerRepository {
 
             return session.createQuery(query).getSingleResult();
           } catch (NoResultException exception) {
-            PluginUtil.getLogger().info("Unable to get Player: No result found.");
+            PluginUtil.getLogger().info("Unable to get Player: No result found");
 
             return null;
           }
