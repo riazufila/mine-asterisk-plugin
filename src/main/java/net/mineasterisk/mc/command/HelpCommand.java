@@ -26,6 +26,51 @@ import org.jetbrains.annotations.NotNull;
 public class HelpCommand {
   private static final @NotNull String rootCommandName = "help";
 
+  public static Set<Builder<CommandSourceStack>> build(
+      PaperCommandManager<CommandSourceStack> manager, HelpHandler<CommandSourceStack> help) {
+    return Set.of(HelpCommand.helpCommand(manager, help));
+  }
+
+  private static Builder<CommandSourceStack> helpCommand(
+      PaperCommandManager<CommandSourceStack> manager, HelpHandler<CommandSourceStack> help) {
+    return manager
+        .commandBuilder(HelpCommand.rootCommandName)
+        .optional(
+            "command",
+            StringParser.greedyStringParser(),
+            DefaultValue.constant(""),
+            (context, input) ->
+                CompletableFuture.supplyAsync(
+                    () ->
+                        help.queryRootIndex(context.sender()).entries().stream()
+                            .map(CommandEntry::syntax)
+                            .map(Suggestion::suggestion)
+                            .collect(Collectors.toList())))
+        .handler(
+            context -> {
+              HelpQueryResult<CommandSourceStack> result =
+                  help.query(HelpQuery.of(context.sender(), context.get("command")));
+
+              HelpCommand.printHelp(context.sender(), context.get("command"), result);
+            });
+  }
+
+  private static void printHelp(
+      @NotNull CommandSourceStack sender,
+      @NotNull String command,
+      @NotNull HelpQueryResult<CommandSourceStack> result) {
+    if (result instanceof IndexCommandResult) {
+      HelpCommand.printIndexHelp(sender, command, (IndexCommandResult<CommandSourceStack>) result);
+    } else if (result instanceof MultipleCommandResult) {
+      HelpCommand.printMultipleHelp(
+          sender, command, (MultipleCommandResult<CommandSourceStack>) result);
+    } else if (result instanceof VerboseCommandResult) {
+      HelpCommand.printVerboseHelp(sender, (VerboseCommandResult<CommandSourceStack>) result);
+    } else {
+      throw new IllegalArgumentException("Unable to display help: Unknown help query result type.");
+    }
+  }
+
   private static void printNoResultHelp(
       @NotNull CommandSourceStack sender, @NotNull String command) {
     sender
@@ -83,50 +128,5 @@ public class HelpCommand {
       @NotNull CommandSourceStack sender,
       @NotNull VerboseCommandResult<CommandSourceStack> result) {
     sender.getSender().sendMessage(Component.text(String.format("/%s", result.entry().syntax())));
-  }
-
-  private static void printHelp(
-      @NotNull CommandSourceStack sender,
-      @NotNull String command,
-      @NotNull HelpQueryResult<CommandSourceStack> result) {
-    if (result instanceof IndexCommandResult) {
-      HelpCommand.printIndexHelp(sender, command, (IndexCommandResult<CommandSourceStack>) result);
-    } else if (result instanceof MultipleCommandResult) {
-      HelpCommand.printMultipleHelp(
-          sender, command, (MultipleCommandResult<CommandSourceStack>) result);
-    } else if (result instanceof VerboseCommandResult) {
-      HelpCommand.printVerboseHelp(sender, (VerboseCommandResult<CommandSourceStack>) result);
-    } else {
-      throw new IllegalArgumentException("Unable to display help: Unknown help query result type.");
-    }
-  }
-
-  private static Builder<CommandSourceStack> helpCommand(
-      PaperCommandManager<CommandSourceStack> manager, HelpHandler<CommandSourceStack> help) {
-    return manager
-        .commandBuilder(HelpCommand.rootCommandName)
-        .optional(
-            "command",
-            StringParser.greedyStringParser(),
-            DefaultValue.constant(""),
-            (context, input) ->
-                CompletableFuture.supplyAsync(
-                    () ->
-                        help.queryRootIndex(context.sender()).entries().stream()
-                            .map(CommandEntry::syntax)
-                            .map(Suggestion::suggestion)
-                            .collect(Collectors.toList())))
-        .handler(
-            context -> {
-              HelpQueryResult<CommandSourceStack> result =
-                  help.query(HelpQuery.of(context.sender(), context.get("command")));
-
-              HelpCommand.printHelp(context.sender(), context.get("command"), result);
-            });
-  }
-
-  public static Set<Builder<CommandSourceStack>> build(
-      PaperCommandManager<CommandSourceStack> manager, HelpHandler<CommandSourceStack> help) {
-    return Set.of(HelpCommand.helpCommand(manager, help));
   }
 }

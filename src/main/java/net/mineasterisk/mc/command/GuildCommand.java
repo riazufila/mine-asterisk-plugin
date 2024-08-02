@@ -10,6 +10,16 @@ import org.jetbrains.annotations.NotNull;
 public class GuildCommand {
   private static final @NotNull String rootCommandName = "guild";
 
+  public static Set<Builder<CommandSourceStack>> build(
+      PaperCommandManager<CommandSourceStack> manager) {
+    return Set.of(
+        GuildCommand.createCommand(manager),
+        GuildCommand.disbandCommand(manager),
+        GuildCommand.sendInviteCommand(manager),
+        GuildCommand.inviteRemovalCommand(manager),
+        GuildCommand.kickCommand(manager));
+  }
+
   private static Builder<CommandSourceStack> createCommand(
       PaperCommandManager<CommandSourceStack> manager) {
     return manager
@@ -69,15 +79,5 @@ public class GuildCommand {
             context -> {
               // TODO: Guild kick.
             });
-  }
-
-  public static Set<Builder<CommandSourceStack>> build(
-      PaperCommandManager<CommandSourceStack> manager) {
-    return Set.of(
-        GuildCommand.createCommand(manager),
-        GuildCommand.disbandCommand(manager),
-        GuildCommand.sendInviteCommand(manager),
-        GuildCommand.inviteRemovalCommand(manager),
-        GuildCommand.kickCommand(manager));
   }
 }
