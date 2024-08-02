@@ -53,12 +53,12 @@ public final class GuildModel {
   private GuildModel() {}
 
   public GuildModel(
-      @NotNull Instant createdAt,
-      @NotNull PlayerModel createdBy,
-      @NotNull String name,
-      @NotNull PlayerModel owner,
-      @NotNull GuildStatus status,
-      @NotNull Set<@NotNull PlayerModel> players) {
+      final @NotNull Instant createdAt,
+      final @NotNull PlayerModel createdBy,
+      final @NotNull String name,
+      final @NotNull PlayerModel owner,
+      final @NotNull GuildStatus status,
+      final @NotNull Set<@NotNull PlayerModel> players) {
     this.createdAt = createdAt;
     this.createdBy = createdBy;
     this.name = name;
@@ -71,7 +71,7 @@ public final class GuildModel {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(final int id) {
     this.id = id;
   }
 
@@ -79,7 +79,7 @@ public final class GuildModel {
     return createdAt;
   }
 
-  public void setCreatedAt(@NotNull Instant createdAt) {
+  public void setCreatedAt(final @NotNull Instant createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -87,7 +87,7 @@ public final class GuildModel {
     return createdBy;
   }
 
-  public void setCreatedBy(@NotNull PlayerModel createdBy) {
+  public void setCreatedBy(final @NotNull PlayerModel createdBy) {
     this.createdBy = createdBy;
   }
 
@@ -95,7 +95,7 @@ public final class GuildModel {
     return name;
   }
 
-  public void setName(@NotNull String name) {
+  public void setName(final @NotNull String name) {
     this.name = name;
   }
 
@@ -103,7 +103,7 @@ public final class GuildModel {
     return owner;
   }
 
-  public void setOwner(@NotNull PlayerModel owner) {
+  public void setOwner(final @NotNull PlayerModel owner) {
     this.owner = owner;
   }
 
@@ -111,7 +111,7 @@ public final class GuildModel {
     return status;
   }
 
-  public void setStatus(@NotNull GuildStatus status) {
+  public void setStatus(final @NotNull GuildStatus status) {
     this.status = status;
   }
 
@@ -119,7 +119,7 @@ public final class GuildModel {
     return players;
   }
 
-  public void setPlayers(@NotNull Set<@NotNull PlayerModel> players) {
+  public void setPlayers(final @NotNull Set<@NotNull PlayerModel> players) {
     for (PlayerModel player : players) {
       player.setGuild(this);
     }

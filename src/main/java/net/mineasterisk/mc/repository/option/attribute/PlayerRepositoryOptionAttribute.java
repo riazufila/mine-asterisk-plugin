@@ -10,7 +10,7 @@ public enum PlayerRepositoryOptionAttribute {
 
   private final @NotNull String attribute;
 
-  PlayerRepositoryOptionAttribute(@NotNull String attribute) {
+  PlayerRepositoryOptionAttribute(final @NotNull String attribute) {
     this.attribute = attribute;
   }
 

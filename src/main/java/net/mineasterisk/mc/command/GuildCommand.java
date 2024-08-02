@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 public class GuildCommand {
   private static final @NotNull String rootCommandName = "guild";
 
-  public static Set<Builder<CommandSourceStack>> build(
-      PaperCommandManager<CommandSourceStack> manager) {
+  public static @NotNull Set<@NotNull Builder<@NotNull CommandSourceStack>> build(
+      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
     return Set.of(
         GuildCommand.createCommand(manager),
         GuildCommand.disbandCommand(manager),
@@ -20,8 +20,8 @@ public class GuildCommand {
         GuildCommand.kickCommand(manager));
   }
 
-  private static Builder<CommandSourceStack> createCommand(
-      PaperCommandManager<CommandSourceStack> manager) {
+  private static @NotNull Builder<@NotNull CommandSourceStack> createCommand(
+      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
     return manager
         .commandBuilder(GuildCommand.rootCommandName)
         .literal("create")
@@ -32,8 +32,8 @@ public class GuildCommand {
             });
   }
 
-  private static Builder<CommandSourceStack> disbandCommand(
-      PaperCommandManager<CommandSourceStack> manager) {
+  private static @NotNull Builder<@NotNull CommandSourceStack> disbandCommand(
+      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
     return manager
         .commandBuilder(GuildCommand.rootCommandName)
         .literal("disband")
@@ -43,8 +43,8 @@ public class GuildCommand {
             });
   }
 
-  private static Builder<CommandSourceStack> sendInviteCommand(
-      PaperCommandManager<CommandSourceStack> manager) {
+  private static @NotNull Builder<@NotNull CommandSourceStack> sendInviteCommand(
+      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
     return manager
         .commandBuilder(GuildCommand.rootCommandName)
         .literal("invite")
@@ -56,8 +56,8 @@ public class GuildCommand {
             });
   }
 
-  private static Builder<CommandSourceStack> inviteRemovalCommand(
-      PaperCommandManager<CommandSourceStack> manager) {
+  private static @NotNull Builder<@NotNull CommandSourceStack> inviteRemovalCommand(
+      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
     return manager
         .commandBuilder(GuildCommand.rootCommandName)
         .literal("invite")
@@ -69,8 +69,8 @@ public class GuildCommand {
             });
   }
 
-  private static Builder<CommandSourceStack> kickCommand(
-      PaperCommandManager<CommandSourceStack> manager) {
+  private static @NotNull Builder<@NotNull CommandSourceStack> kickCommand(
+      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
     return manager
         .commandBuilder(GuildCommand.rootCommandName)
         .literal("kick")

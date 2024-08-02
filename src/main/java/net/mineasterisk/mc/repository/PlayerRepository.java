@@ -17,14 +17,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class PlayerRepository {
   public static <T> @NotNull CompletableFuture<@Nullable PlayerModel> get(
-      @NotNull PlayerRepositoryOptionAttribute attribute, @NotNull T value) {
+      final @NotNull PlayerRepositoryOptionAttribute attribute, final @NotNull T value) {
     return PlayerRepository.get(attribute, value, null);
   }
 
   public static <T> @NotNull CompletableFuture<@Nullable PlayerModel> get(
-      @NotNull PlayerRepositoryOptionAttribute attribute,
-      @NotNull T value,
-      @Nullable Set<@NotNull PlayerRepositoryOptionForceFetch> forceFetches) {
+      final @NotNull PlayerRepositoryOptionAttribute attribute,
+      final @NotNull T value,
+      final @Nullable Set<@NotNull PlayerRepositoryOptionForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
         () -> {
           try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -50,7 +50,8 @@ public class PlayerRepository {
         });
   }
 
-  public static @NotNull CompletableFuture<@NotNull Void> add(@NotNull PlayerModel playerToAdd) {
+  public static @NotNull CompletableFuture<@NotNull Void> add(
+      final @NotNull PlayerModel playerToAdd) {
     return CompletableFuture.runAsync(
         () ->
             HibernateUtil.getSessionFactory()
@@ -58,7 +59,7 @@ public class PlayerRepository {
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
-      @NotNull PlayerModel updatedPlayer) {
+      final @NotNull PlayerModel updatedPlayer) {
     return CompletableFuture.runAsync(
         () ->
             HibernateUtil.getSessionFactory()

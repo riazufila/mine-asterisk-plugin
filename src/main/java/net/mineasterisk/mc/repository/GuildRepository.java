@@ -17,14 +17,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class GuildRepository {
   public static <T> @NotNull CompletableFuture<@Nullable GuildModel> get(
-      @NotNull GuildRepositoryOptionAttribute attribute, @NotNull T value) {
+      final @NotNull GuildRepositoryOptionAttribute attribute, final @NotNull T value) {
     return GuildRepository.get(attribute, value, null);
   }
 
   public static <T> @NotNull CompletableFuture<@Nullable GuildModel> get(
-      @NotNull GuildRepositoryOptionAttribute attribute,
-      @NotNull T value,
-      @Nullable Set<@NotNull GuildRepositoryOptionForceFetch> forceFetches) {
+      final @NotNull GuildRepositoryOptionAttribute attribute,
+      final @NotNull T value,
+      final @Nullable Set<@NotNull GuildRepositoryOptionForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
         () -> {
           try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -58,14 +58,16 @@ public class GuildRepository {
         });
   }
 
-  public static @NotNull CompletableFuture<@NotNull Void> add(@NotNull GuildModel guildToAdd) {
+  public static @NotNull CompletableFuture<@NotNull Void> add(
+      final @NotNull GuildModel guildToAdd) {
     return CompletableFuture.runAsync(
         () ->
             HibernateUtil.getSessionFactory()
                 .inTransaction(session -> session.persist(guildToAdd)));
   }
 
-  public static @NotNull CompletableFuture<@NotNull Void> update(@NotNull GuildModel updatedGuild) {
+  public static @NotNull CompletableFuture<@NotNull Void> update(
+      final @NotNull GuildModel updatedGuild) {
     return CompletableFuture.runAsync(
         () ->
             HibernateUtil.getSessionFactory()

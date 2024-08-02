@@ -26,13 +26,15 @@ import org.jetbrains.annotations.NotNull;
 public class HelpCommand {
   private static final @NotNull String rootCommandName = "help";
 
-  public static Set<Builder<CommandSourceStack>> build(
-      PaperCommandManager<CommandSourceStack> manager, HelpHandler<CommandSourceStack> help) {
+  public static @NotNull Set<@NotNull Builder<@NotNull CommandSourceStack>> build(
+      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager,
+      final @NotNull HelpHandler<@NotNull CommandSourceStack> help) {
     return Set.of(HelpCommand.helpCommand(manager, help));
   }
 
-  private static Builder<CommandSourceStack> helpCommand(
-      PaperCommandManager<CommandSourceStack> manager, HelpHandler<CommandSourceStack> help) {
+  private static @NotNull Builder<@NotNull CommandSourceStack> helpCommand(
+      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager,
+      final @NotNull HelpHandler<@NotNull CommandSourceStack> help) {
     return manager
         .commandBuilder(HelpCommand.rootCommandName)
         .optional(
@@ -56,23 +58,24 @@ public class HelpCommand {
   }
 
   private static void printHelp(
-      @NotNull CommandSourceStack sender,
-      @NotNull String command,
-      @NotNull HelpQueryResult<CommandSourceStack> result) {
-    if (result instanceof IndexCommandResult) {
-      HelpCommand.printIndexHelp(sender, command, (IndexCommandResult<CommandSourceStack>) result);
-    } else if (result instanceof MultipleCommandResult) {
-      HelpCommand.printMultipleHelp(
-          sender, command, (MultipleCommandResult<CommandSourceStack>) result);
-    } else if (result instanceof VerboseCommandResult) {
-      HelpCommand.printVerboseHelp(sender, (VerboseCommandResult<CommandSourceStack>) result);
-    } else {
-      throw new IllegalArgumentException("Unable to display help: Unknown help query result type.");
+      final @NotNull CommandSourceStack sender,
+      final @NotNull String command,
+      final @NotNull HelpQueryResult<@NotNull CommandSourceStack> result) {
+    switch (result) {
+      case IndexCommandResult<CommandSourceStack> indexCommandResult ->
+          HelpCommand.printIndexHelp(sender, command, indexCommandResult);
+      case MultipleCommandResult<CommandSourceStack> multipleCommandResult ->
+          HelpCommand.printMultipleHelp(sender, command, multipleCommandResult);
+      case VerboseCommandResult<CommandSourceStack> verboseCommandResult ->
+          HelpCommand.printVerboseHelp(sender, verboseCommandResult);
+      default ->
+          throw new IllegalArgumentException(
+              "Unable to display help: Unknown help query result type.");
     }
   }
 
   private static void printNoResultHelp(
-      @NotNull CommandSourceStack sender, @NotNull String command) {
+      final @NotNull CommandSourceStack sender, final @NotNull String command) {
     sender
         .getSender()
         .sendMessage(
@@ -81,9 +84,9 @@ public class HelpCommand {
   }
 
   private static void printIndexHelp(
-      @NotNull CommandSourceStack sender,
-      @NotNull String command,
-      @NotNull IndexCommandResult<CommandSourceStack> result) {
+      final @NotNull CommandSourceStack sender,
+      final @NotNull String command,
+      final @NotNull IndexCommandResult<@NotNull CommandSourceStack> result) {
     if (result.isEmpty()) {
       HelpCommand.printNoResultHelp(sender, command);
       return;
@@ -105,9 +108,9 @@ public class HelpCommand {
   }
 
   private static void printMultipleHelp(
-      @NotNull CommandSourceStack sender,
-      @NotNull String command,
-      @NotNull MultipleCommandResult<CommandSourceStack> result) {
+      final @NotNull CommandSourceStack sender,
+      final @NotNull String command,
+      final @NotNull MultipleCommandResult<@NotNull CommandSourceStack> result) {
     if (result.childSuggestions().isEmpty()) {
       HelpCommand.printNoResultHelp(sender, command);
       return;
@@ -125,8 +128,8 @@ public class HelpCommand {
   }
 
   private static void printVerboseHelp(
-      @NotNull CommandSourceStack sender,
-      @NotNull VerboseCommandResult<CommandSourceStack> result) {
+      final @NotNull CommandSourceStack sender,
+      final @NotNull VerboseCommandResult<@NotNull CommandSourceStack> result) {
     sender.getSender().sendMessage(Component.text(String.format("/%s", result.entry().syntax())));
   }
 }

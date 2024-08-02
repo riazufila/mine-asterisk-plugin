@@ -33,7 +33,10 @@ public final class PlayerModel {
   @Deprecated
   private PlayerModel() {}
 
-  public PlayerModel(@NotNull Instant createdAt, @NotNull UUID uuid, @Nullable GuildModel guild) {
+  public PlayerModel(
+      final @NotNull Instant createdAt,
+      final @NotNull UUID uuid,
+      final @Nullable GuildModel guild) {
     this.createdAt = createdAt;
     this.uuid = uuid;
     this.guild = guild;
@@ -43,7 +46,7 @@ public final class PlayerModel {
     return id;
   }
 
-  public void setId(int id) {
+  public void setId(final int id) {
     this.id = id;
   }
 
@@ -51,7 +54,7 @@ public final class PlayerModel {
     return createdAt;
   }
 
-  public void setCreatedAt(@NotNull Instant createdAt) {
+  public void setCreatedAt(final @NotNull Instant createdAt) {
     this.createdAt = createdAt;
   }
 
@@ -59,7 +62,7 @@ public final class PlayerModel {
     return uuid;
   }
 
-  public void setUuid(@NotNull UUID uuid) {
+  public void setUuid(final @NotNull UUID uuid) {
     this.uuid = uuid;
   }
 
@@ -67,7 +70,7 @@ public final class PlayerModel {
     return guild;
   }
 
-  public void setGuild(@NotNull GuildModel guild) {
+  public void setGuild(final @NotNull GuildModel guild) {
     this.guild = guild;
   }
 }

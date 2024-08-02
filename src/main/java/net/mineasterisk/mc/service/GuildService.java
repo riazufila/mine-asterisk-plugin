@@ -14,8 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class GuildService {
   public static @NotNull CompletableFuture<@NotNull Void> add(
-      @NotNull Player performedBy, @NotNull GuildModel guildToAdd) {
-
+      final @NotNull Player performedBy, final @NotNull GuildModel guildToAdd) {
     return PlayerRepository.get(
             PlayerRepositoryOptionAttribute.UUID,
             performedBy.getUniqueId(),
@@ -39,7 +38,7 @@ public class GuildService {
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
-      @NotNull Player performedBy, @NotNull GuildModel updatedGuild) {
+      final @NotNull Player performedBy, final @NotNull GuildModel updatedGuild) {
     return PlayerRepository.get(PlayerRepositoryOptionAttribute.UUID, performedBy.getUniqueId())
         .thenCompose(
             player -> {

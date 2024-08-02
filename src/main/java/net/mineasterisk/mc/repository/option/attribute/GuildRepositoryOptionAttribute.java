@@ -12,7 +12,7 @@ public enum GuildRepositoryOptionAttribute {
 
   private final @NotNull String attribute;
 
-  GuildRepositoryOptionAttribute(@NotNull String attribute) {
+  GuildRepositoryOptionAttribute(final @NotNull String attribute) {
     this.attribute = attribute;
   }
 

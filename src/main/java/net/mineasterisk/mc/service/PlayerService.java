@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class PlayerService {
   public static @NotNull CompletableFuture<@NotNull Void> add(
-      @NotNull Player performedBy, @NotNull PlayerModel playerToAdd) {
+      final @NotNull Player performedBy, final @NotNull PlayerModel playerToAdd) {
     if (performedBy.getUniqueId() != playerToAdd.getUuid()) {
       PluginUtil.getLogger().info("Unable to add Player: Not allowed to add other Player.");
 
@@ -31,7 +31,7 @@ public class PlayerService {
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
-      @NotNull Player performedBy, @NotNull PlayerModel updatedPlayer) {
+      final @NotNull Player performedBy, final @NotNull PlayerModel updatedPlayer) {
     return PlayerRepository.get(PlayerRepositoryOptionAttribute.UUID, performedBy.getUniqueId())
         .thenCompose(
             player -> {
