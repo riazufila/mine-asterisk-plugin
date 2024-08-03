@@ -5,7 +5,8 @@ import org.jetbrains.annotations.NotNull;
 public enum InvitationAttribute {
   ID("id"),
   CREATED_AT("createdAt"),
-  CREATED_BY("createdBy"),
+  INVITER("inviter"),
+  INVITEE("invitee"),
   GUILD("guild"),
   STATUS("status");
 

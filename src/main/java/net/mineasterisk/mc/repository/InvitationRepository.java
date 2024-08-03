@@ -33,8 +33,8 @@ public class InvitationRepository {
                 query.from(InvitationModel.class);
 
             if (forceFetches != null) {
-              if (forceFetches.contains(InvitationForceFetch.CREATED_BY)) {
-                root.fetch(InvitationAttribute.CREATED_BY.getAttribute());
+              if (forceFetches.contains(InvitationForceFetch.INVITER)) {
+                root.fetch(InvitationAttribute.INVITER.getAttribute());
               }
 
               if (forceFetches.contains(InvitationForceFetch.GUILD)) {

@@ -32,8 +32,15 @@ public final class InvitationModel {
   @ManyToOne(
       fetch = FetchType.LAZY,
       cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-  @JoinColumn(name = "created_by", referencedColumnName = "id", nullable = false)
-  private @NotNull PlayerModel createdBy;
+  @JoinColumn(name = "inviter", referencedColumnName = "id", nullable = false)
+  private @NotNull PlayerModel inviter;
+
+  @SuppressWarnings("NotNullFieldNotInitialized")
+  @ManyToOne(
+      fetch = FetchType.LAZY,
+      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @JoinColumn(name = "invitee", referencedColumnName = "id", nullable = false)
+  private @NotNull PlayerModel invitee;
 
   @SuppressWarnings("NotNullFieldNotInitialized")
   @ManyToOne(fetch = FetchType.LAZY)
@@ -55,11 +62,13 @@ public final class InvitationModel {
 
   public InvitationModel(
       final @NotNull Instant createdAt,
-      final @NotNull PlayerModel createdBy,
+      final @NotNull PlayerModel inviter,
+      final @NotNull PlayerModel invitee,
       final @Nullable GuildModel guild,
       final @NotNull InvitationStatus status) {
     this.createdAt = createdAt;
-    this.createdBy = createdBy;
+    this.inviter = inviter;
+    this.invitee = invitee;
     this.guild = guild;
     this.status = status;
   }
@@ -80,12 +89,20 @@ public final class InvitationModel {
     this.createdAt = createdAt;
   }
 
-  public @NotNull PlayerModel getCreatedBy() {
-    return createdBy;
+  public @NotNull PlayerModel getInviter() {
+    return inviter;
   }
 
-  public void setCreatedBy(final @NotNull PlayerModel createdBy) {
-    this.createdBy = createdBy;
+  public void setInviter(final @NotNull PlayerModel inviter) {
+    this.inviter = inviter;
+  }
+
+  public @NotNull PlayerModel getInvitee() {
+    return invitee;
+  }
+
+  public void setInvitee(final @NotNull PlayerModel invitee) {
+    this.invitee = invitee;
   }
 
   public @NotNull GuildModel getGuild() {
