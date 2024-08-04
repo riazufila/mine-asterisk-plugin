@@ -18,6 +18,6 @@ public enum GuildAttribute {
   }
 
   public @NotNull String getAttribute() {
-    return attribute;
+    return this.attribute;
   }
 }

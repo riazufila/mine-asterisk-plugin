@@ -68,7 +68,7 @@ public final class GuildModel {
   }
 
   public int getId() {
-    return id;
+    return this.id;
   }
 
   public void setId(final int id) {
@@ -76,7 +76,7 @@ public final class GuildModel {
   }
 
   public @NotNull Instant getCreatedAt() {
-    return createdAt;
+    return this.createdAt;
   }
 
   public void setCreatedAt(final @NotNull Instant createdAt) {
@@ -84,7 +84,7 @@ public final class GuildModel {
   }
 
   public @NotNull PlayerModel getCreatedBy() {
-    return createdBy;
+    return this.createdBy;
   }
 
   public void setCreatedBy(final @NotNull PlayerModel createdBy) {
@@ -92,7 +92,7 @@ public final class GuildModel {
   }
 
   public @NotNull String getName() {
-    return name;
+    return this.name;
   }
 
   public void setName(final @NotNull String name) {
@@ -100,7 +100,7 @@ public final class GuildModel {
   }
 
   public @NotNull PlayerModel getOwner() {
-    return owner;
+    return this.owner;
   }
 
   public void setOwner(final @NotNull PlayerModel owner) {
@@ -108,7 +108,7 @@ public final class GuildModel {
   }
 
   public @NotNull GuildStatus getStatus() {
-    return status;
+    return this.status;
   }
 
   public void setStatus(final @NotNull GuildStatus status) {
@@ -116,7 +116,7 @@ public final class GuildModel {
   }
 
   public @NotNull Set<@NotNull PlayerModel> getPlayers() {
-    return players;
+    return this.players;
   }
 
   public void setPlayers(final @NotNull Set<@NotNull PlayerModel> players) {

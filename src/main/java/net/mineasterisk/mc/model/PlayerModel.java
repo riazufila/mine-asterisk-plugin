@@ -43,7 +43,7 @@ public final class PlayerModel {
   }
 
   public int getId() {
-    return id;
+    return this.id;
   }
 
   public void setId(final int id) {
@@ -51,7 +51,7 @@ public final class PlayerModel {
   }
 
   public @NotNull Instant getCreatedAt() {
-    return createdAt;
+    return this.createdAt;
   }
 
   public void setCreatedAt(final @NotNull Instant createdAt) {
@@ -59,7 +59,7 @@ public final class PlayerModel {
   }
 
   public @NotNull UUID getUuid() {
-    return uuid;
+    return this.uuid;
   }
 
   public void setUuid(final @NotNull UUID uuid) {
@@ -67,7 +67,7 @@ public final class PlayerModel {
   }
 
   public @Nullable GuildModel getGuild() {
-    return guild;
+    return this.guild;
   }
 
   public void setGuild(final @NotNull GuildModel guild) {

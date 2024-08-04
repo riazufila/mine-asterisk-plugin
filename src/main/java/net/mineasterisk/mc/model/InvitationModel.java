@@ -74,7 +74,7 @@ public final class InvitationModel {
   }
 
   public int getId() {
-    return id;
+    return this.id;
   }
 
   public void setId(final int id) {
@@ -82,7 +82,7 @@ public final class InvitationModel {
   }
 
   public @NotNull Instant getCreatedAt() {
-    return createdAt;
+    return this.createdAt;
   }
 
   public void setCreatedAt(final @NotNull Instant createdAt) {
@@ -90,7 +90,7 @@ public final class InvitationModel {
   }
 
   public @NotNull PlayerModel getInviter() {
-    return inviter;
+    return this.inviter;
   }
 
   public void setInviter(final @NotNull PlayerModel inviter) {
@@ -98,7 +98,7 @@ public final class InvitationModel {
   }
 
   public @NotNull PlayerModel getInvitee() {
-    return invitee;
+    return this.invitee;
   }
 
   public void setInvitee(final @NotNull PlayerModel invitee) {
@@ -106,7 +106,7 @@ public final class InvitationModel {
   }
 
   public @NotNull GuildModel getGuild() {
-    return guild;
+    return this.guild;
   }
 
   public void setGuild(final @NotNull GuildModel guild) {
@@ -114,7 +114,7 @@ public final class InvitationModel {
   }
 
   public @NotNull InvitationStatus getStatus() {
-    return status;
+    return this.status;
   }
 
   public void setStatus(final @NotNull InvitationStatus status) {
