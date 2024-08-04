@@ -1,6 +1,5 @@
 package net.mineasterisk.mc.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,16 +28,12 @@ public final class InvitationModel {
   private @NotNull Instant createdAt;
 
   @SuppressWarnings("NotNullFieldNotInitialized")
-  @ManyToOne(
-      fetch = FetchType.LAZY,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "inviter", referencedColumnName = "id", nullable = false)
   private @NotNull PlayerModel inviter;
 
   @SuppressWarnings("NotNullFieldNotInitialized")
-  @ManyToOne(
-      fetch = FetchType.LAZY,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "invitee", referencedColumnName = "id", nullable = false)
   private @NotNull PlayerModel invitee;
 

@@ -18,9 +18,7 @@ public final class GuildModel {
   private @NotNull Instant createdAt;
 
   @SuppressWarnings("NotNullFieldNotInitialized")
-  @ManyToOne(
-      fetch = FetchType.LAZY,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "created_by", referencedColumnName = "id", nullable = false)
   private @NotNull PlayerModel createdBy;
 
@@ -29,9 +27,7 @@ public final class GuildModel {
   private @NotNull String name;
 
   @SuppressWarnings("NotNullFieldNotInitialized")
-  @ManyToOne(
-      fetch = FetchType.LAZY,
-      cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "owner", referencedColumnName = "id", nullable = false)
   private @NotNull PlayerModel owner;
 
@@ -41,7 +37,7 @@ public final class GuildModel {
   private @NotNull GuildStatus status;
 
   @SuppressWarnings("NotNullFieldNotInitialized")
-  @OneToMany(mappedBy = "guild")
+  @OneToMany(mappedBy = "guild", cascade = CascadeType.MERGE)
   private @NotNull Set<@NotNull PlayerModel> players;
 
   /**
