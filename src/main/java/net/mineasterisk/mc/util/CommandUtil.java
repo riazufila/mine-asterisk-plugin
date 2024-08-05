@@ -13,8 +13,8 @@ public class CommandUtil {
     PaperCommandManager<CommandSourceStack> manager = CommandUtil.getCommandManager();
     HelpHandler<CommandSourceStack> help = CommandUtil.getHelp(manager);
 
-    GuildCommand.build(manager).forEach(manager::command);
-    HelpCommand.build(manager, help).forEach(manager::command);
+    new GuildCommand(manager).build().forEach(manager::command);
+    new HelpCommand(manager, help).build().forEach(manager::command);
   }
 
   private static @NotNull PaperCommandManager<@NotNull CommandSourceStack> getCommandManager() {

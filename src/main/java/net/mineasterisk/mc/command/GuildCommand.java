@@ -8,24 +8,27 @@ import org.incendo.cloud.parser.standard.StringParser;
 import org.jetbrains.annotations.NotNull;
 
 public class GuildCommand {
-  private static final @NotNull String rootCommandName = "guild";
+  private final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager;
+  private final @NotNull String rootCommandName = "guild";
 
-  public static @NotNull Set<@NotNull Builder<@NotNull CommandSourceStack>> build(
-      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
-    return Set.of(
-        GuildCommand.createCommand(manager),
-        GuildCommand.disbandCommand(manager),
-        GuildCommand.sendInviteCommand(manager),
-        GuildCommand.inviteRemovalCommand(manager),
-        GuildCommand.kickCommand(manager));
+  public GuildCommand(final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
+    this.manager = manager;
   }
 
-  private static @NotNull Builder<@NotNull CommandSourceStack> createCommand(
-      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
+  public @NotNull Set<@NotNull Builder<@NotNull CommandSourceStack>> build() {
+    return Set.of(
+        this.createCommand(),
+        this.disbandCommand(),
+        this.sendInviteCommand(),
+        this.inviteRemovalCommand(),
+        this.kickCommand());
+  }
+
+  private @NotNull Builder<@NotNull CommandSourceStack> createCommand() {
     final String nameArgument = "name";
 
     return manager
-        .commandBuilder(GuildCommand.rootCommandName)
+        .commandBuilder(this.rootCommandName)
         .literal("create")
         .required(nameArgument, StringParser.greedyStringParser())
         .handler(
@@ -34,10 +37,9 @@ public class GuildCommand {
             });
   }
 
-  private static @NotNull Builder<@NotNull CommandSourceStack> disbandCommand(
-      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
+  private @NotNull Builder<@NotNull CommandSourceStack> disbandCommand() {
     return manager
-        .commandBuilder(GuildCommand.rootCommandName)
+        .commandBuilder(this.rootCommandName)
         .literal("disband")
         .handler(
             context -> {
@@ -45,12 +47,11 @@ public class GuildCommand {
             });
   }
 
-  private static @NotNull Builder<@NotNull CommandSourceStack> sendInviteCommand(
-      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
+  private @NotNull Builder<@NotNull CommandSourceStack> sendInviteCommand() {
     final String playerArgument = "player";
 
     return manager
-        .commandBuilder(GuildCommand.rootCommandName)
+        .commandBuilder(this.rootCommandName)
         .literal("invite")
         .literal("send")
         .required(playerArgument, StringParser.stringParser())
@@ -60,12 +61,11 @@ public class GuildCommand {
             });
   }
 
-  private static @NotNull Builder<@NotNull CommandSourceStack> inviteRemovalCommand(
-      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
+  private @NotNull Builder<@NotNull CommandSourceStack> inviteRemovalCommand() {
     final String playerArgument = "player";
 
     return manager
-        .commandBuilder(GuildCommand.rootCommandName)
+        .commandBuilder(this.rootCommandName)
         .literal("invite")
         .literal("remove")
         .required(playerArgument, StringParser.stringParser())
@@ -75,12 +75,11 @@ public class GuildCommand {
             });
   }
 
-  private static @NotNull Builder<@NotNull CommandSourceStack> kickCommand(
-      final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
+  private @NotNull Builder<@NotNull CommandSourceStack> kickCommand() {
     final String playerArgument = "player";
 
     return manager
-        .commandBuilder(GuildCommand.rootCommandName)
+        .commandBuilder(this.rootCommandName)
         .literal("kick")
         .required(playerArgument, StringParser.stringParser())
         .handler(
