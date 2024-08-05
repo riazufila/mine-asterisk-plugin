@@ -6,8 +6,10 @@ import java.util.Set;
 import net.mineasterisk.mc.constant.status.GuildStatus;
 import org.jetbrains.annotations.NotNull;
 
-@Entity(name = "guild")
+@Entity(name = GuildModel.entity)
 public final class GuildModel {
+  public static final @NotNull String entity = "guild";
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false)

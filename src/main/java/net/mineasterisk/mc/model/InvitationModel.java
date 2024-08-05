@@ -16,8 +16,10 @@ import net.mineasterisk.mc.constant.status.InvitationStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@Entity(name = "invitation")
+@Entity(name = InvitationModel.entity)
 public final class InvitationModel {
+  public static final @NotNull String entity = "invitation";
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false)

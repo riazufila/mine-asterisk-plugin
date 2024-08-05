@@ -28,17 +28,22 @@ public class PlayerRepository {
                 .fromSession(
                     session -> {
                       try {
-                        StringJoiner query = new StringJoiner(" ").add("from player p");
+                        final char alias = 'p';
+                        StringJoiner query =
+                            new StringJoiner(" ")
+                                .add(String.format("from %s %c", PlayerModel.entity, alias));
 
                         if (forceFetches != null) {
                           if (forceFetches.contains(PlayerForceFetch.GUILD)) {
                             query.add(
                                 String.format(
-                                    "left join fetch p.%s", PlayerAttribute.GUILD.getAttribute()));
+                                    "left join fetch %c.%s",
+                                    alias, PlayerAttribute.GUILD.getAttribute()));
                           }
                         }
 
-                        query.add(String.format("where p.%s = :value", attribute.getAttribute()));
+                        query.add(
+                            String.format("where %c.%s = :value", alias, attribute.getAttribute()));
 
                         return session
                             .createSelectionQuery(query.toString(), PlayerModel.class)

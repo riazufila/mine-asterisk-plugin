@@ -28,23 +28,29 @@ public class InvitationRepository {
                 .fromSession(
                     session -> {
                       try {
-                        StringJoiner query = new StringJoiner(" ").add("from invitation i");
+                        final char alias = 'i';
+                        StringJoiner query =
+                            new StringJoiner(" ")
+                                .add(String.format("from %s %c", InvitationModel.entity, alias));
 
                         if (forceFetches != null) {
                           if (forceFetches.contains(InvitationForceFetch.INVITER)) {
                             query.add(
                                 String.format(
-                                    "join fetch i.%s", InvitationAttribute.INVITER.getAttribute()));
+                                    "join fetch %c.%s",
+                                    alias, InvitationAttribute.INVITER.getAttribute()));
                           }
 
                           if (forceFetches.contains(InvitationForceFetch.GUILD)) {
                             query.add(
                                 String.format(
-                                    "join fetch i.%s", InvitationAttribute.GUILD.getAttribute()));
+                                    "join fetch %c.%s",
+                                    alias, InvitationAttribute.GUILD.getAttribute()));
                           }
                         }
 
-                        query.add(String.format("where i.%s = :value", attribute.getAttribute()));
+                        query.add(
+                            String.format("where %c.%s = :value", alias, attribute.getAttribute()));
 
                         return session
                             .createSelectionQuery(query.toString(), InvitationModel.class)

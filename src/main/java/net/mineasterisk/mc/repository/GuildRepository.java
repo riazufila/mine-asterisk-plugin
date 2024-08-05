@@ -28,29 +28,36 @@ public class GuildRepository {
                 .fromSession(
                     session -> {
                       try {
-                        StringJoiner query = new StringJoiner(" ").add("from guild g");
+                        final char alias = 'g';
+                        StringJoiner query =
+                            new StringJoiner(" ")
+                                .add(String.format("from %s %c", GuildModel.entity, alias));
 
                         if (forceFetches != null) {
                           if (forceFetches.contains(GuildForceFetch.CREATED_BY)) {
                             query.add(
                                 String.format(
-                                    "join fetch g.%s", GuildAttribute.CREATED_BY.getAttribute()));
+                                    "join fetch %c.%s",
+                                    alias, GuildAttribute.CREATED_BY.getAttribute()));
                           }
 
                           if (forceFetches.contains(GuildForceFetch.OWNER)) {
                             query.add(
                                 String.format(
-                                    "join fetch g.%s", GuildAttribute.OWNER.getAttribute()));
+                                    "join fetch %c.%s",
+                                    alias, GuildAttribute.OWNER.getAttribute()));
                           }
 
                           if (forceFetches.contains(GuildForceFetch.PLAYERS)) {
                             query.add(
                                 String.format(
-                                    "left join fetch g.%s", GuildAttribute.PLAYERS.getAttribute()));
+                                    "left join fetch %c.%s",
+                                    alias, GuildAttribute.PLAYERS.getAttribute()));
                           }
                         }
 
-                        query.add(String.format("where g.%s = :value", attribute.getAttribute()));
+                        query.add(
+                            String.format("where %c.%s = :value", alias, attribute.getAttribute()));
 
                         return session
                             .createSelectionQuery(query.toString(), GuildModel.class)

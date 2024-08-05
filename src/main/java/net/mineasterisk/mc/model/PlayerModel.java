@@ -6,8 +6,10 @@ import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@Entity(name = "player")
+@Entity(name = PlayerModel.entity)
 public final class PlayerModel {
+  public static final @NotNull String entity = "player";
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id", nullable = false)
