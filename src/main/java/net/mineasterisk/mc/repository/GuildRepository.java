@@ -1,17 +1,14 @@
 package net.mineasterisk.mc.repository;
 
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import net.mineasterisk.mc.constant.attribute.GuildAttribute;
 import net.mineasterisk.mc.constant.forcefetch.GuildForceFetch;
 import net.mineasterisk.mc.model.GuildModel;
 import net.mineasterisk.mc.util.HibernateUtil;
 import net.mineasterisk.mc.util.PluginUtil;
-import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,36 +23,45 @@ public class GuildRepository {
       final @NotNull T value,
       final @Nullable Set<@NotNull GuildForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
-        () -> {
-          try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaQuery<GuildModel> query = builder.createQuery(GuildModel.class);
-            Root<GuildModel> root = query.from(GuildModel.class);
+        () ->
+            HibernateUtil.getSessionFactory()
+                .fromSession(
+                    session -> {
+                      try {
+                        StringJoiner query = new StringJoiner(" ").add("from guild g");
 
-            if (forceFetches != null) {
-              if (forceFetches.contains(GuildForceFetch.CREATED_BY)) {
-                root.fetch(GuildAttribute.CREATED_BY.getAttribute());
-              }
+                        if (forceFetches != null) {
+                          if (forceFetches.contains(GuildForceFetch.CREATED_BY)) {
+                            query.add(
+                                String.format(
+                                    "join fetch g.%s", GuildAttribute.CREATED_BY.getAttribute()));
+                          }
 
-              if (forceFetches.contains(GuildForceFetch.OWNER)) {
-                root.fetch(GuildAttribute.OWNER.getAttribute());
-              }
+                          if (forceFetches.contains(GuildForceFetch.OWNER)) {
+                            query.add(
+                                String.format(
+                                    "join fetch g.%s", GuildAttribute.OWNER.getAttribute()));
+                          }
 
-              if (forceFetches.contains(GuildForceFetch.PLAYERS)) {
-                root.fetch(GuildAttribute.PLAYERS.getAttribute());
-              }
-            }
+                          if (forceFetches.contains(GuildForceFetch.PLAYERS)) {
+                            query.add(
+                                String.format(
+                                    "left join fetch g.%s", GuildAttribute.PLAYERS.getAttribute()));
+                          }
+                        }
 
-            query.select(root);
-            query.where(builder.equal(root.get(attribute.getAttribute()), value));
+                        query.add(String.format("where g.%s = :value", attribute.getAttribute()));
 
-            return session.createQuery(query).getSingleResult();
-          } catch (NoResultException exception) {
-            PluginUtil.getLogger().info("Unable to get Guild: No result found");
+                        return session
+                            .createSelectionQuery(query.toString(), GuildModel.class)
+                            .setParameter("value", value)
+                            .getSingleResult();
+                      } catch (NoResultException exception) {
+                        PluginUtil.getLogger().info("Unable to get Guild: No result found");
 
-            return null;
-          }
-        });
+                        return null;
+                      }
+                    }));
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> add(

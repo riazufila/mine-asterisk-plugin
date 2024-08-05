@@ -1,17 +1,14 @@
 package net.mineasterisk.mc.repository;
 
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Root;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
 import net.mineasterisk.mc.constant.forcefetch.PlayerForceFetch;
 import net.mineasterisk.mc.model.PlayerModel;
 import net.mineasterisk.mc.util.HibernateUtil;
 import net.mineasterisk.mc.util.PluginUtil;
-import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,28 +23,33 @@ public class PlayerRepository {
       final @NotNull T value,
       final @Nullable Set<@NotNull PlayerForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
-        () -> {
-          try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaQuery<PlayerModel> query = builder.createQuery(PlayerModel.class);
-            Root<PlayerModel> root = query.from(PlayerModel.class);
+        () ->
+            HibernateUtil.getSessionFactory()
+                .fromSession(
+                    session -> {
+                      try {
+                        StringJoiner query = new StringJoiner(" ").add("from player p");
 
-            if (forceFetches != null) {
-              if (forceFetches.contains(PlayerForceFetch.GUILD)) {
-                root.fetch(PlayerAttribute.GUILD.getAttribute());
-              }
-            }
+                        if (forceFetches != null) {
+                          if (forceFetches.contains(PlayerForceFetch.GUILD)) {
+                            query.add(
+                                String.format(
+                                    "left join fetch p.%s", PlayerAttribute.GUILD.getAttribute()));
+                          }
+                        }
 
-            query.select(root);
-            query.where(builder.equal(root.get(attribute.getAttribute()), value));
+                        query.add(String.format("where p.%s = :value", attribute.getAttribute()));
 
-            return session.createQuery(query).getSingleResult();
-          } catch (NoResultException exception) {
-            PluginUtil.getLogger().info("Unable to get Player: No result found");
+                        return session
+                            .createSelectionQuery(query.toString(), PlayerModel.class)
+                            .setParameter("value", value)
+                            .getSingleResult();
+                      } catch (NoResultException exception) {
+                        PluginUtil.getLogger().info("Unable to get Player: No result found");
 
-            return null;
-          }
-        });
+                        return null;
+                      }
+                    }));
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> add(

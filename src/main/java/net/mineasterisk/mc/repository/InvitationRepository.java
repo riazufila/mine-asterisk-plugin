@@ -1,16 +1,14 @@
 package net.mineasterisk.mc.repository;
 
 import jakarta.persistence.NoResultException;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 import net.mineasterisk.mc.constant.attribute.InvitationAttribute;
 import net.mineasterisk.mc.constant.forcefetch.InvitationForceFetch;
 import net.mineasterisk.mc.model.InvitationModel;
 import net.mineasterisk.mc.util.HibernateUtil;
 import net.mineasterisk.mc.util.PluginUtil;
-import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,33 +23,40 @@ public class InvitationRepository {
       final @NotNull T value,
       final @Nullable Set<@NotNull InvitationForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
-        () -> {
-          try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaQuery<InvitationModel> query = builder.createQuery(InvitationModel.class);
-            jakarta.persistence.criteria.Root<InvitationModel> root =
-                query.from(InvitationModel.class);
+        () ->
+            HibernateUtil.getSessionFactory()
+                .fromSession(
+                    session -> {
+                      try {
+                        StringJoiner query = new StringJoiner(" ").add("from invitation i");
 
-            if (forceFetches != null) {
-              if (forceFetches.contains(InvitationForceFetch.INVITER)) {
-                root.fetch(InvitationAttribute.INVITER.getAttribute());
-              }
+                        if (forceFetches != null) {
+                          if (forceFetches.contains(InvitationForceFetch.INVITER)) {
+                            query.add(
+                                String.format(
+                                    "join fetch i.%s", InvitationAttribute.INVITER.getAttribute()));
+                          }
 
-              if (forceFetches.contains(InvitationForceFetch.GUILD)) {
-                root.fetch(InvitationAttribute.GUILD.getAttribute());
-              }
-            }
+                          if (forceFetches.contains(InvitationForceFetch.GUILD)) {
+                            query.add(
+                                String.format(
+                                    "join fetch i.%s", InvitationAttribute.GUILD.getAttribute()));
+                          }
+                        }
 
-            query.select(root);
-            query.where(builder.equal(root.get(attribute.getAttribute()), value));
+                        query.add(String.format("where i.%s = :value", attribute.getAttribute()));
 
-            return session.createQuery(query).getSingleResult();
-          } catch (NoResultException exception) {
-            PluginUtil.getLogger().info("Unable to get Guild invitation: No result found");
+                        return session
+                            .createSelectionQuery(query.toString(), InvitationModel.class)
+                            .setParameter("value", value)
+                            .getSingleResult();
+                      } catch (NoResultException exception) {
+                        PluginUtil.getLogger()
+                            .info("Unable to get Guild invitation: No result found");
 
-            return null;
-          }
-        });
+                        return null;
+                      }
+                    }));
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> add(
