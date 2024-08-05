@@ -61,6 +61,10 @@ public final class GuildModel {
     this.owner = owner;
     this.status = status;
     this.players = players;
+
+    for (PlayerModel player : players) {
+      player.setGuild(this);
+    }
   }
 
   public int getId() {
@@ -116,6 +120,8 @@ public final class GuildModel {
   }
 
   public void setPlayers(final @NotNull Set<@NotNull PlayerModel> players) {
+    this.players = players;
+
     for (PlayerModel player : players) {
       player.setGuild(this);
     }
