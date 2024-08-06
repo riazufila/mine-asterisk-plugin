@@ -15,7 +15,7 @@ public class InvitationService {
   public static @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull Player performedBy, final @NotNull InvitationModel invitationToAdd) {
     if (performedBy.getUniqueId() != invitationToAdd.getInviter().getUuid()) {
-      PluginUtil.getLogger().info("Unable to add Guild invitation: Inviter mismatch");
+      PluginUtil.getLogger().info("Unable to add Guild invitation: Performer is not the inviter");
 
       return CompletableFuture.completedFuture(null);
     }
@@ -75,7 +75,7 @@ public class InvitationService {
     if (!(performedBy.getUniqueId() == updatedInvitation.getInviter().getUuid()
         || performedBy.getUniqueId() == updatedInvitation.getInvitee().getUuid())) {
       PluginUtil.getLogger()
-          .info("Unable to update Guild invitation: Performer is not inviter or invitee");
+          .info("Unable to update Guild invitation: Performer is not the inviter or invitee");
 
       return CompletableFuture.completedFuture(null);
     }

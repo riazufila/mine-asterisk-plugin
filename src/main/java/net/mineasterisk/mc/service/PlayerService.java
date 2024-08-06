@@ -32,17 +32,17 @@ public class PlayerService {
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull Player performedBy, final @NotNull PlayerModel updatedPlayer) {
+    if (performedBy.getUniqueId() != updatedPlayer.getUuid()) {
+      PluginUtil.getLogger().info("Unable to update Player: Cannot update other Player");
+
+      return CompletableFuture.completedFuture(null);
+    }
+
     return PlayerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId())
         .thenCompose(
             player -> {
               if (player == null) {
                 PluginUtil.getLogger().info("Unable to update Player: Player doesn't exist");
-
-                return CompletableFuture.completedFuture(null);
-              }
-
-              if (performedBy.getUniqueId() != player.getUuid()) {
-                PluginUtil.getLogger().info("Unable to update Player: Cannot update other Player");
 
                 return CompletableFuture.completedFuture(null);
               }
