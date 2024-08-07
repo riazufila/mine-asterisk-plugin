@@ -1,4 +1,4 @@
-package net.mineasterisk.mc.playermanager;
+package net.mineasterisk.mc.manager.player;
 
 import java.time.Instant;
 import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class PlayerManager implements Listener {
   @EventHandler
-  public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
+  public void onPlayerJoin(final @NotNull PlayerJoinEvent event) {
     Player performedBy = event.getPlayer();
     PlayerModel playerToAdd = new PlayerModel(Instant.now(), performedBy.getUniqueId(), null);
 
