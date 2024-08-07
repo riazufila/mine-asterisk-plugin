@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class PlayerService {
   public static @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull Player performedBy, final @NotNull PlayerModel playerToAdd) {
-    if (performedBy.getUniqueId() != playerToAdd.getUuid()) {
+    if (!(performedBy.getUniqueId().equals(playerToAdd.getUuid()))) {
       PluginUtil.getLogger().info("Unable to add Player: Not allowed to add other Player");
 
       return CompletableFuture.completedFuture(null);
@@ -32,7 +32,7 @@ public class PlayerService {
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull Player performedBy, final @NotNull PlayerModel updatedPlayer) {
-    if (performedBy.getUniqueId() != updatedPlayer.getUuid()) {
+    if (!(performedBy.getUniqueId().equals(updatedPlayer.getUuid()))) {
       PluginUtil.getLogger().info("Unable to update Player: Cannot update other Player");
 
       return CompletableFuture.completedFuture(null);

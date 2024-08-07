@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 public class InvitationService {
   public static @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull Player performedBy, final @NotNull InvitationModel invitationToAdd) {
-    if (performedBy.getUniqueId() != invitationToAdd.getInviter().getUuid()) {
+    if (!(performedBy.getUniqueId().equals(invitationToAdd.getInviter().getUuid()))) {
       PluginUtil.getLogger().info("Unable to add Guild invitation: Performer is not the inviter");
 
       return CompletableFuture.completedFuture(null);
@@ -38,7 +38,7 @@ public class InvitationService {
                 return CompletableFuture.completedFuture(null);
               }
 
-              if (inviter.getGuild().getOwner().getUuid() == inviter.getUuid()) {
+              if (inviter.getGuild().getOwner().getId() == inviter.getId()) {
                 PluginUtil.getLogger()
                     .info("Unable to add Guild invitation: Inviter doesn't own a Guild");
 
@@ -72,8 +72,8 @@ public class InvitationService {
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull Player performedBy, final @NotNull InvitationModel updatedInvitation) {
-    if (!(performedBy.getUniqueId() == updatedInvitation.getInviter().getUuid()
-        || performedBy.getUniqueId() == updatedInvitation.getInvitee().getUuid())) {
+    if (!(performedBy.getUniqueId().equals(updatedInvitation.getInviter().getUuid())
+        || performedBy.getUniqueId().equals(updatedInvitation.getInvitee().getUuid()))) {
       PluginUtil.getLogger()
           .info("Unable to update Guild invitation: Performer is not the inviter or invitee");
 
@@ -98,7 +98,7 @@ public class InvitationService {
                 return CompletableFuture.completedFuture(null);
               }
 
-              if (inviter.getGuild().getOwner().getUuid() == inviter.getUuid()) {
+              if (inviter.getGuild().getOwner().getId() == inviter.getId()) {
                 PluginUtil.getLogger()
                     .info("Unable to update Guild invitation: Inviter doesn't own a Guild");
 

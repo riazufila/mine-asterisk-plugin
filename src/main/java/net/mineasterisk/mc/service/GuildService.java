@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 public class GuildService {
   public static @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull Player performedBy, final @NotNull GuildModel guildToAdd) {
-    if (performedBy.getUniqueId() != guildToAdd.getOwner().getUuid()) {
+    if (!(performedBy.getUniqueId().equals(guildToAdd.getOwner().getUuid()))) {
       PluginUtil.getLogger().info("Unable to add Guild: Not allowed to add Guild for other Player");
 
       return CompletableFuture.completedFuture(null);
@@ -43,7 +43,7 @@ public class GuildService {
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull Player performedBy, final @NotNull GuildModel updatedGuild) {
-    if (performedBy.getUniqueId() != updatedGuild.getOwner().getUuid()) {
+    if (!(performedBy.getUniqueId().equals(updatedGuild.getOwner().getUuid()))) {
       PluginUtil.getLogger()
           .info("Unable to update Guild: Not allowed to update Guild for other Player");
 
