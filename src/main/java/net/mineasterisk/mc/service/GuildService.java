@@ -34,7 +34,7 @@ public class GuildService {
             player -> {
               if (player == null) {
                 logger.warn(
-                    "Player doesn't exist",
+                    "Encountered error",
                     String.format("Player %s is not initialized", performedBy.getUniqueId()));
 
                 return CompletableFuture.completedFuture(false);
@@ -42,7 +42,7 @@ public class GuildService {
 
               if (player.getGuild() != null) {
                 logger.warn(
-                    "Already on a Guild",
+                    "Already in a Guild",
                     String.format(
                         "Player %s have an existing Guild %s",
                         performedBy.getUniqueId(), guildToAdd.getName()));
@@ -86,7 +86,7 @@ public class GuildService {
             player -> {
               if (player == null) {
                 logger.warn(
-                    "Player doesn't exist",
+                    "Encountered error",
                     String.format("Player %s is not initialized", performedBy.getUniqueId()));
 
                 return CompletableFuture.completedFuture(false);
@@ -97,7 +97,7 @@ public class GuildService {
                       guild -> {
                         if (guild == null) {
                           logger.warn(
-                              "Guild doesn't exist",
+                              "Encountered error",
                               String.format(
                                   "Player %s is trying to update a non-existent Guild %s",
                                   performedBy.getUniqueId(), guildToUpdate.getName()));
@@ -107,7 +107,7 @@ public class GuildService {
 
                         if (guild.getOwner().getId() != player.getId()) {
                           logger.warn(
-                              "Player is not the Guild owner",
+                              "Must be the Guild owner to update Guild",
                               String.format(
                                   "Player %s is not the owner of Guild %s",
                                   performedBy.getUniqueId(), guildToUpdate.getName()));

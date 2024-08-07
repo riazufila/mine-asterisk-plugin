@@ -86,9 +86,9 @@ public class InvitationService {
 
                         if (invitee.getGuild() != null) {
                           logger.warn(
-                              "Invitee is already on a Guild",
+                              "Invitee is already in a Guild",
                               String.format(
-                                  "Inviter %s is trying to send Invitee %s invitation to Guild %s, but Invitee is already on a Guild",
+                                  "Inviter %s is trying to send Invitee %s invitation to Guild %s, but Invitee is already in a Guild",
                                   performedBy.getUniqueId(),
                                   invitationToAdd.getInvitee().getUuid(),
                                   invitationToAdd.getGuild().getName()));
@@ -161,9 +161,9 @@ public class InvitationService {
 
               if (inviter.getGuild().getOwner().getId() == inviter.getId()) {
                 logger.warn(
-                    "Must be a Guild owner to update a Guild invitation",
+                    "Must be the Guild owner to update a Guild invitation",
                     String.format(
-                        "Inviter %s is trying to update Player %s's invitation to Guild %s, but isn't a Guild owner",
+                        "Inviter %s is trying to update Player %s's invitation to Guild %s, but isn't the Guild owner",
                         performedBy.getUniqueId(),
                         invitationToUpdate.getInvitee().getUuid(),
                         invitationToUpdate.getGuild().getName()));
@@ -190,9 +190,9 @@ public class InvitationService {
 
                         if (invitee.getGuild() != null) {
                           logger.warn(
-                              "Invitee is already on a Guild",
+                              "Invitee is already in a Guild",
                               String.format(
-                                  "Inviter %s is trying to update Invitee %s's invitation to Guild %s, but Invitee is already on a Guild",
+                                  "Inviter %s is trying to update Invitee %s's invitation to Guild %s, but Invitee is already in a Guild",
                                   performedBy.getUniqueId(),
                                   invitationToUpdate.getInvitee().getUuid(),
                                   invitationToUpdate.getGuild().getName()));
