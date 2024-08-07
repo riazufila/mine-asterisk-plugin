@@ -71,19 +71,30 @@ public class GuildRepository {
                     }));
   }
 
-  public static @NotNull CompletableFuture<@NotNull Void> add(
-      final @NotNull GuildModel guildToAdd) {
+  public static @NotNull CompletableFuture<@NotNull Void> add(@NotNull GuildModel guildToAdd) {
     return CompletableFuture.runAsync(
-        () ->
-            HibernateUtil.getSessionFactory()
-                .inTransaction(session -> session.persist(guildToAdd)));
+        () -> {
+          try {
+            HibernateUtil.getSessionFactory().inTransaction(session -> session.persist(guildToAdd));
+          } catch (Exception exception) {
+            PluginUtil.getLogger().severe(String.format("Unable to persist Guild: %s", exception));
+
+            throw new RuntimeException(exception);
+          }
+        });
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull GuildModel updatedGuild) {
     return CompletableFuture.runAsync(
-        () ->
-            HibernateUtil.getSessionFactory()
-                .inTransaction(session -> session.merge(updatedGuild)));
+        () -> {
+          try {
+            HibernateUtil.getSessionFactory().inTransaction(session -> session.merge(updatedGuild));
+          } catch (Exception exception) {
+            PluginUtil.getLogger().severe(String.format("Unable to merge Guild: %s", exception));
+
+            throw new RuntimeException(exception);
+          }
+        });
   }
 }

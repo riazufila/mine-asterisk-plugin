@@ -9,17 +9,23 @@ import net.mineasterisk.mc.constant.status.GuildStatus;
 import net.mineasterisk.mc.model.GuildModel;
 import net.mineasterisk.mc.repository.GuildRepository;
 import net.mineasterisk.mc.repository.PlayerRepository;
-import net.mineasterisk.mc.util.PluginUtil;
+import net.mineasterisk.mc.util.LoggerUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class GuildService {
-  public static @NotNull CompletableFuture<@NotNull Void> add(
+  public static @NotNull CompletableFuture<@NotNull Boolean> add(
       final @NotNull Player performedBy, final @NotNull GuildModel guildToAdd) {
-    if (!(performedBy.getUniqueId().equals(guildToAdd.getOwner().getUuid()))) {
-      PluginUtil.getLogger().info("Unable to add Guild: Not allowed to add Guild for other Player");
+    final LoggerUtil logger = new LoggerUtil(performedBy, "Added Guild", "Unable to add Guild");
 
-      return CompletableFuture.completedFuture(null);
+    if (!(performedBy.getUniqueId().equals(guildToAdd.getOwner().getUuid()))) {
+      logger.warn(
+          "Not allowed to add Guild for other Player",
+          String.format(
+              "Player %s is trying to add Guild %s for Player %s",
+              performedBy.getUniqueId(), guildToAdd.getName(), guildToAdd.getOwner().getUuid()));
+
+      return CompletableFuture.completedFuture(false);
     }
 
     return PlayerRepository.get(
@@ -27,64 +33,110 @@ public class GuildService {
         .thenCompose(
             player -> {
               if (player == null) {
-                PluginUtil.getLogger().info("Unable to add Guild: Player doesn't exist");
+                logger.warn(
+                    "Player doesn't exist",
+                    String.format("Player %s is not initialized", performedBy.getUniqueId()));
 
-                return CompletableFuture.completedFuture(null);
+                return CompletableFuture.completedFuture(false);
               }
 
               if (player.getGuild() != null) {
-                PluginUtil.getLogger().info("Unable to add Guild: Already on a Guild");
+                logger.warn(
+                    "Already on a Guild",
+                    String.format(
+                        "Player %s have an existing Guild %s",
+                        performedBy.getUniqueId(), guildToAdd.getName()));
 
-                return CompletableFuture.completedFuture(null);
+                return CompletableFuture.completedFuture(false);
               }
 
-              return GuildRepository.add(guildToAdd);
+              return GuildRepository.add(guildToAdd).thenApply((object) -> true);
+            })
+        .exceptionally(
+            exception -> {
+              logger.error(
+                  "Encountered error",
+                  String.format(
+                      "Player %s encountered error trying to add Guild %s",
+                      performedBy.getUniqueId(), guildToAdd.getName()));
+
+              return false;
             });
   }
 
-  public static @NotNull CompletableFuture<@NotNull Void> update(
+  public static @NotNull CompletableFuture<@NotNull Boolean> update(
       final @NotNull Player performedBy, final @NotNull GuildModel updatedGuild) {
-    if (!(performedBy.getUniqueId().equals(updatedGuild.getOwner().getUuid()))) {
-      PluginUtil.getLogger()
-          .info("Unable to update Guild: Not allowed to update Guild for other Player");
+    final LoggerUtil logger =
+        new LoggerUtil(performedBy, "Updated Guild", "Unable to update Guild");
 
-      return CompletableFuture.completedFuture(null);
+    if (!(performedBy.getUniqueId().equals(updatedGuild.getOwner().getUuid()))) {
+      logger.warn(
+          "Not allowed to update Guild for other Player",
+          String.format(
+              "Player %s is trying to update Guild %s for Player %s",
+              performedBy.getUniqueId(),
+              updatedGuild.getName(),
+              updatedGuild.getOwner().getUuid()));
+
+      return CompletableFuture.completedFuture(false);
     }
 
     return PlayerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId())
         .thenCompose(
             player -> {
               if (player == null) {
-                PluginUtil.getLogger().info("Unable to update Guild: Player doesn't exist");
+                logger.warn(
+                    "Player doesn't exist",
+                    String.format("Player %s is not initialized", performedBy.getUniqueId()));
 
-                return CompletableFuture.completedFuture(null);
+                return CompletableFuture.completedFuture(false);
               }
 
               return GuildRepository.get(GuildAttribute.ID, updatedGuild.getId())
                   .thenCompose(
                       guild -> {
                         if (guild == null) {
-                          PluginUtil.getLogger()
-                              .info("Unable to update Guild: Guild doesn't exist");
+                          logger.warn(
+                              "Guild doesn't exist",
+                              String.format(
+                                  "Player %s is trying to update a non-existent Guild %s",
+                                  performedBy.getUniqueId(), updatedGuild.getName()));
 
-                          return CompletableFuture.completedFuture(null);
+                          return CompletableFuture.completedFuture(false);
                         }
 
                         if (guild.getOwner().getId() != player.getId()) {
-                          PluginUtil.getLogger()
-                              .info("Unable to update Guild: Player is not the Guild owner");
+                          logger.warn(
+                              "Player is not the Guild owner",
+                              String.format(
+                                  "Player %s is not the owner of Guild %s",
+                                  performedBy.getUniqueId(), updatedGuild.getName()));
 
-                          return CompletableFuture.completedFuture(null);
+                          return CompletableFuture.completedFuture(false);
                         }
 
                         if (guild.getStatus() == GuildStatus.INACTIVE) {
-                          PluginUtil.getLogger().info("Unable to update Guild: Guild is inactive");
+                          logger.warn(
+                              "Guild is inactive",
+                              String.format(
+                                  "Player %s is trying to update an inactive Guild %s",
+                                  performedBy.getUniqueId(), updatedGuild.getName()));
 
-                          return CompletableFuture.completedFuture(null);
+                          return CompletableFuture.completedFuture(false);
                         }
 
-                        return GuildRepository.update(updatedGuild);
+                        return GuildRepository.update(updatedGuild).thenApply((object) -> true);
                       });
+            })
+        .exceptionally(
+            exception -> {
+              logger.error(
+                  "Encountered error",
+                  String.format(
+                      "Player %s encountered error trying to add Guild %s",
+                      performedBy.getUniqueId(), updatedGuild.getName()));
+
+              return false;
             });
   }
 }
