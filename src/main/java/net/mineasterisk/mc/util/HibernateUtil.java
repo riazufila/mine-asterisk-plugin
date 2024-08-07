@@ -1,6 +1,7 @@
 package net.mineasterisk.mc.util;
 
 import net.mineasterisk.mc.model.GuildModel;
+import net.mineasterisk.mc.model.InvitationModel;
 import net.mineasterisk.mc.model.PlayerModel;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -15,6 +16,7 @@ public class HibernateUtil {
         new Configuration()
             .addAnnotatedClass(PlayerModel.class)
             .addAnnotatedClass(GuildModel.class)
+            .addAnnotatedClass(InvitationModel.class)
             .buildSessionFactory();
   }
 
