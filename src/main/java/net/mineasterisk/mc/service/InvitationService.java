@@ -125,7 +125,7 @@ public class InvitationService {
                           return CompletableFuture.completedFuture(null);
                         }
 
-                        return InvitationRepository.add(invitationToUpdate);
+                        return InvitationRepository.update(invitationToUpdate);
                       });
             });
   }
