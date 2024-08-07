@@ -55,6 +55,18 @@ public class InvitationService {
                 return CompletableFuture.completedFuture(false);
               }
 
+              if (inviter.getGuild().getId() == invitationToAdd.getGuild().getId()) {
+                logger.warn(
+                    "Must be in the Guild to send a Guild invitation",
+                    String.format(
+                        "Inviter %s is trying to send Player %s invitation to Guild %s, but isn't in the Guild",
+                        performedBy.getUniqueId(),
+                        invitationToAdd.getInvitee().getUuid(),
+                        invitationToAdd.getGuild().getName()));
+
+                return CompletableFuture.completedFuture(false);
+              }
+
               if (inviter.getGuild().getOwner().getId() == inviter.getId()) {
                 logger.warn(
                     "Must be a Guild owner to send a Guild invitation",
@@ -152,6 +164,18 @@ public class InvitationService {
                     "Must be in a Guild to update a Guild invitation",
                     String.format(
                         "Inviter %s is trying to update Player %s's invitation to Guild %s, but isn't in a Guild",
+                        performedBy.getUniqueId(),
+                        invitationToUpdate.getInvitee().getUuid(),
+                        invitationToUpdate.getGuild().getName()));
+
+                return CompletableFuture.completedFuture(false);
+              }
+
+              if (inviter.getGuild().getId() == invitationToUpdate.getGuild().getId()) {
+                logger.warn(
+                    "Must be in the Guild to update a Guild invitation",
+                    String.format(
+                        "Inviter %s is trying to update Player %s's invitation to Guild %s, but isn't in the Guild",
                         performedBy.getUniqueId(),
                         invitationToUpdate.getInvitee().getUuid(),
                         invitationToUpdate.getGuild().getName()));
