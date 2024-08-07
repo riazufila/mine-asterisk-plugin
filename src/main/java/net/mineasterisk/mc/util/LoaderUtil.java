@@ -5,6 +5,7 @@ public class LoaderUtil {
     try {
       HibernateUtil.loadSessionFactory();
       CommandUtil.register();
+      EventUtil.register();
 
       return true;
     } catch (Exception exception) {
