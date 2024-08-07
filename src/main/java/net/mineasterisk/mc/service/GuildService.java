@@ -50,7 +50,7 @@ public class GuildService {
                 return CompletableFuture.completedFuture(false);
               }
 
-              return GuildRepository.add(guildToAdd).thenApply((object) -> true);
+              return GuildRepository.add(guildToAdd).thenApply(object -> true);
             })
         .exceptionally(
             exception -> {
@@ -125,7 +125,7 @@ public class GuildService {
                           return CompletableFuture.completedFuture(false);
                         }
 
-                        return GuildRepository.update(guildToUpdate).thenApply((object) -> true);
+                        return GuildRepository.update(guildToUpdate).thenApply(object -> true);
                       });
             })
         .exceptionally(
