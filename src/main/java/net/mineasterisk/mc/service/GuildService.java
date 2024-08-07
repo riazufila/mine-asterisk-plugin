@@ -2,6 +2,7 @@ package net.mineasterisk.mc.service;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import net.mineasterisk.mc.constant.attribute.GuildAttribute;
 import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
 import net.mineasterisk.mc.constant.forcefetch.PlayerForceFetch;
 import net.mineasterisk.mc.constant.status.GuildStatus;
@@ -59,28 +60,31 @@ public class GuildService {
                 return CompletableFuture.completedFuture(null);
               }
 
-              GuildModel playerGuild = player.getGuild();
+              return GuildRepository.get(GuildAttribute.ID, updatedGuild.getId())
+                  .thenCompose(
+                      guild -> {
+                        if (guild == null) {
+                          PluginUtil.getLogger()
+                              .info("Unable to update Guild: Guild doesn't exist");
 
-              if (playerGuild == null) {
-                PluginUtil.getLogger().info("Unable to update Guild: Player doesn't have a Guild");
+                          return CompletableFuture.completedFuture(null);
+                        }
 
-                return CompletableFuture.completedFuture(null);
-              }
+                        if (guild.getOwner().getId() != player.getId()) {
+                          PluginUtil.getLogger()
+                              .info("Unable to update Guild: Player is not the Guild owner");
 
-              if (playerGuild.getOwner().getId() != player.getId()) {
-                PluginUtil.getLogger()
-                    .info("Unable to update Guild: Player is not the Guild owner");
+                          return CompletableFuture.completedFuture(null);
+                        }
 
-                return CompletableFuture.completedFuture(null);
-              }
+                        if (guild.getStatus() == GuildStatus.INACTIVE) {
+                          PluginUtil.getLogger().info("Unable to update Guild: Guild is inactive");
 
-              if (playerGuild.getStatus() == GuildStatus.INACTIVE) {
-                PluginUtil.getLogger().info("Unable to update Guild: Guild is inactive");
+                          return CompletableFuture.completedFuture(null);
+                        }
 
-                return CompletableFuture.completedFuture(null);
-              }
-
-              return GuildRepository.update(updatedGuild);
+                        return GuildRepository.update(updatedGuild);
+                      });
             });
   }
 }
