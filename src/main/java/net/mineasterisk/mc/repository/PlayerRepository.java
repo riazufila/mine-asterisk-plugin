@@ -60,16 +60,30 @@ public class PlayerRepository {
   public static @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull PlayerModel playerToAdd) {
     return CompletableFuture.runAsync(
-        () ->
+        () -> {
+          try {
             HibernateUtil.getSessionFactory()
-                .inTransaction(session -> session.persist(playerToAdd)));
+                .inTransaction(session -> session.persist(playerToAdd));
+          } catch (Exception exception) {
+            PluginUtil.getLogger().severe(String.format("Unable to persist Player: %s", exception));
+
+            throw new RuntimeException(exception);
+          }
+        });
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull PlayerModel playerToUpdate) {
     return CompletableFuture.runAsync(
-        () ->
+        () -> {
+          try {
             HibernateUtil.getSessionFactory()
-                .inTransaction(session -> session.merge(playerToUpdate)));
+                .inTransaction(session -> session.merge(playerToUpdate));
+          } catch (Exception exception) {
+            PluginUtil.getLogger().severe(String.format("Unable to merge Player: %s", exception));
+
+            throw new RuntimeException(exception);
+          }
+        });
   }
 }

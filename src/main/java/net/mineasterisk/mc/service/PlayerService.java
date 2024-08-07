@@ -4,50 +4,91 @@ import java.util.concurrent.CompletableFuture;
 import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
 import net.mineasterisk.mc.model.PlayerModel;
 import net.mineasterisk.mc.repository.PlayerRepository;
-import net.mineasterisk.mc.util.PluginUtil;
+import net.mineasterisk.mc.util.LoggerUtil;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerService {
-  public static @NotNull CompletableFuture<@NotNull Void> add(
+  public static @NotNull CompletableFuture<@NotNull Boolean> add(
       final @NotNull Player performedBy, final @NotNull PlayerModel playerToAdd) {
-    if (!(performedBy.getUniqueId().equals(playerToAdd.getUuid()))) {
-      PluginUtil.getLogger().info("Unable to add Player: Not allowed to add other Player");
+    final LoggerUtil logger = new LoggerUtil(performedBy, "Added Player", "Unable to add Player");
 
-      return CompletableFuture.completedFuture(null);
+    if (!(performedBy.getUniqueId().equals(playerToAdd.getUuid()))) {
+      logger.warn(
+          "Not allowed to add other Player",
+          String.format(
+              "Player %s is trying to add other Player %s",
+              performedBy.getUniqueId(), playerToAdd.getUuid()));
+
+      return CompletableFuture.completedFuture(false);
     }
 
     return PlayerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId())
         .thenCompose(
             player -> {
               if (player != null) {
-                PluginUtil.getLogger().info("Unable to add Player: Player already exist");
+                logger.warn(
+                    "Encountered error",
+                    String.format(
+                        "Player %s is trying to add existing Player %s",
+                        performedBy.getUniqueId(), playerToAdd.getUuid()));
 
-                return CompletableFuture.completedFuture(null);
+                return CompletableFuture.completedFuture(false);
               }
 
-              return PlayerRepository.add(playerToAdd);
+              return PlayerRepository.add(playerToAdd).thenApply(object -> true);
+            })
+        .exceptionally(
+            exception -> {
+              logger.error(
+                  "Encountered error",
+                  String.format(
+                      "Player %s encountered error trying to add Player %s",
+                      performedBy.getUniqueId(), playerToAdd.getUuid()));
+
+              return false;
             });
   }
 
-  public static @NotNull CompletableFuture<@NotNull Void> update(
+  public static @NotNull CompletableFuture<@NotNull Boolean> update(
       final @NotNull Player performedBy, final @NotNull PlayerModel playerToUpdate) {
-    if (!(performedBy.getUniqueId().equals(playerToUpdate.getUuid()))) {
-      PluginUtil.getLogger().info("Unable to update Player: Cannot update other Player");
+    final LoggerUtil logger =
+        new LoggerUtil(performedBy, "Updated Player", "Unable to update Player");
 
-      return CompletableFuture.completedFuture(null);
+    if (!(performedBy.getUniqueId().equals(playerToUpdate.getUuid()))) {
+      logger.warn(
+          "Can't update other Player",
+          String.format(
+              "Player %s is trying to update other Player %s",
+              performedBy.getUniqueId(), playerToUpdate.getUuid()));
+
+      return CompletableFuture.completedFuture(false);
     }
 
     return PlayerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId())
         .thenCompose(
             player -> {
               if (player == null) {
-                PluginUtil.getLogger().info("Unable to update Player: Player doesn't exist");
+                logger.warn(
+                    "Encountered error",
+                    String.format(
+                        "Player %s is trying to update non-existent Player %s",
+                        performedBy.getUniqueId(), playerToUpdate.getUuid()));
 
-                return CompletableFuture.completedFuture(null);
+                return CompletableFuture.completedFuture(false);
               }
 
-              return PlayerRepository.update(playerToUpdate);
+              return PlayerRepository.update(playerToUpdate).thenApply(object -> true);
+            })
+        .exceptionally(
+            exception -> {
+              logger.error(
+                  "Encountered error",
+                  String.format(
+                      "Player %s encountered error trying to add Player %s",
+                      performedBy.getUniqueId(), playerToUpdate.getUuid()));
+
+              return false;
             });
   }
 }

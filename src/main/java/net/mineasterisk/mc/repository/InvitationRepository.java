@@ -68,16 +68,32 @@ public class InvitationRepository {
   public static @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull InvitationModel invitationToAdd) {
     return CompletableFuture.runAsync(
-        () ->
+        () -> {
+          try {
             HibernateUtil.getSessionFactory()
-                .inTransaction(session -> session.persist(invitationToAdd)));
+                .inTransaction(session -> session.persist(invitationToAdd));
+          } catch (Exception exception) {
+            PluginUtil.getLogger()
+                .severe(String.format("Unable to persist Guild invitation: %s", exception));
+
+            throw new RuntimeException(exception);
+          }
+        });
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull InvitationModel invitationToUpdate) {
     return CompletableFuture.runAsync(
-        () ->
+        () -> {
+          try {
             HibernateUtil.getSessionFactory()
-                .inTransaction(session -> session.merge(invitationToUpdate)));
+                .inTransaction(session -> session.merge(invitationToUpdate));
+          } catch (Exception exception) {
+            PluginUtil.getLogger()
+                .severe(String.format("Unable to merge Guild invitation: %s", exception));
+
+            throw new RuntimeException(exception);
+          }
+        });
   }
 }
