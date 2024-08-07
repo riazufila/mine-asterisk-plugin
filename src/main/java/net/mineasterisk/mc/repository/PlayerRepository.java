@@ -66,10 +66,10 @@ public class PlayerRepository {
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
-      final @NotNull PlayerModel updatedPlayer) {
+      final @NotNull PlayerModel playerToUpdate) {
     return CompletableFuture.runAsync(
         () ->
             HibernateUtil.getSessionFactory()
-                .inTransaction(session -> session.merge(updatedPlayer)));
+                .inTransaction(session -> session.merge(playerToUpdate)));
   }
 }

@@ -85,11 +85,12 @@ public class GuildRepository {
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
-      final @NotNull GuildModel updatedGuild) {
+      final @NotNull GuildModel guildToUpdate) {
     return CompletableFuture.runAsync(
         () -> {
           try {
-            HibernateUtil.getSessionFactory().inTransaction(session -> session.merge(updatedGuild));
+            HibernateUtil.getSessionFactory()
+                .inTransaction(session -> session.merge(guildToUpdate));
           } catch (Exception exception) {
             PluginUtil.getLogger().severe(String.format("Unable to merge Guild: %s", exception));
 

@@ -74,10 +74,10 @@ public class InvitationRepository {
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
-      final @NotNull InvitationModel updatedInvitation) {
+      final @NotNull InvitationModel invitationToUpdate) {
     return CompletableFuture.runAsync(
         () ->
             HibernateUtil.getSessionFactory()
-                .inTransaction(session -> session.merge(updatedInvitation)));
+                .inTransaction(session -> session.merge(invitationToUpdate)));
   }
 }

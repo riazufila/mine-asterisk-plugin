@@ -65,18 +65,18 @@ public class GuildService {
   }
 
   public static @NotNull CompletableFuture<@NotNull Boolean> update(
-      final @NotNull Player performedBy, final @NotNull GuildModel updatedGuild) {
+      final @NotNull Player performedBy, final @NotNull GuildModel guildToUpdate) {
     final LoggerUtil logger =
         new LoggerUtil(performedBy, "Updated Guild", "Unable to update Guild");
 
-    if (!(performedBy.getUniqueId().equals(updatedGuild.getOwner().getUuid()))) {
+    if (!(performedBy.getUniqueId().equals(guildToUpdate.getOwner().getUuid()))) {
       logger.warn(
           "Not allowed to update Guild for other Player",
           String.format(
               "Player %s is trying to update Guild %s for Player %s",
               performedBy.getUniqueId(),
-              updatedGuild.getName(),
-              updatedGuild.getOwner().getUuid()));
+              guildToUpdate.getName(),
+              guildToUpdate.getOwner().getUuid()));
 
       return CompletableFuture.completedFuture(false);
     }
@@ -92,7 +92,7 @@ public class GuildService {
                 return CompletableFuture.completedFuture(false);
               }
 
-              return GuildRepository.get(GuildAttribute.ID, updatedGuild.getId())
+              return GuildRepository.get(GuildAttribute.ID, guildToUpdate.getId())
                   .thenCompose(
                       guild -> {
                         if (guild == null) {
@@ -100,7 +100,7 @@ public class GuildService {
                               "Guild doesn't exist",
                               String.format(
                                   "Player %s is trying to update a non-existent Guild %s",
-                                  performedBy.getUniqueId(), updatedGuild.getName()));
+                                  performedBy.getUniqueId(), guildToUpdate.getName()));
 
                           return CompletableFuture.completedFuture(false);
                         }
@@ -110,7 +110,7 @@ public class GuildService {
                               "Player is not the Guild owner",
                               String.format(
                                   "Player %s is not the owner of Guild %s",
-                                  performedBy.getUniqueId(), updatedGuild.getName()));
+                                  performedBy.getUniqueId(), guildToUpdate.getName()));
 
                           return CompletableFuture.completedFuture(false);
                         }
@@ -120,12 +120,12 @@ public class GuildService {
                               "Guild is inactive",
                               String.format(
                                   "Player %s is trying to update an inactive Guild %s",
-                                  performedBy.getUniqueId(), updatedGuild.getName()));
+                                  performedBy.getUniqueId(), guildToUpdate.getName()));
 
                           return CompletableFuture.completedFuture(false);
                         }
 
-                        return GuildRepository.update(updatedGuild).thenApply((object) -> true);
+                        return GuildRepository.update(guildToUpdate).thenApply((object) -> true);
                       });
             })
         .exceptionally(
@@ -134,7 +134,7 @@ public class GuildService {
                   "Encountered error",
                   String.format(
                       "Player %s encountered error trying to add Guild %s",
-                      performedBy.getUniqueId(), updatedGuild.getName()));
+                      performedBy.getUniqueId(), guildToUpdate.getName()));
 
               return false;
             });

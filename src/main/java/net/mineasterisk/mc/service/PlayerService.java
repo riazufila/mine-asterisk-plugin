@@ -31,8 +31,8 @@ public class PlayerService {
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
-      final @NotNull Player performedBy, final @NotNull PlayerModel updatedPlayer) {
-    if (!(performedBy.getUniqueId().equals(updatedPlayer.getUuid()))) {
+      final @NotNull Player performedBy, final @NotNull PlayerModel playerToUpdate) {
+    if (!(performedBy.getUniqueId().equals(playerToUpdate.getUuid()))) {
       PluginUtil.getLogger().info("Unable to update Player: Cannot update other Player");
 
       return CompletableFuture.completedFuture(null);
@@ -47,7 +47,7 @@ public class PlayerService {
                 return CompletableFuture.completedFuture(null);
               }
 
-              return PlayerRepository.update(updatedPlayer);
+              return PlayerRepository.update(playerToUpdate);
             });
   }
 }

@@ -71,9 +71,9 @@ public class InvitationService {
   }
 
   public static @NotNull CompletableFuture<@NotNull Void> update(
-      final @NotNull Player performedBy, final @NotNull InvitationModel updatedInvitation) {
-    if (!(performedBy.getUniqueId().equals(updatedInvitation.getInviter().getUuid())
-        || performedBy.getUniqueId().equals(updatedInvitation.getInvitee().getUuid()))) {
+      final @NotNull Player performedBy, final @NotNull InvitationModel invitationToUpdate) {
+    if (!(performedBy.getUniqueId().equals(invitationToUpdate.getInviter().getUuid())
+        || performedBy.getUniqueId().equals(invitationToUpdate.getInvitee().getUuid()))) {
       PluginUtil.getLogger()
           .info("Unable to update Guild invitation: Performer is not the inviter or invitee");
 
@@ -107,7 +107,7 @@ public class InvitationService {
 
               return PlayerRepository.get(
                       PlayerAttribute.UUID,
-                      updatedInvitation.getInvitee().getUuid(),
+                      invitationToUpdate.getInvitee().getUuid(),
                       Set.of(PlayerForceFetch.GUILD))
                   .thenCompose(
                       invitee -> {
@@ -125,7 +125,7 @@ public class InvitationService {
                           return CompletableFuture.completedFuture(null);
                         }
 
-                        return InvitationRepository.add(updatedInvitation);
+                        return InvitationRepository.add(invitationToUpdate);
                       });
             });
   }
