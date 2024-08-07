@@ -1,7 +1,19 @@
 package net.mineasterisk.mc.command;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
+import java.time.Instant;
+import java.util.Collections;
 import java.util.Set;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
+import net.mineasterisk.mc.constant.status.GuildStatus;
+import net.mineasterisk.mc.model.GuildModel;
+import net.mineasterisk.mc.repository.PlayerRepository;
+import net.mineasterisk.mc.service.GuildService;
+import net.mineasterisk.mc.util.PluginUtil;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.incendo.cloud.Command.Builder;
 import org.incendo.cloud.paper.PaperCommandManager;
 import org.incendo.cloud.parser.standard.StringParser;
@@ -33,7 +45,52 @@ public class GuildCommand {
         .required(nameArgument, StringParser.greedyStringParser())
         .handler(
             context -> {
-              // TODO: Create Guild.
+              final CommandSender sender = context.sender().getSender();
+              final String name = context.get(nameArgument);
+              final Instant now = Instant.now();
+
+              if (!(sender instanceof Player performedBy)) {
+                PluginUtil.getLogger()
+                    .warning(
+                        "Unable to execute Guild create command: Only Player is allowed to execute this command");
+
+                return;
+              }
+
+              PlayerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId())
+                  .thenAccept(
+                      player -> {
+                        if (player == null) {
+                          return;
+                        }
+
+                        final GuildModel guild =
+                            new GuildModel(
+                                now,
+                                player,
+                                name,
+                                player,
+                                GuildStatus.ACTIVE,
+                                Collections.emptySet());
+
+                        GuildService.add(performedBy, guild)
+                            .thenRun(
+                                () -> {
+                                  guild.setPlayers(Set.of(player));
+                                  GuildService.update(performedBy, guild)
+                                      .thenRun(
+                                          () -> {
+                                            PluginUtil.getLogger()
+                                                .info(
+                                                    String.format(
+                                                        "Player %s created Guild %s",
+                                                        performedBy.getUniqueId(), name));
+                                            sender.sendMessage(
+                                                Component.text("Created Guild")
+                                                    .color(NamedTextColor.GREEN));
+                                          });
+                                });
+                      });
             });
   }
 
