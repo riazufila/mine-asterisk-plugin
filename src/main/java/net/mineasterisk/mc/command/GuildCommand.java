@@ -4,14 +4,19 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Set;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
 import net.mineasterisk.mc.constant.status.GuildStatus;
 import net.mineasterisk.mc.model.GuildModel;
 import net.mineasterisk.mc.repository.PlayerRepository;
 import net.mineasterisk.mc.service.GuildService;
 import net.mineasterisk.mc.util.LoggerUtil;
+import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 import org.incendo.cloud.Command.Builder;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.paper.PaperCommandManager;
@@ -90,6 +95,17 @@ public class GuildCommand {
                                   if (!guildUpdated) {
                                     return;
                                   }
+
+                                  Scoreboard scoreboard = PluginUtil.getMainScoreboard();
+                                  Team team = scoreboard.registerNewTeam(name);
+
+                                  team.displayName(Component.text(name));
+                                  team.prefix(
+                                      Component.textOfChildren(
+                                          Component.text(name).color(NamedTextColor.GRAY),
+                                          Component.text('.').color(NamedTextColor.GRAY)));
+
+                                  team.addEntity(performedBy);
 
                                   logger.success(
                                       "Created Guild",
