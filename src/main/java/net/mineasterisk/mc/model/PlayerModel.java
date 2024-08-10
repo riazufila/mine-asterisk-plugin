@@ -72,7 +72,7 @@ public final class PlayerModel {
     return this.guild;
   }
 
-  public void setGuild(final @NotNull GuildModel guild) {
+  public void setGuild(final @Nullable GuildModel guild) {
     this.guild = guild;
   }
 }

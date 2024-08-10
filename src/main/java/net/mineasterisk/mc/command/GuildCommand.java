@@ -7,12 +7,16 @@ import java.util.Set;
 import java.util.concurrent.CompletionException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.mineasterisk.mc.constant.attribute.GuildAttribute;
 import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
+import net.mineasterisk.mc.constant.forcefetch.GuildForceFetch;
+import net.mineasterisk.mc.constant.forcefetch.PlayerForceFetch;
 import net.mineasterisk.mc.constant.status.GuildStatus;
 import net.mineasterisk.mc.exception.MissingEntityException;
 import net.mineasterisk.mc.exception.ValidationException;
 import net.mineasterisk.mc.model.GuildModel;
 import net.mineasterisk.mc.model.PlayerModel;
+import net.mineasterisk.mc.repository.GuildRepository;
 import net.mineasterisk.mc.repository.PlayerRepository;
 import net.mineasterisk.mc.service.GuildService;
 import net.mineasterisk.mc.util.HibernateUtil;
@@ -76,13 +80,14 @@ public class GuildCommand {
 
       if (player == null) {
         throw new ValidationException(
-            String.format("Player %s is not initialized", performedBy.getUniqueId()),
-            "Encountered error");
+            "Encountered error",
+            String.format("Player %s is not initialized", performedBy.getUniqueId()));
       }
 
       GuildService guildService = new GuildService(session);
       final GuildModel guild =
-          new GuildModel(now, player, name, player, GuildStatus.ACTIVE, new HashSet<>());
+          new GuildModel(
+              now, player, null, null, name, player, GuildStatus.ACTIVE, new HashSet<>());
 
       guildService.add(performedBy, guild).join();
       guild.addPlayer(player);
@@ -142,13 +147,112 @@ public class GuildCommand {
   }
 
   private @NotNull Builder<@NotNull CommandSourceStack> disbandCommand() {
-    return manager
-        .commandBuilder(this.rootCommandName)
-        .literal("disband")
-        .handler(
-            context -> {
-              // TODO: Disband Guild.
-            });
+    return manager.commandBuilder(this.rootCommandName).literal("disband").handler(this::disband);
+  }
+
+  private void disband(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
+    Session session = HibernateUtil.getSessionFactory().openSession();
+    session.getTransaction().begin();
+
+    try {
+      final CommandSender sender = context.sender().getSender();
+      final Instant now = Instant.now();
+
+      if (!(sender instanceof Player performedBy)) {
+        throw new RuntimeException(String.format("Sender %s is not a Player", sender.getName()));
+      }
+
+      PlayerRepository playerRepository = new PlayerRepository(session);
+      PlayerModel player =
+          playerRepository
+              .get(PlayerAttribute.UUID, performedBy.getUniqueId(), Set.of(PlayerForceFetch.GUILD))
+              .join();
+
+      if (player == null) {
+        throw new ValidationException(
+            "Encountered error",
+            String.format("Player %s is not initialized", performedBy.getUniqueId()));
+      }
+
+      if (player.getGuild() == null) {
+        throw new ValidationException(
+            "Doesn't have a Guild",
+            String.format("Player %s doesn't have a Guild", performedBy.getUniqueId()));
+      }
+
+      GuildModel guild =
+          new GuildRepository(session)
+              .get(GuildAttribute.ID, player.getGuild().getId(), Set.of(GuildForceFetch.PLAYERS))
+              .join();
+
+      if (guild == null) {
+        throw new ValidationException(
+            "Doesn't have a Guild",
+            String.format("Player %s doesn't have a Guild", performedBy.getUniqueId()));
+      }
+
+      session.evict(guild);
+      guild.setUpdatedAt(now);
+      guild.setUpdatedBy(player);
+      guild.setStatus(GuildStatus.INACTIVE);
+      guild.clearPlayers();
+
+      GuildService guildService = new GuildService(session);
+
+      guildService.update(performedBy, guild).join();
+
+      Scoreboard scoreboard = PluginUtil.getMainScoreboard();
+      Team team = scoreboard.getTeam(guild.getName());
+
+      if (team == null) {
+        throw new ValidationException(
+            "Encountered error",
+            String.format(
+                "Guild %s doesn't have a Team %s applied", guild.getName(), guild.getName()));
+      }
+
+      team.unregister();
+      session.getTransaction().commit();
+
+      PluginUtil.getLogger()
+          .info(
+              String.format(
+                  "Player %s disbanded Guild %s", performedBy.getUniqueId(), guild.getName()));
+
+      performedBy.sendMessage(Component.text("Disbanded Guild").color(NamedTextColor.GREEN));
+    } catch (CompletionException exception) {
+      final CommandSender sender = context.sender().getSender();
+      String message = "Encountered error";
+      final Throwable cause = exception.getCause();
+
+      if (cause instanceof MissingEntityException) {
+        message = ((MissingEntityException) cause).getClientMessage();
+      } else if (cause instanceof ValidationException) {
+        message = ((ValidationException) cause).getClientMessage();
+      }
+
+      session.getTransaction().rollback();
+
+      PluginUtil.getLogger()
+          .severe(String.format("Unable to execute Guild disband command: %s", exception));
+
+      if (sender instanceof Player performedBy) {
+        performedBy.sendMessage(Component.text(message).color(NamedTextColor.RED));
+      }
+    } catch (Exception exception) {
+      final CommandSender sender = context.sender().getSender();
+
+      session.getTransaction().rollback();
+
+      PluginUtil.getLogger()
+          .severe(String.format("Unable to execute Guild disband command: %s", exception));
+
+      if (sender instanceof Player performedBy) {
+        performedBy.sendMessage(Component.text("Encountered error").color(NamedTextColor.RED));
+      }
+    } finally {
+      session.close();
+    }
   }
 
   private @NotNull Builder<@NotNull CommandSourceStack> sendInviteCommand() {

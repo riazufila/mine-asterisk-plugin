@@ -2,9 +2,11 @@ package net.mineasterisk.mc.model;
 
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Set;
 import net.mineasterisk.mc.constant.status.GuildStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @Entity(name = GuildModel.entity)
 public final class GuildModel {
@@ -23,6 +25,13 @@ public final class GuildModel {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "created_by", referencedColumnName = "id", nullable = false)
   private @NotNull PlayerModel createdBy;
+
+  @Column(name = "updated_at", columnDefinition = "DATETIME")
+  private @Nullable Instant updatedAt;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "updated_by", referencedColumnName = "id")
+  private @Nullable PlayerModel updatedBy;
 
   @SuppressWarnings("NotNullFieldNotInitialized")
   @Column(name = "name", unique = true, nullable = false, length = 10)
@@ -45,7 +54,8 @@ public final class GuildModel {
   /**
    * This no argument constructor is deprecated and should not be used. It exists solely for the
    * purpose of Hibernate requiring a no argument constructor. Use {@link
-   * GuildModel#GuildModel(Instant, PlayerModel, String, PlayerModel, GuildStatus, Set)} instead.
+   * GuildModel#GuildModel(Instant, PlayerModel, Instant, PlayerModel, String, PlayerModel,
+   * GuildStatus, Set)} instead.
    */
   @Deprecated
   private GuildModel() {}
@@ -53,12 +63,16 @@ public final class GuildModel {
   public GuildModel(
       final @NotNull Instant createdAt,
       final @NotNull PlayerModel createdBy,
+      final @Nullable Instant updatedAt,
+      final @Nullable PlayerModel updatedBy,
       final @NotNull String name,
       final @NotNull PlayerModel owner,
       final @NotNull GuildStatus status,
       final @NotNull Set<@NotNull PlayerModel> players) {
     this.createdAt = createdAt;
     this.createdBy = createdBy;
+    this.updatedAt = updatedAt;
+    this.updatedBy = updatedBy;
     this.name = name;
     this.owner = owner;
     this.status = status;
@@ -91,6 +105,22 @@ public final class GuildModel {
 
   public void setCreatedBy(final @NotNull PlayerModel createdBy) {
     this.createdBy = createdBy;
+  }
+
+  public @Nullable Instant getUpdatedAt() {
+    return this.updatedAt;
+  }
+
+  public void setUpdatedAt(final @NotNull Instant updatedAt) {
+    this.updatedAt = updatedAt;
+  }
+
+  public @Nullable PlayerModel getUpdatedBy() {
+    return this.updatedBy;
+  }
+
+  public void setUpdatedBy(final @NotNull PlayerModel updatedBy) {
+    this.updatedBy = updatedBy;
   }
 
   public @NotNull String getName() {
@@ -132,5 +162,18 @@ public final class GuildModel {
   public void addPlayer(final @NotNull PlayerModel player) {
     this.players.add(player);
     player.setGuild(this);
+  }
+
+  public void removePlayer(final @NotNull PlayerModel player) {
+    this.players.remove(player);
+    player.setGuild(null);
+  }
+
+  public void clearPlayers() {
+    for (PlayerModel player : this.players) {
+      player.setGuild(null);
+    }
+
+    this.players = new HashSet<>();
   }
 }
