@@ -70,8 +70,9 @@ public class GuildCommand {
         throw new RuntimeException(String.format("Sender %s is not a Player", sender.getName()));
       }
 
+      PlayerRepository playerRepository = new PlayerRepository(session);
       PlayerModel player =
-          PlayerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
+          playerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
 
       if (player == null) {
         throw new ValidationException(

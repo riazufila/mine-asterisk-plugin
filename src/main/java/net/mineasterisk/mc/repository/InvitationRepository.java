@@ -9,18 +9,24 @@ import net.mineasterisk.mc.constant.forcefetch.InvitationForceFetch;
 import net.mineasterisk.mc.model.InvitationModel;
 import net.mineasterisk.mc.util.HibernateUtil;
 import net.mineasterisk.mc.util.PluginUtil;
+import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class InvitationRepository {
-  public static <T> @NotNull CompletableFuture<@Nullable InvitationModel> get(
-      final @NotNull InvitationAttribute attribute, final @NotNull T value) {
-    return InvitationRepository.get(attribute, value, null);
+public class InvitationRepository
+    extends Repository<InvitationModel, InvitationAttribute, InvitationForceFetch> {
+  public InvitationRepository(@NotNull Session session) {
+    super(session);
   }
 
-  public static <T> @NotNull CompletableFuture<@Nullable InvitationModel> get(
+  public @NotNull CompletableFuture<@Nullable InvitationModel> get(
+      final @NotNull InvitationAttribute attribute, final @NotNull Object value) {
+    return this.get(attribute, value, null);
+  }
+
+  public @NotNull CompletableFuture<@Nullable InvitationModel> get(
       final @NotNull InvitationAttribute attribute,
-      final @NotNull T value,
+      final @NotNull Object value,
       final @Nullable Set<@NotNull InvitationForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
         () ->
@@ -65,35 +71,13 @@ public class InvitationRepository {
                     }));
   }
 
-  public static @NotNull CompletableFuture<@NotNull Void> add(
+  public @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull InvitationModel invitationToAdd) {
-    return CompletableFuture.runAsync(
-        () -> {
-          try {
-            HibernateUtil.getSessionFactory()
-                .inTransaction(session -> session.persist(invitationToAdd));
-          } catch (Exception exception) {
-            PluginUtil.getLogger()
-                .severe(String.format("Unable to persist Guild invitation: %s", exception));
-
-            throw new RuntimeException(exception);
-          }
-        });
+    return CompletableFuture.runAsync(() -> this.getSession().persist(invitationToAdd));
   }
 
-  public static @NotNull CompletableFuture<@NotNull Void> update(
+  public @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull InvitationModel invitationToUpdate) {
-    return CompletableFuture.runAsync(
-        () -> {
-          try {
-            HibernateUtil.getSessionFactory()
-                .inTransaction(session -> session.merge(invitationToUpdate));
-          } catch (Exception exception) {
-            PluginUtil.getLogger()
-                .severe(String.format("Unable to merge Guild invitation: %s", exception));
-
-            throw new RuntimeException(exception);
-          }
-        });
+    return CompletableFuture.runAsync(() -> this.getSession().merge(invitationToUpdate));
   }
 }

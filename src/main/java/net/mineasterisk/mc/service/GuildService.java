@@ -35,8 +35,10 @@ public class GuildService extends Service<GuildModel> {
                     guildToAdd.getOwner().getUuid()));
           }
 
+          PlayerRepository playerRepository = new PlayerRepository(this.getSession());
           PlayerModel player =
-              PlayerRepository.get(
+              playerRepository
+                  .get(
                       PlayerAttribute.UUID,
                       performedBy.getUniqueId(),
                       Set.of(PlayerForceFetch.GUILD))
@@ -57,7 +59,9 @@ public class GuildService extends Service<GuildModel> {
                     performedBy.getUniqueId(), player.getGuild().getName()));
           }
 
-          return new GuildRepository(this.getSession()).add(guildToAdd).join();
+          GuildRepository guildRepository = new GuildRepository(this.getSession());
+
+          return guildRepository.add(guildToAdd).join();
         });
   }
 
@@ -65,8 +69,6 @@ public class GuildService extends Service<GuildModel> {
       final @NotNull Player performedBy, final @NotNull GuildModel guildToUpdate) {
     return CompletableFuture.supplyAsync(
         () -> {
-          GuildRepository guildRepository = new GuildRepository(this.getSession());
-
           if (!(performedBy.getUniqueId().equals(guildToUpdate.getOwner().getUuid()))) {
             throw new ValidationException(
                 "Not allowed to update Guild for other Player",
@@ -78,7 +80,9 @@ public class GuildService extends Service<GuildModel> {
           }
 
           PlayerModel player =
-              PlayerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
+              new PlayerRepository(this.getSession())
+                  .get(PlayerAttribute.UUID, performedBy.getUniqueId())
+                  .join();
 
           if (player == null) {
             throw new MissingEntityException(
@@ -87,6 +91,7 @@ public class GuildService extends Service<GuildModel> {
                 PlayerModel.class);
           }
 
+          GuildRepository guildRepository = new GuildRepository(this.getSession());
           GuildModel guild = guildRepository.get(GuildAttribute.ID, guildToUpdate.getId()).join();
 
           if (guild == null) {

@@ -9,18 +9,23 @@ import net.mineasterisk.mc.constant.forcefetch.PlayerForceFetch;
 import net.mineasterisk.mc.model.PlayerModel;
 import net.mineasterisk.mc.util.HibernateUtil;
 import net.mineasterisk.mc.util.PluginUtil;
+import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class PlayerRepository {
-  public static <T> @NotNull CompletableFuture<@Nullable PlayerModel> get(
-      final @NotNull PlayerAttribute attribute, final @NotNull T value) {
-    return PlayerRepository.get(attribute, value, null);
+public class PlayerRepository extends Repository<PlayerModel, PlayerAttribute, PlayerForceFetch> {
+  public PlayerRepository(@NotNull Session session) {
+    super(session);
   }
 
-  public static <T> @NotNull CompletableFuture<@Nullable PlayerModel> get(
+  public @NotNull CompletableFuture<@Nullable PlayerModel> get(
+      final @NotNull PlayerAttribute attribute, final @NotNull Object value) {
+    return this.get(attribute, value, null);
+  }
+
+  public @NotNull CompletableFuture<@Nullable PlayerModel> get(
       final @NotNull PlayerAttribute attribute,
-      final @NotNull T value,
+      final @NotNull Object value,
       final @Nullable Set<@NotNull PlayerForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
         () ->
@@ -57,33 +62,12 @@ public class PlayerRepository {
                     }));
   }
 
-  public static @NotNull CompletableFuture<@NotNull Void> add(
-      final @NotNull PlayerModel playerToAdd) {
-    return CompletableFuture.runAsync(
-        () -> {
-          try {
-            HibernateUtil.getSessionFactory()
-                .inTransaction(session -> session.persist(playerToAdd));
-          } catch (Exception exception) {
-            PluginUtil.getLogger().severe(String.format("Unable to persist Player: %s", exception));
-
-            throw new RuntimeException(exception);
-          }
-        });
+  public @NotNull CompletableFuture<@NotNull Void> add(final @NotNull PlayerModel playerToAdd) {
+    return CompletableFuture.runAsync(() -> this.getSession().persist(playerToAdd));
   }
 
-  public static @NotNull CompletableFuture<@NotNull Void> update(
+  public @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull PlayerModel playerToUpdate) {
-    return CompletableFuture.runAsync(
-        () -> {
-          try {
-            HibernateUtil.getSessionFactory()
-                .inTransaction(session -> session.merge(playerToUpdate));
-          } catch (Exception exception) {
-            PluginUtil.getLogger().severe(String.format("Unable to merge Player: %s", exception));
-
-            throw new RuntimeException(exception);
-          }
-        });
+    return CompletableFuture.runAsync(() -> this.getSession().merge(playerToUpdate));
   }
 }
