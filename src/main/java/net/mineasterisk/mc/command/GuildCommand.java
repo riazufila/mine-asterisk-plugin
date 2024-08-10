@@ -191,7 +191,6 @@ public class GuildCommand {
             String.format("Player %s doesn't have a Guild", performedBy.getUniqueId()));
       }
 
-      session.evict(guild);
       guild.setUpdatedAt(now);
       guild.setUpdatedBy(player);
       guild.setStatus(GuildStatus.INACTIVE);

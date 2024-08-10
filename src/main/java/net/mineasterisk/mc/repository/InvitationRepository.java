@@ -58,10 +58,15 @@ public class InvitationRepository
                         query.add(
                             String.format("where %c.%s = :value", alias, attribute.getAttribute()));
 
-                        return session
-                            .createSelectionQuery(query.toString(), InvitationModel.class)
-                            .setParameter("value", value)
-                            .getSingleResult();
+                        InvitationModel invitation =
+                            session
+                                .createSelectionQuery(query.toString(), InvitationModel.class)
+                                .setParameter("value", value)
+                                .getSingleResult();
+
+                        this.getSession().evict(invitation);
+
+                        return invitation;
                       } catch (NoResultException exception) {
                         PluginUtil.getLogger()
                             .info("Unable to get Guild invitation: No result found");

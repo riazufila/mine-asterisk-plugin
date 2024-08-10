@@ -54,10 +54,15 @@ public class GuildRepository extends Repository<GuildModel, GuildAttribute, Guil
 
             query.add(String.format("where %c.%s = :value", alias, attribute.getAttribute()));
 
-            return this.getSession()
-                .createSelectionQuery(query.toString(), GuildModel.class)
-                .setParameter("value", value)
-                .getSingleResult();
+            GuildModel guild =
+                this.getSession()
+                    .createSelectionQuery(query.toString(), GuildModel.class)
+                    .setParameter("value", value)
+                    .getSingleResult();
+
+            this.getSession().evict(guild);
+
+            return guild;
           } catch (NoResultException exception) {
             PluginUtil.getLogger().info("Unable to get Guild: No result found");
 

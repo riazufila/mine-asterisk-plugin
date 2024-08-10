@@ -50,10 +50,15 @@ public class PlayerRepository extends Repository<PlayerModel, PlayerAttribute, P
                         query.add(
                             String.format("where %c.%s = :value", alias, attribute.getAttribute()));
 
-                        return session
-                            .createSelectionQuery(query.toString(), PlayerModel.class)
-                            .setParameter("value", value)
-                            .getSingleResult();
+                        PlayerModel player =
+                            session
+                                .createSelectionQuery(query.toString(), PlayerModel.class)
+                                .setParameter("value", value)
+                                .getSingleResult();
+
+                        this.getSession().evict(player);
+
+                        return player;
                       } catch (NoResultException exception) {
                         PluginUtil.getLogger().info("Unable to get Player: No result found");
 
