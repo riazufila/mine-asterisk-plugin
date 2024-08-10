@@ -4,7 +4,6 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CompletionException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.constant.attribute.GuildAttribute;
@@ -12,7 +11,6 @@ import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
 import net.mineasterisk.mc.constant.forcefetch.GuildForceFetch;
 import net.mineasterisk.mc.constant.forcefetch.PlayerForceFetch;
 import net.mineasterisk.mc.constant.status.GuildStatus;
-import net.mineasterisk.mc.exception.MissingEntityException;
 import net.mineasterisk.mc.exception.ValidationException;
 import net.mineasterisk.mc.model.GuildModel;
 import net.mineasterisk.mc.model.PlayerModel;
@@ -32,7 +30,7 @@ import org.incendo.cloud.paper.PaperCommandManager;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.jetbrains.annotations.NotNull;
 
-public class GuildCommand {
+public class GuildCommand extends Command {
   private final @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager;
   private final @NotNull String rootCommandName = "guild";
 
@@ -111,36 +109,8 @@ public class GuildCommand {
                   "Player %s created Guild %s", performedBy.getUniqueId(), guild.getName()));
 
       performedBy.sendMessage(Component.text("Created Guild").color(NamedTextColor.GREEN));
-    } catch (CompletionException exception) {
-      final CommandSender sender = context.sender().getSender();
-      String message = "Encountered error";
-      final Throwable cause = exception.getCause();
-
-      if (cause instanceof MissingEntityException) {
-        message = ((MissingEntityException) cause).getClientMessage();
-      } else if (cause instanceof ValidationException) {
-        message = ((ValidationException) cause).getClientMessage();
-      }
-
-      session.getTransaction().rollback();
-
-      PluginUtil.getLogger()
-          .severe(String.format("Unable to execute Guild create command: %s", exception));
-
-      if (sender instanceof Player performedBy) {
-        performedBy.sendMessage(Component.text(message).color(NamedTextColor.RED));
-      }
     } catch (Exception exception) {
-      final CommandSender sender = context.sender().getSender();
-
-      session.getTransaction().rollback();
-
-      PluginUtil.getLogger()
-          .severe(String.format("Unable to execute Guild create command: %s", exception));
-
-      if (sender instanceof Player performedBy) {
-        performedBy.sendMessage(Component.text("Encountered error").color(NamedTextColor.RED));
-      }
+      this.exceptionHandler(context.sender().getSender(), "create Guild", session, exception);
     } finally {
       session.close();
     }
@@ -219,36 +189,8 @@ public class GuildCommand {
                   "Player %s disbanded Guild %s", performedBy.getUniqueId(), guild.getName()));
 
       performedBy.sendMessage(Component.text("Disbanded Guild").color(NamedTextColor.GREEN));
-    } catch (CompletionException exception) {
-      final CommandSender sender = context.sender().getSender();
-      String message = "Encountered error";
-      final Throwable cause = exception.getCause();
-
-      if (cause instanceof MissingEntityException) {
-        message = ((MissingEntityException) cause).getClientMessage();
-      } else if (cause instanceof ValidationException) {
-        message = ((ValidationException) cause).getClientMessage();
-      }
-
-      session.getTransaction().rollback();
-
-      PluginUtil.getLogger()
-          .severe(String.format("Unable to execute Guild disband command: %s", exception));
-
-      if (sender instanceof Player performedBy) {
-        performedBy.sendMessage(Component.text(message).color(NamedTextColor.RED));
-      }
     } catch (Exception exception) {
-      final CommandSender sender = context.sender().getSender();
-
-      session.getTransaction().rollback();
-
-      PluginUtil.getLogger()
-          .severe(String.format("Unable to execute Guild disband command: %s", exception));
-
-      if (sender instanceof Player performedBy) {
-        performedBy.sendMessage(Component.text("Encountered error").color(NamedTextColor.RED));
-      }
+      this.exceptionHandler(context.sender().getSender(), "disband Guild", session, exception);
     } finally {
       session.close();
     }
