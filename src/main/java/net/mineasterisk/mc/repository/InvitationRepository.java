@@ -7,7 +7,6 @@ import java.util.concurrent.CompletableFuture;
 import net.mineasterisk.mc.constant.attribute.InvitationAttribute;
 import net.mineasterisk.mc.constant.forcefetch.InvitationForceFetch;
 import net.mineasterisk.mc.model.InvitationModel;
-import net.mineasterisk.mc.util.HibernateUtil;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
@@ -29,51 +28,44 @@ public class InvitationRepository
       final @NotNull Object value,
       final @Nullable Set<@NotNull InvitationForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
-        () ->
-            HibernateUtil.getSessionFactory()
-                .fromSession(
-                    session -> {
-                      try {
-                        final char alias = 'i';
-                        StringJoiner query =
-                            new StringJoiner(" ")
-                                .add(String.format("from %s %c", InvitationModel.entity, alias));
+        () -> {
+          try {
+            final char alias = 'i';
+            StringJoiner query =
+                new StringJoiner(" ")
+                    .add(String.format("from %s %c", InvitationModel.entity, alias));
 
-                        if (forceFetches != null) {
-                          if (forceFetches.contains(InvitationForceFetch.INVITER)) {
-                            query.add(
-                                String.format(
-                                    "join fetch %c.%s",
-                                    alias, InvitationAttribute.INVITER.getAttribute()));
-                          }
+            if (forceFetches != null) {
+              if (forceFetches.contains(InvitationForceFetch.INVITER)) {
+                query.add(
+                    String.format(
+                        "join fetch %c.%s", alias, InvitationAttribute.INVITER.getAttribute()));
+              }
 
-                          if (forceFetches.contains(InvitationForceFetch.GUILD)) {
-                            query.add(
-                                String.format(
-                                    "join fetch %c.%s",
-                                    alias, InvitationAttribute.GUILD.getAttribute()));
-                          }
-                        }
+              if (forceFetches.contains(InvitationForceFetch.GUILD)) {
+                query.add(
+                    String.format(
+                        "join fetch %c.%s", alias, InvitationAttribute.GUILD.getAttribute()));
+              }
+            }
 
-                        query.add(
-                            String.format("where %c.%s = :value", alias, attribute.getAttribute()));
+            query.add(String.format("where %c.%s = :value", alias, attribute.getAttribute()));
 
-                        InvitationModel invitation =
-                            session
-                                .createSelectionQuery(query.toString(), InvitationModel.class)
-                                .setParameter("value", value)
-                                .getSingleResult();
+            InvitationModel invitation =
+                this.getSession()
+                    .createSelectionQuery(query.toString(), InvitationModel.class)
+                    .setParameter("value", value)
+                    .getSingleResult();
 
-                        this.getSession().evict(invitation);
+            this.getSession().evict(invitation);
 
-                        return invitation;
-                      } catch (NoResultException exception) {
-                        PluginUtil.getLogger()
-                            .info("Unable to get Guild invitation: No result found");
+            return invitation;
+          } catch (NoResultException exception) {
+            PluginUtil.getLogger().info("Unable to get Guild invitation: No result found");
 
-                        return null;
-                      }
-                    }));
+            return null;
+          }
+        });
   }
 
   public @NotNull CompletableFuture<@NotNull Void> add(

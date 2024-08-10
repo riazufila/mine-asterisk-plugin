@@ -7,7 +7,6 @@ import java.util.concurrent.CompletableFuture;
 import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
 import net.mineasterisk.mc.constant.forcefetch.PlayerForceFetch;
 import net.mineasterisk.mc.model.PlayerModel;
-import net.mineasterisk.mc.util.HibernateUtil;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.hibernate.Session;
 import org.jetbrains.annotations.NotNull;
@@ -28,43 +27,37 @@ public class PlayerRepository extends Repository<PlayerModel, PlayerAttribute, P
       final @NotNull Object value,
       final @Nullable Set<@NotNull PlayerForceFetch> forceFetches) {
     return CompletableFuture.supplyAsync(
-        () ->
-            HibernateUtil.getSessionFactory()
-                .fromSession(
-                    session -> {
-                      try {
-                        final char alias = 'p';
-                        StringJoiner query =
-                            new StringJoiner(" ")
-                                .add(String.format("from %s %c", PlayerModel.entity, alias));
+        () -> {
+          try {
+            final char alias = 'p';
+            StringJoiner query =
+                new StringJoiner(" ").add(String.format("from %s %c", PlayerModel.entity, alias));
 
-                        if (forceFetches != null) {
-                          if (forceFetches.contains(PlayerForceFetch.GUILD)) {
-                            query.add(
-                                String.format(
-                                    "left join fetch %c.%s",
-                                    alias, PlayerAttribute.GUILD.getAttribute()));
-                          }
-                        }
+            if (forceFetches != null) {
+              if (forceFetches.contains(PlayerForceFetch.GUILD)) {
+                query.add(
+                    String.format(
+                        "left join fetch %c.%s", alias, PlayerAttribute.GUILD.getAttribute()));
+              }
+            }
 
-                        query.add(
-                            String.format("where %c.%s = :value", alias, attribute.getAttribute()));
+            query.add(String.format("where %c.%s = :value", alias, attribute.getAttribute()));
 
-                        PlayerModel player =
-                            session
-                                .createSelectionQuery(query.toString(), PlayerModel.class)
-                                .setParameter("value", value)
-                                .getSingleResult();
+            PlayerModel player =
+                this.getSession()
+                    .createSelectionQuery(query.toString(), PlayerModel.class)
+                    .setParameter("value", value)
+                    .getSingleResult();
 
-                        this.getSession().evict(player);
+            this.getSession().evict(player);
 
-                        return player;
-                      } catch (NoResultException exception) {
-                        PluginUtil.getLogger().info("Unable to get Player: No result found");
+            return player;
+          } catch (NoResultException exception) {
+            PluginUtil.getLogger().info("Unable to get Player: No result found");
 
-                        return null;
-                      }
-                    }));
+            return null;
+          }
+        });
   }
 
   public @NotNull CompletableFuture<@NotNull Void> add(final @NotNull PlayerModel playerToAdd) {
