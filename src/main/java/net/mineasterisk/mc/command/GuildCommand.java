@@ -2,21 +2,26 @@ package net.mineasterisk.mc.command;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import java.time.Instant;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletionException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
 import net.mineasterisk.mc.constant.status.GuildStatus;
+import net.mineasterisk.mc.exception.MissingEntityException;
+import net.mineasterisk.mc.exception.ValidationException;
 import net.mineasterisk.mc.model.GuildModel;
+import net.mineasterisk.mc.model.PlayerModel;
 import net.mineasterisk.mc.repository.PlayerRepository;
 import net.mineasterisk.mc.service.GuildService;
-import net.mineasterisk.mc.util.LoggerUtil;
+import net.mineasterisk.mc.util.HibernateUtil;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
+import org.hibernate.Session;
 import org.incendo.cloud.Command.Builder;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.paper.PaperCommandManager;
@@ -53,68 +58,86 @@ public class GuildCommand {
   private void create(
       final @NotNull CommandContext<@NotNull CommandSourceStack> context,
       final @NotNull String nameArgument) {
-    final CommandSender sender = context.sender().getSender();
-    final String name = context.get(nameArgument);
-    final Instant now = Instant.now();
+    Session session = HibernateUtil.getSessionFactory().openSession();
+    session.getTransaction().begin();
 
-    if (!(sender instanceof Player performedBy)) {
-      return;
+    try {
+      final CommandSender sender = context.sender().getSender();
+      final String name = context.get(nameArgument);
+      final Instant now = Instant.now();
+
+      if (!(sender instanceof Player performedBy)) {
+        throw new RuntimeException(String.format("Sender %s is not a Player", sender.getName()));
+      }
+
+      PlayerModel player =
+          PlayerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
+
+      if (player == null) {
+        throw new ValidationException(
+            String.format("Player %s is not initialized", performedBy.getUniqueId()),
+            "Encountered error");
+      }
+
+      GuildService guildService = new GuildService(session);
+      final GuildModel guild =
+          new GuildModel(now, player, name, player, GuildStatus.ACTIVE, new HashSet<>());
+
+      guildService.add(performedBy, guild).join();
+      guild.addPlayer(player);
+      guildService.update(performedBy, guild).join();
+
+      Scoreboard scoreboard = PluginUtil.getMainScoreboard();
+      Team team = scoreboard.registerNewTeam(name);
+
+      team.addEntity(performedBy);
+      team.displayName(Component.text(name));
+      team.prefix(
+          Component.textOfChildren(
+              Component.text(name).color(NamedTextColor.GRAY),
+              Component.text('.').color(NamedTextColor.GRAY)));
+
+      session.getTransaction().commit();
+
+      PluginUtil.getLogger()
+          .info(
+              String.format(
+                  "Player %s created Guild %s", performedBy.getUniqueId(), guild.getName()));
+
+      performedBy.sendMessage(Component.text("Created Guild").color(NamedTextColor.GREEN));
+    } catch (CompletionException exception) {
+      final CommandSender sender = context.sender().getSender();
+      String message = "Encountered error";
+      final Throwable cause = exception.getCause();
+
+      if (cause instanceof MissingEntityException) {
+        message = ((MissingEntityException) cause).getClientMessage();
+      } else if (cause instanceof ValidationException) {
+        message = ((ValidationException) cause).getClientMessage();
+      }
+
+      session.getTransaction().rollback();
+
+      PluginUtil.getLogger()
+          .severe(String.format("Unable to execute Guild create command: %s", exception));
+
+      if (sender instanceof Player performedBy) {
+        performedBy.sendMessage(Component.text(message).color(NamedTextColor.RED));
+      }
+    } catch (Exception exception) {
+      final CommandSender sender = context.sender().getSender();
+
+      session.getTransaction().rollback();
+
+      PluginUtil.getLogger()
+          .severe(String.format("Unable to execute Guild create command: %s", exception));
+
+      if (sender instanceof Player performedBy) {
+        performedBy.sendMessage(Component.text("Encountered error").color(NamedTextColor.RED));
+      }
+    } finally {
+      session.close();
     }
-
-    final LoggerUtil logger =
-        new LoggerUtil(
-            performedBy, "Executed Guild create command", "Unable to execute Guild create command");
-
-    PlayerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId())
-        .thenAccept(
-            player -> {
-              if (player == null) {
-                logger.warn(
-                    "Player doesn't exist",
-                    String.format("Player %s is not initialized", performedBy.getUniqueId()));
-
-                return;
-              }
-
-              final GuildModel guild =
-                  new GuildModel(
-                      now, player, name, player, GuildStatus.ACTIVE, Collections.emptySet());
-
-              GuildService.add(performedBy, guild)
-                  .thenAccept(
-                      (guildAdded) -> {
-                        if (!guildAdded) {
-                          return;
-                        }
-
-                        guild.setPlayers(Set.of(player));
-
-                        GuildService.update(performedBy, guild)
-                            .thenAccept(
-                                guildUpdated -> {
-                                  if (!guildUpdated) {
-                                    return;
-                                  }
-
-                                  Scoreboard scoreboard = PluginUtil.getMainScoreboard();
-                                  Team team = scoreboard.registerNewTeam(name);
-
-                                  team.displayName(Component.text(name));
-                                  team.prefix(
-                                      Component.textOfChildren(
-                                          Component.text(name).color(NamedTextColor.GRAY),
-                                          Component.text('.').color(NamedTextColor.GRAY)));
-
-                                  team.addEntity(performedBy);
-
-                                  logger.success(
-                                      "Created Guild",
-                                      String.format(
-                                          "Player %s created Guild %s",
-                                          performedBy.getUniqueId(), guild.getName()));
-                                });
-                      });
-            });
   }
 
   private @NotNull Builder<@NotNull CommandSourceStack> disbandCommand() {

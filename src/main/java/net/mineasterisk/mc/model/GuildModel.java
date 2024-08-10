@@ -128,4 +128,9 @@ public final class GuildModel {
       player.setGuild(this);
     }
   }
+
+  public void addPlayer(final @NotNull PlayerModel player) {
+    this.players.add(player);
+    player.setGuild(this);
+  }
 }
