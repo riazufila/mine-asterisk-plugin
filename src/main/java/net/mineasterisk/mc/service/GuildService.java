@@ -108,7 +108,7 @@ public class GuildService extends Service<GuildModel> {
                 "Must be the Guild owner to update Guild",
                 String.format(
                     "Player %s is not the owner of Guild %s",
-                    performedBy.getUniqueId(), guildToUpdate.getName()));
+                    performedBy.getUniqueId(), guild.getName()));
           }
 
           if (guild.getStatus() == GuildStatus.INACTIVE) {
@@ -116,7 +116,7 @@ public class GuildService extends Service<GuildModel> {
                 "Guild is inactive",
                 String.format(
                     "Player %s is trying to update an inactive Guild %s",
-                    performedBy.getUniqueId(), guildToUpdate.getName()));
+                    performedBy.getUniqueId(), guild.getName()));
           }
 
           return guildRepository.update(guildToUpdate).join();

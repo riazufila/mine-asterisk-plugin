@@ -36,7 +36,7 @@ public class PlayerService extends Service<PlayerModel> {
                 "Encountered error",
                 String.format(
                     "Player %s is trying to add existing Player %s",
-                    performedBy.getUniqueId(), playerToAdd.getUuid()));
+                    performedBy.getUniqueId(), player.getUuid()));
           }
 
           return playerRepository.add(playerToAdd).join();

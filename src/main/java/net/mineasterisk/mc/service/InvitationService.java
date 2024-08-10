@@ -57,7 +57,7 @@ public class InvitationService extends Service<InvitationModel> {
                 "Must be in a Guild to send a Guild invitation",
                 String.format(
                     "Inviter %s is trying to send Player %s invitation to Guild %s, but isn't in a Guild",
-                    performedBy.getUniqueId(),
+                    inviter.getUuid(),
                     invitationToAdd.getInvitee().getUuid(),
                     invitationToAdd.getGuild().getName()));
           }
@@ -67,7 +67,7 @@ public class InvitationService extends Service<InvitationModel> {
                 "Must be in the Guild to send a Guild invitation",
                 String.format(
                     "Inviter %s is trying to send Player %s invitation to Guild %s, but isn't in the Guild",
-                    performedBy.getUniqueId(),
+                    inviter.getUuid(),
                     invitationToAdd.getInvitee().getUuid(),
                     invitationToAdd.getGuild().getName()));
           }
@@ -77,7 +77,7 @@ public class InvitationService extends Service<InvitationModel> {
                 "Must be a Guild owner to send a Guild invitation",
                 String.format(
                     "Inviter %s is trying to send Player %s invitation to Guild %s, but isn't a Guild owner",
-                    performedBy.getUniqueId(),
+                    inviter.getUuid(),
                     invitationToAdd.getInvitee().getUuid(),
                     invitationToAdd.getGuild().getName()));
           }
@@ -104,9 +104,7 @@ public class InvitationService extends Service<InvitationModel> {
                 "Invitee is already in a Guild",
                 String.format(
                     "Inviter %s is trying to send Invitee %s invitation to Guild %s, but Invitee is already in a Guild",
-                    performedBy.getUniqueId(),
-                    invitationToAdd.getInvitee().getUuid(),
-                    invitationToAdd.getGuild().getName()));
+                    inviter.getUuid(), invitee.getUuid(), invitationToAdd.getGuild().getName()));
           }
 
           InvitationRepository invitationRepository = new InvitationRepository(this.getSession());
@@ -153,9 +151,9 @@ public class InvitationService extends Service<InvitationModel> {
                 "Must be in a Guild to update a Guild invitation",
                 String.format(
                     "Inviter %s is trying to update Player %s's invitation to Guild %s, but isn't in a Guild",
-                    performedBy.getUniqueId(),
+                    inviter.getUuid(),
                     invitationToUpdate.getInvitee().getUuid(),
-                    invitationToUpdate.getGuild().getName()));
+                    inviter.getGuild().getName()));
           }
 
           if (inviter.getGuild().getId() == invitationToUpdate.getGuild().getId()) {
@@ -163,7 +161,7 @@ public class InvitationService extends Service<InvitationModel> {
                 "Must be in the Guild to update a Guild invitation",
                 String.format(
                     "Inviter %s is trying to update Player %s's invitation to Guild %s, but isn't in the Guild",
-                    performedBy.getUniqueId(),
+                    inviter.getUuid(),
                     invitationToUpdate.getInvitee().getUuid(),
                     invitationToUpdate.getGuild().getName()));
           }
@@ -173,7 +171,7 @@ public class InvitationService extends Service<InvitationModel> {
                 "Must be the Guild owner to update a Guild invitation",
                 String.format(
                     "Inviter %s is trying to update Player %s's invitation to Guild %s, but isn't the Guild owner",
-                    performedBy.getUniqueId(),
+                    inviter.getUuid(),
                     invitationToUpdate.getInvitee().getUuid(),
                     invitationToUpdate.getGuild().getName()));
           }
@@ -200,9 +198,7 @@ public class InvitationService extends Service<InvitationModel> {
                 "Invitee is already in a Guild",
                 String.format(
                     "Inviter %s is trying to update Invitee %s's invitation to Guild %s, but Invitee is already in a Guild",
-                    performedBy.getUniqueId(),
-                    invitationToUpdate.getInvitee().getUuid(),
-                    invitationToUpdate.getGuild().getName()));
+                    inviter.getUuid(), invitee.getUuid(), invitee.getGuild().getName()));
           }
 
           InvitationRepository invitationRepository = new InvitationRepository(this.getSession());
