@@ -21,7 +21,6 @@ public class InvitationService extends Service<InvitationModel> {
 
   public @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull Player performedBy, final @NotNull InvitationModel invitationToAdd) {
-
     return CompletableFuture.supplyAsync(
         () -> {
           if (!(performedBy.getUniqueId().equals(invitationToAdd.getInviter().getUuid()))) {
