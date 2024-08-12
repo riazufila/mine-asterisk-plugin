@@ -53,7 +53,7 @@ public class InvitationService extends Service<InvitationModel> {
             throw new MissingEntityException(
                 "Encountered error",
                 String.format(
-                    String.format("Inviter %s is not initialized", performedBy.getUniqueId())),
+                    String.format("Inviter %s isn't initialized", performedBy.getUniqueId())),
                 PlayerModel.class);
           }
 
@@ -100,7 +100,7 @@ public class InvitationService extends Service<InvitationModel> {
                 "Encountered error",
                 String.format(
                     String.format(
-                        "Invitee %s is not initialized", invitationToAdd.getInvitee().getId())),
+                        "Invitee %s isn't initialized", invitationToAdd.getInvitee().getId())),
                 PlayerModel.class);
           }
 
@@ -150,7 +150,7 @@ public class InvitationService extends Service<InvitationModel> {
                 "Encountered error",
                 String.format(
                     String.format(
-                        "Inviter %s is not initialized", invitationToUpdate.getInvitee().getId())),
+                        "Inviter %s isn't initialized", invitationToUpdate.getInvitee().getId())),
                 PlayerModel.class);
           }
 
@@ -197,7 +197,7 @@ public class InvitationService extends Service<InvitationModel> {
                 "Encountered error",
                 String.format(
                     String.format(
-                        "Invitee %s is not initialized", invitationToUpdate.getInvitee().getId())),
+                        "Invitee %s isn't initialized", invitationToUpdate.getInvitee().getId())),
                 PlayerModel.class);
           }
 

@@ -56,7 +56,7 @@ public class GuildCommand extends Command {
       final GuildService guildService = new GuildService(statelessSession);
 
       if (!(sender instanceof Player performedBy)) {
-        throw new RuntimeException(String.format("Sender %s is not a Player", sender.getName()));
+        throw new RuntimeException(String.format("Sender %s isn't a Player", sender.getName()));
       }
 
       guildService.create(performedBy, name).join();
@@ -85,7 +85,7 @@ public class GuildCommand extends Command {
       final GuildService guildService = new GuildService(statelessSession);
 
       if (!(sender instanceof Player performedBy)) {
-        throw new RuntimeException(String.format("Sender %s is not a Player", sender.getName()));
+        throw new RuntimeException(String.format("Sender %s isn't a Player", sender.getName()));
       }
 
       guildService.disband(performedBy).join();

@@ -50,7 +50,7 @@ public class GuildService extends Service<GuildModel> {
           if (player == null) {
             throw new MissingEntityException(
                 "Encountered error",
-                String.format("Player %s is not initialized", performedBy.getUniqueId()),
+                String.format("Player %s isn't initialized", performedBy.getUniqueId()),
                 PlayerModel.class);
           }
 
@@ -117,7 +117,7 @@ public class GuildService extends Service<GuildModel> {
           if (player == null) {
             throw new MissingEntityException(
                 "Encountered error",
-                String.format("Player %s is not initialized", performedBy.getUniqueId()),
+                String.format("Player %s isn't initialized", performedBy.getUniqueId()),
                 PlayerModel.class);
           }
 
@@ -135,7 +135,7 @@ public class GuildService extends Service<GuildModel> {
           if (guild == null) {
             throw new MissingEntityException(
                 "Encountered error",
-                String.format("Guild %s is not initialized", player.getGuild().getName()),
+                String.format("Guild %s isn't initialized", player.getGuild().getName()),
                 GuildModel.class);
           }
 
@@ -143,7 +143,7 @@ public class GuildService extends Service<GuildModel> {
             throw new ValidationException(
                 "Must be the Guild owner",
                 String.format(
-                    "Player %s is not the owner of Guild %s", player.getUuid(), guild.getName()));
+                    "Player %s isn't the owner of Guild %s", player.getUuid(), guild.getName()));
           }
 
           if (guild.getStatus() == GuildStatus.INACTIVE) {

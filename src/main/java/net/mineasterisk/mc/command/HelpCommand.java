@@ -86,7 +86,7 @@ public class HelpCommand {
     sender
         .getSender()
         .sendMessage(
-            Component.text(String.format("Command %s is not found", command))
+            Component.text(String.format("Command %s isn't found", command))
                 .color(NamedTextColor.RED));
   }
 
