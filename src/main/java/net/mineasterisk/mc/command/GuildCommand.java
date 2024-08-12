@@ -162,6 +162,7 @@ public class GuildCommand extends Command {
             String.format("Player %s doesn't have a Guild", performedBy.getUniqueId()));
       }
 
+      session.clear();
       guild.setUpdatedAt(now);
       guild.setUpdatedBy(player);
       guild.setStatus(GuildStatus.INACTIVE);
