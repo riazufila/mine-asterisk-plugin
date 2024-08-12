@@ -8,6 +8,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.constant.attribute.GuildAttribute;
 import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
+import net.mineasterisk.mc.constant.forcefetch.GuildForceFetch;
 import net.mineasterisk.mc.constant.forcefetch.PlayerForceFetch;
 import net.mineasterisk.mc.constant.status.GuildStatus;
 import net.mineasterisk.mc.exception.MissingEntityException;
@@ -98,25 +99,20 @@ public class GuildService extends Service<GuildModel> {
         });
   }
 
-  public @NotNull CompletableFuture<@Nullable Void> update(
-      final @NotNull Player performedBy, final @NotNull GuildModel guildToUpdate) {
+  public @NotNull CompletableFuture<@Nullable Void> disband(final @NotNull Player performedBy) {
     return CompletableFuture.supplyAsync(
         () -> {
           final PlayerRepository playerRepository =
               new PlayerRepository(this.getStatelessSession());
-          final GuildRepository guildRepository = new GuildRepository(this.getStatelessSession());
-          if (!(performedBy.getUniqueId().equals(guildToUpdate.getOwner().getUuid()))) {
-            throw new ValidationException(
-                "Not allowed to update Guild for other Player",
-                String.format(
-                    "Player %s is trying to update Guild %s for Player %s",
-                    performedBy.getUniqueId(),
-                    guildToUpdate.getName(),
-                    guildToUpdate.getOwner().getUuid()));
-          }
 
+          final GuildRepository guildRepository = new GuildRepository(this.getStatelessSession());
           final PlayerModel player =
-              playerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
+              playerRepository
+                  .get(
+                      PlayerAttribute.UUID,
+                      performedBy.getUniqueId(),
+                      Set.of(PlayerForceFetch.GUILD))
+                  .join();
 
           if (player == null) {
             throw new MissingEntityException(
@@ -125,24 +121,29 @@ public class GuildService extends Service<GuildModel> {
                 PlayerModel.class);
           }
 
+          if (player.getGuild() == null) {
+            throw new ValidationException(
+                "Encountered error",
+                String.format("Player %s doesn't have a Guild", performedBy.getUniqueId()));
+          }
+
           final GuildModel guild =
-              guildRepository.get(GuildAttribute.ID, guildToUpdate.getId()).join();
+              guildRepository
+                  .get(GuildAttribute.ID, player.getGuild(), Set.of(GuildForceFetch.PLAYERS))
+                  .join();
 
           if (guild == null) {
             throw new MissingEntityException(
                 "Encountered error",
-                String.format(
-                    "Player %s is trying to update a non-existent Guild %s",
-                    performedBy.getUniqueId(), guildToUpdate.getName()),
+                String.format("Guild %s is not initialized", player.getGuild().getName()),
                 GuildModel.class);
           }
 
           if (guild.getOwner().getId() != player.getId()) {
             throw new ValidationException(
-                "Must be the Guild owner to update Guild",
+                "Must be the Guild owner",
                 String.format(
-                    "Player %s is not the owner of Guild %s",
-                    performedBy.getUniqueId(), guild.getName()));
+                    "Player %s is not the owner of Guild %s", player.getUuid(), guild.getName()));
           }
 
           if (guild.getStatus() == GuildStatus.INACTIVE) {
@@ -150,10 +151,35 @@ public class GuildService extends Service<GuildModel> {
                 "Guild is inactive",
                 String.format(
                     "Player %s is trying to update an inactive Guild %s",
-                    performedBy.getUniqueId(), guild.getName()));
+                    player.getUuid(), guild.getName()));
           }
 
-          return guildRepository.update(guildToUpdate).join();
+          guild.setUpdatedBy(player);
+          guild.setUpdatedAt(Instant.now());
+          guild.setStatus(GuildStatus.INACTIVE);
+          guild
+              .getPlayers()
+              .forEach(
+                  playerInGuild -> {
+                    playerInGuild.setGuild(null);
+                    playerRepository.update(playerInGuild).join();
+                  });
+
+          guildRepository.update(guild).join();
+
+          final Scoreboard scoreboard = PluginUtil.getMainScoreboard();
+          final Team team = scoreboard.getTeam(guild.getName());
+
+          if (team == null) {
+            throw new ValidationException(
+                "Encountered error",
+                String.format(
+                    "Guild %s doesn't have a Team %s applied", guild.getName(), guild.getName()));
+          }
+
+          team.unregister();
+
+          return null;
         });
   }
 }

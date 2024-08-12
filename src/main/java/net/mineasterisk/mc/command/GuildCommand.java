@@ -1,28 +1,14 @@
 package net.mineasterisk.mc.command;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
-import java.time.Instant;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.mineasterisk.mc.constant.attribute.GuildAttribute;
-import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
-import net.mineasterisk.mc.constant.forcefetch.GuildForceFetch;
-import net.mineasterisk.mc.constant.forcefetch.PlayerForceFetch;
-import net.mineasterisk.mc.constant.status.GuildStatus;
-import net.mineasterisk.mc.exception.ValidationException;
-import net.mineasterisk.mc.model.GuildModel;
-import net.mineasterisk.mc.model.PlayerModel;
-import net.mineasterisk.mc.repository.GuildRepository;
-import net.mineasterisk.mc.repository.PlayerRepository;
 import net.mineasterisk.mc.service.GuildService;
-import net.mineasterisk.mc.service.PlayerService;
 import net.mineasterisk.mc.util.HibernateUtil;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.incendo.cloud.Command.Builder;
@@ -96,72 +82,17 @@ public class GuildCommand extends Command {
 
     try (statelessSession) {
       final CommandSender sender = context.sender().getSender();
-      final Instant now = Instant.now();
-      final PlayerRepository playerRepository = new PlayerRepository(statelessSession);
-      final GuildRepository guildRepository = new GuildRepository(statelessSession);
-      final PlayerService playerService = new PlayerService(statelessSession);
       final GuildService guildService = new GuildService(statelessSession);
 
       if (!(sender instanceof Player performedBy)) {
         throw new RuntimeException(String.format("Sender %s is not a Player", sender.getName()));
       }
 
-      final PlayerModel player =
-          playerRepository
-              .get(PlayerAttribute.UUID, performedBy.getUniqueId(), Set.of(PlayerForceFetch.GUILD))
-              .join();
-
-      if (player == null) {
-        throw new ValidationException(
-            "Encountered error",
-            String.format("Player %s is not initialized", performedBy.getUniqueId()));
-      }
-
-      if (player.getGuild() == null) {
-        throw new ValidationException(
-            "Doesn't have a Guild",
-            String.format("Player %s doesn't have a Guild", performedBy.getUniqueId()));
-      }
-
-      final GuildModel guild =
-          guildRepository
-              .get(GuildAttribute.ID, player.getGuild().getId(), Set.of(GuildForceFetch.PLAYERS))
-              .join();
-
-      if (guild == null) {
-        throw new ValidationException(
-            "Doesn't have a Guild",
-            String.format("Player %s doesn't have a Guild", performedBy.getUniqueId()));
-      }
-
-      guild.setUpdatedAt(now);
-      guild.setUpdatedBy(player);
-      guild.setStatus(GuildStatus.INACTIVE);
-
-      for (PlayerModel playerInGuild : guild.getPlayers()) {
-        playerInGuild.setGuild(null);
-        playerService.update(performedBy, playerInGuild);
-      }
-
-      guildService.update(performedBy, guild).join();
-
-      final Scoreboard scoreboard = PluginUtil.getMainScoreboard();
-      final Team team = scoreboard.getTeam(guild.getName());
-
-      if (team == null) {
-        throw new ValidationException(
-            "Encountered error",
-            String.format(
-                "Guild %s doesn't have a Team %s applied", guild.getName(), guild.getName()));
-      }
-
-      team.unregister();
+      guildService.disband(performedBy).join();
       transaction.commit();
 
       PluginUtil.getLogger()
-          .info(
-              String.format(
-                  "Player %s disbanded Guild %s", performedBy.getUniqueId(), guild.getName()));
+          .info(String.format("Player %s disbanded its Guild", performedBy.getUniqueId()));
 
       performedBy.sendMessage(Component.text("Disbanded Guild").color(NamedTextColor.GREEN));
     } catch (Exception exception) {
