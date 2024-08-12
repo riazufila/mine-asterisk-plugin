@@ -50,6 +50,16 @@ public class GuildService extends Service<GuildModel> {
                     performedBy.getUniqueId(), nameMaxLength, name));
           }
 
+          final GuildModel isGuildExist = guildRepository.get(GuildAttribute.NAME, name).join();
+
+          if (isGuildExist != null) {
+            throw new ValidationException(
+                "Guild name exists",
+                String.format(
+                    "Player %s is trying to add Guild %s but the name is taken",
+                    performedBy.getUniqueId(), name));
+          }
+
           final PlayerModel player =
               playerRepository
                   .get(
