@@ -2,7 +2,6 @@ package net.mineasterisk.mc.command;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -68,48 +67,17 @@ public class GuildCommand extends Command {
     try (statelessSession) {
       final CommandSender sender = context.sender().getSender();
       final String name = context.get(nameArgument);
-      final Instant now = Instant.now();
-      final PlayerRepository playerRepository = new PlayerRepository(statelessSession);
-      final PlayerService playerService = new PlayerService(statelessSession);
       final GuildService guildService = new GuildService(statelessSession);
 
       if (!(sender instanceof Player performedBy)) {
         throw new RuntimeException(String.format("Sender %s is not a Player", sender.getName()));
       }
 
-      final PlayerModel player =
-          playerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
-
-      if (player == null) {
-        throw new ValidationException(
-            "Encountered error",
-            String.format("Player %s is not initialized", performedBy.getUniqueId()));
-      }
-
-      final GuildModel guild =
-          new GuildModel(
-              now, player, null, null, name, player, GuildStatus.ACTIVE, Collections.emptySet());
-
-      guildService.add(performedBy, guild).join();
-      player.setGuild(guild);
-      playerService.update(performedBy, player).join();
-
-      final Scoreboard scoreboard = PluginUtil.getMainScoreboard();
-      final Team team = scoreboard.registerNewTeam(name);
-
-      team.addEntity(performedBy);
-      team.displayName(Component.text(name));
-      team.prefix(
-          Component.textOfChildren(
-              Component.text(name).color(NamedTextColor.GRAY),
-              Component.text('.').color(NamedTextColor.GRAY)));
-
+      guildService.create(performedBy, name).join();
       transaction.commit();
 
       PluginUtil.getLogger()
-          .info(
-              String.format(
-                  "Player %s created Guild %s", performedBy.getUniqueId(), guild.getName()));
+          .info(String.format("Player %s created Guild %s", performedBy.getUniqueId(), name));
 
       performedBy.sendMessage(Component.text("Created Guild").color(NamedTextColor.GREEN));
     } catch (Exception exception) {
