@@ -7,18 +7,21 @@ import net.mineasterisk.mc.exception.ValidationException;
 import net.mineasterisk.mc.model.PlayerModel;
 import net.mineasterisk.mc.repository.PlayerRepository;
 import org.bukkit.entity.Player;
-import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerService extends Service<PlayerModel> {
-  public PlayerService(@NotNull Session session) {
-    super(session);
+  public PlayerService(final @NotNull StatelessSession statelessSession) {
+    super(statelessSession);
   }
 
   public @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull Player performedBy, final @NotNull PlayerModel playerToAdd) {
     return CompletableFuture.supplyAsync(
         () -> {
+          final PlayerRepository playerRepository =
+              new PlayerRepository(this.getStatelessSession());
+
           if (!(performedBy.getUniqueId().equals(playerToAdd.getUuid()))) {
             throw new ValidationException(
                 "Not allowed to add other Player",
@@ -27,8 +30,7 @@ public class PlayerService extends Service<PlayerModel> {
                     performedBy.getUniqueId(), playerToAdd.getUuid()));
           }
 
-          PlayerRepository playerRepository = new PlayerRepository(this.getSession());
-          PlayerModel player =
+          final PlayerModel player =
               playerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
 
           if (player != null) {
@@ -47,6 +49,9 @@ public class PlayerService extends Service<PlayerModel> {
       final @NotNull Player performedBy, final @NotNull PlayerModel playerToUpdate) {
     return CompletableFuture.supplyAsync(
         () -> {
+          final PlayerRepository playerRepository =
+              new PlayerRepository(this.getStatelessSession());
+
           if (!(performedBy.getUniqueId().equals(playerToUpdate.getUuid()))) {
             throw new ValidationException(
                 "Can't update other Player",
@@ -55,8 +60,7 @@ public class PlayerService extends Service<PlayerModel> {
                     performedBy.getUniqueId(), playerToUpdate.getUuid()));
           }
 
-          PlayerRepository playerRepository = new PlayerRepository(this.getSession());
-          PlayerModel player =
+          final PlayerModel player =
               playerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
 
           if (player == null) {

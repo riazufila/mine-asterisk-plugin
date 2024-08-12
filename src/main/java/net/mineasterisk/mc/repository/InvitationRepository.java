@@ -8,14 +8,14 @@ import net.mineasterisk.mc.constant.attribute.InvitationAttribute;
 import net.mineasterisk.mc.constant.forcefetch.InvitationForceFetch;
 import net.mineasterisk.mc.model.InvitationModel;
 import net.mineasterisk.mc.util.PluginUtil;
-import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class InvitationRepository
     extends Repository<InvitationModel, InvitationAttribute, InvitationForceFetch> {
-  public InvitationRepository(@NotNull Session session) {
-    super(session);
+  public InvitationRepository(final @NotNull StatelessSession statelessSession) {
+    super(statelessSession);
   }
 
   public @NotNull CompletableFuture<@Nullable InvitationModel> get(
@@ -31,7 +31,7 @@ public class InvitationRepository
         () -> {
           try {
             final char alias = 'i';
-            StringJoiner query =
+            final StringJoiner query =
                 new StringJoiner(" ")
                     .add(String.format("from %s %c", InvitationModel.entity, alias));
 
@@ -51,7 +51,7 @@ public class InvitationRepository
 
             query.add(String.format("where %c.%s = :value", alias, attribute.getAttribute()));
 
-            return this.getSession()
+            return this.getStatelessSession()
                 .createSelectionQuery(query.toString(), InvitationModel.class)
                 .setParameter("value", value)
                 .getSingleResult();
@@ -65,11 +65,11 @@ public class InvitationRepository
 
   public @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull InvitationModel invitationToAdd) {
-    return CompletableFuture.runAsync(() -> this.getSession().persist(invitationToAdd));
+    return CompletableFuture.runAsync(() -> this.getStatelessSession().insert(invitationToAdd));
   }
 
   public @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull InvitationModel invitationToUpdate) {
-    return CompletableFuture.runAsync(() -> this.getSession().merge(invitationToUpdate));
+    return CompletableFuture.runAsync(() -> this.getStatelessSession().update(invitationToUpdate));
   }
 }

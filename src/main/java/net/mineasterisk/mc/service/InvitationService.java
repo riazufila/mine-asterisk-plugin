@@ -11,18 +11,24 @@ import net.mineasterisk.mc.model.PlayerModel;
 import net.mineasterisk.mc.repository.InvitationRepository;
 import net.mineasterisk.mc.repository.PlayerRepository;
 import org.bukkit.entity.Player;
-import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.jetbrains.annotations.NotNull;
 
 public class InvitationService extends Service<InvitationModel> {
-  public InvitationService(@NotNull Session session) {
-    super(session);
+  public InvitationService(final @NotNull StatelessSession statelessSession) {
+    super(statelessSession);
   }
 
   public @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull Player performedBy, final @NotNull InvitationModel invitationToAdd) {
     return CompletableFuture.supplyAsync(
         () -> {
+          final PlayerRepository playerRepository =
+              new PlayerRepository(this.getStatelessSession());
+
+          final InvitationRepository invitationRepository =
+              new InvitationRepository(this.getStatelessSession());
+
           if (!(performedBy.getUniqueId().equals(invitationToAdd.getInviter().getUuid()))) {
             throw new ValidationException(
                 "Not allowed to send Guild invitation for other Player",
@@ -34,8 +40,7 @@ public class InvitationService extends Service<InvitationModel> {
                     invitationToAdd.getInviter().getUuid()));
           }
 
-          PlayerRepository playerRepository = new PlayerRepository(this.getSession());
-          PlayerModel inviter =
+          final PlayerModel inviter =
               playerRepository
                   .get(
                       PlayerAttribute.UUID,
@@ -81,7 +86,7 @@ public class InvitationService extends Service<InvitationModel> {
                     invitationToAdd.getGuild().getName()));
           }
 
-          PlayerModel invitee =
+          final PlayerModel invitee =
               playerRepository
                   .get(
                       PlayerAttribute.UUID,
@@ -106,8 +111,6 @@ public class InvitationService extends Service<InvitationModel> {
                     inviter.getUuid(), invitee.getUuid(), invitationToAdd.getGuild().getName()));
           }
 
-          InvitationRepository invitationRepository = new InvitationRepository(this.getSession());
-
           return invitationRepository.add(invitationToAdd).join();
         });
   }
@@ -116,6 +119,12 @@ public class InvitationService extends Service<InvitationModel> {
       final @NotNull Player performedBy, final @NotNull InvitationModel invitationToUpdate) {
     return CompletableFuture.supplyAsync(
         () -> {
+          final PlayerRepository playerRepository =
+              new PlayerRepository(this.getStatelessSession());
+
+          final InvitationRepository invitationRepository =
+              new InvitationRepository(this.getStatelessSession());
+
           if (!(performedBy.getUniqueId().equals(invitationToUpdate.getInviter().getUuid())
               || performedBy.getUniqueId().equals(invitationToUpdate.getInvitee().getUuid()))) {
             throw new ValidationException(
@@ -127,8 +136,7 @@ public class InvitationService extends Service<InvitationModel> {
                     invitationToUpdate.getGuild().getName()));
           }
 
-          PlayerRepository playerRepository = new PlayerRepository(this.getSession());
-          PlayerModel inviter =
+          final PlayerModel inviter =
               playerRepository
                   .get(
                       PlayerAttribute.UUID,
@@ -175,7 +183,7 @@ public class InvitationService extends Service<InvitationModel> {
                     invitationToUpdate.getGuild().getName()));
           }
 
-          PlayerModel invitee =
+          final PlayerModel invitee =
               playerRepository
                   .get(
                       PlayerAttribute.UUID,
@@ -199,8 +207,6 @@ public class InvitationService extends Service<InvitationModel> {
                     "Inviter %s is trying to update Invitee %s's invitation to Guild %s, but Invitee is already in a Guild",
                     inviter.getUuid(), invitee.getUuid(), invitee.getGuild().getName()));
           }
-
-          InvitationRepository invitationRepository = new InvitationRepository(this.getSession());
 
           return invitationRepository.update(invitationToUpdate).join();
         });

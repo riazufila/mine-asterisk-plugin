@@ -14,43 +14,43 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
-import org.hibernate.Session;
+import org.hibernate.StatelessSession;
+import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerManager implements Listener {
   @EventHandler
   public void onPlayerJoin(final @NotNull PlayerLoginEvent event) {
-    Session session = HibernateUtil.getSessionFactory().openSession();
-    session.getTransaction().begin();
+    final StatelessSession statelessSession = HibernateUtil.getStatelessSession();
+    final Transaction transaction = statelessSession.beginTransaction();
 
-    try {
-      Player performedBy = event.getPlayer();
-      PlayerModel playerToAdd = new PlayerModel(Instant.now(), performedBy.getUniqueId(), null);
-      PlayerRepository playerRepository = new PlayerRepository(session);
-      PlayerModel player =
+    try (statelessSession) {
+      final Player performedBy = event.getPlayer();
+      final PlayerModel playerToAdd =
+          new PlayerModel(Instant.now(), performedBy.getUniqueId(), null);
+
+      final PlayerRepository playerRepository = new PlayerRepository(statelessSession);
+      final PlayerService playerService = new PlayerService(statelessSession);
+      final PlayerModel player =
           playerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
-
-      PlayerService playerService = new PlayerService(session);
 
       if (player == null) {
         playerService.add(performedBy, playerToAdd).join();
       }
 
-      session.getTransaction().commit();
+      transaction.commit();
     } catch (Exception exception) {
       event.disallow(
           Result.KICK_OTHER,
           Component.text("Encountered error while joining...").color(NamedTextColor.RED));
 
-      session.getTransaction().rollback();
+      transaction.rollback();
 
       PluginUtil.getLogger()
           .severe(
               String.format(
                   "Unable to initialize Player %s: %s",
                   event.getPlayer().getUniqueId(), exception));
-    } finally {
-      session.close();
     }
   }
 }

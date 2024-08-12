@@ -99,7 +99,7 @@ public class HelpCommand {
       return;
     }
 
-    List<TextComponent> components =
+    final List<TextComponent> components =
         result.entries().stream()
             .map(
                 entry -> {
@@ -123,7 +123,7 @@ public class HelpCommand {
       return;
     }
 
-    List<TextComponent> components =
+    final List<TextComponent> components =
         result.childSuggestions().stream()
             .map(child -> Component.text(String.format("/%s", child)))
             .toList();

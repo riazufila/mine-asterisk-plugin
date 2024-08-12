@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class CommandUtil {
   public static void register() {
-    PaperCommandManager<CommandSourceStack> manager = CommandUtil.getCommandManager();
-    HelpHandler<CommandSourceStack> help = CommandUtil.getHelp(manager);
+    final PaperCommandManager<CommandSourceStack> manager = CommandUtil.getCommandManager();
+    final HelpHandler<CommandSourceStack> help = CommandUtil.getHelp(manager);
 
     new GuildCommand(manager).build().forEach(manager::command);
     new HelpCommand(manager, help).build().forEach(manager::command);

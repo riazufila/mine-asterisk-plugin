@@ -2,7 +2,7 @@ package net.mineasterisk.mc.command;
 
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import java.time.Instant;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Set;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -17,13 +17,15 @@ import net.mineasterisk.mc.model.PlayerModel;
 import net.mineasterisk.mc.repository.GuildRepository;
 import net.mineasterisk.mc.repository.PlayerRepository;
 import net.mineasterisk.mc.service.GuildService;
+import net.mineasterisk.mc.service.PlayerService;
 import net.mineasterisk.mc.util.HibernateUtil;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
-import org.hibernate.Session;
+import org.hibernate.StatelessSession;
+import org.hibernate.Transaction;
 import org.incendo.cloud.Command.Builder;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.paper.PaperCommandManager;
@@ -60,20 +62,22 @@ public class GuildCommand extends Command {
   private void create(
       final @NotNull CommandContext<@NotNull CommandSourceStack> context,
       final @NotNull String nameArgument) {
-    Session session = HibernateUtil.getSessionFactory().openSession();
-    session.getTransaction().begin();
+    final StatelessSession statelessSession = HibernateUtil.getStatelessSession();
+    final Transaction transaction = statelessSession.beginTransaction();
 
-    try {
+    try (statelessSession) {
       final CommandSender sender = context.sender().getSender();
       final String name = context.get(nameArgument);
       final Instant now = Instant.now();
+      final PlayerRepository playerRepository = new PlayerRepository(statelessSession);
+      final PlayerService playerService = new PlayerService(statelessSession);
+      final GuildService guildService = new GuildService(statelessSession);
 
       if (!(sender instanceof Player performedBy)) {
         throw new RuntimeException(String.format("Sender %s is not a Player", sender.getName()));
       }
 
-      PlayerRepository playerRepository = new PlayerRepository(session);
-      PlayerModel player =
+      final PlayerModel player =
           playerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
 
       if (player == null) {
@@ -82,17 +86,16 @@ public class GuildCommand extends Command {
             String.format("Player %s is not initialized", performedBy.getUniqueId()));
       }
 
-      GuildService guildService = new GuildService(session);
       final GuildModel guild =
           new GuildModel(
-              now, player, null, null, name, player, GuildStatus.ACTIVE, new HashSet<>());
+              now, player, null, null, name, player, GuildStatus.ACTIVE, Collections.emptySet());
 
       guildService.add(performedBy, guild).join();
-      guild.addPlayer(player);
-      guildService.update(performedBy, guild).join();
+      player.setGuild(guild);
+      playerService.update(performedBy, player).join();
 
-      Scoreboard scoreboard = PluginUtil.getMainScoreboard();
-      Team team = scoreboard.registerNewTeam(name);
+      final Scoreboard scoreboard = PluginUtil.getMainScoreboard();
+      final Team team = scoreboard.registerNewTeam(name);
 
       team.addEntity(performedBy);
       team.displayName(Component.text(name));
@@ -101,7 +104,7 @@ public class GuildCommand extends Command {
               Component.text(name).color(NamedTextColor.GRAY),
               Component.text('.').color(NamedTextColor.GRAY)));
 
-      session.getTransaction().commit();
+      transaction.commit();
 
       PluginUtil.getLogger()
           .info(
@@ -110,9 +113,8 @@ public class GuildCommand extends Command {
 
       performedBy.sendMessage(Component.text("Created Guild").color(NamedTextColor.GREEN));
     } catch (Exception exception) {
-      this.exceptionHandler(context.sender().getSender(), "create Guild", session, exception);
-    } finally {
-      session.close();
+      transaction.rollback();
+      this.exceptionHandler(exception, context.sender().getSender(), "create Guild");
     }
   }
 
@@ -121,19 +123,22 @@ public class GuildCommand extends Command {
   }
 
   private void disband(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
-    Session session = HibernateUtil.getSessionFactory().openSession();
-    session.getTransaction().begin();
+    final StatelessSession statelessSession = HibernateUtil.getStatelessSession();
+    final Transaction transaction = statelessSession.beginTransaction();
 
-    try {
+    try (statelessSession) {
       final CommandSender sender = context.sender().getSender();
       final Instant now = Instant.now();
+      final PlayerRepository playerRepository = new PlayerRepository(statelessSession);
+      final GuildRepository guildRepository = new GuildRepository(statelessSession);
+      final PlayerService playerService = new PlayerService(statelessSession);
+      final GuildService guildService = new GuildService(statelessSession);
 
       if (!(sender instanceof Player performedBy)) {
         throw new RuntimeException(String.format("Sender %s is not a Player", sender.getName()));
       }
 
-      PlayerRepository playerRepository = new PlayerRepository(session);
-      PlayerModel player =
+      final PlayerModel player =
           playerRepository
               .get(PlayerAttribute.UUID, performedBy.getUniqueId(), Set.of(PlayerForceFetch.GUILD))
               .join();
@@ -150,8 +155,7 @@ public class GuildCommand extends Command {
             String.format("Player %s doesn't have a Guild", performedBy.getUniqueId()));
       }
 
-      GuildRepository guildRepository = new GuildRepository(session);
-      GuildModel guild =
+      final GuildModel guild =
           guildRepository
               .get(GuildAttribute.ID, player.getGuild().getId(), Set.of(GuildForceFetch.PLAYERS))
               .join();
@@ -162,18 +166,19 @@ public class GuildCommand extends Command {
             String.format("Player %s doesn't have a Guild", performedBy.getUniqueId()));
       }
 
-      session.clear();
       guild.setUpdatedAt(now);
       guild.setUpdatedBy(player);
       guild.setStatus(GuildStatus.INACTIVE);
-      guild.clearPlayers();
 
-      GuildService guildService = new GuildService(session);
+      for (PlayerModel playerInGuild : guild.getPlayers()) {
+        playerInGuild.setGuild(null);
+        playerService.update(performedBy, playerInGuild);
+      }
 
       guildService.update(performedBy, guild).join();
 
-      Scoreboard scoreboard = PluginUtil.getMainScoreboard();
-      Team team = scoreboard.getTeam(guild.getName());
+      final Scoreboard scoreboard = PluginUtil.getMainScoreboard();
+      final Team team = scoreboard.getTeam(guild.getName());
 
       if (team == null) {
         throw new ValidationException(
@@ -183,7 +188,7 @@ public class GuildCommand extends Command {
       }
 
       team.unregister();
-      session.getTransaction().commit();
+      transaction.commit();
 
       PluginUtil.getLogger()
           .info(
@@ -192,9 +197,8 @@ public class GuildCommand extends Command {
 
       performedBy.sendMessage(Component.text("Disbanded Guild").color(NamedTextColor.GREEN));
     } catch (Exception exception) {
-      this.exceptionHandler(context.sender().getSender(), "disband Guild", session, exception);
-    } finally {
-      session.close();
+      transaction.rollback();
+      this.exceptionHandler(exception, context.sender().getSender(), "disband Guild");
     }
   }
 

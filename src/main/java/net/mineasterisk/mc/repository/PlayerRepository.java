@@ -8,13 +8,13 @@ import net.mineasterisk.mc.constant.attribute.PlayerAttribute;
 import net.mineasterisk.mc.constant.forcefetch.PlayerForceFetch;
 import net.mineasterisk.mc.model.PlayerModel;
 import net.mineasterisk.mc.util.PluginUtil;
-import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class PlayerRepository extends Repository<PlayerModel, PlayerAttribute, PlayerForceFetch> {
-  public PlayerRepository(@NotNull Session session) {
-    super(session);
+  public PlayerRepository(final @NotNull StatelessSession statelessSession) {
+    super(statelessSession);
   }
 
   public @NotNull CompletableFuture<@Nullable PlayerModel> get(
@@ -30,7 +30,7 @@ public class PlayerRepository extends Repository<PlayerModel, PlayerAttribute, P
         () -> {
           try {
             final char alias = 'p';
-            StringJoiner query =
+            final StringJoiner query =
                 new StringJoiner(" ").add(String.format("from %s %c", PlayerModel.entity, alias));
 
             if (forceFetches != null) {
@@ -43,7 +43,7 @@ public class PlayerRepository extends Repository<PlayerModel, PlayerAttribute, P
 
             query.add(String.format("where %c.%s = :value", alias, attribute.getAttribute()));
 
-            return this.getSession()
+            return this.getStatelessSession()
                 .createSelectionQuery(query.toString(), PlayerModel.class)
                 .setParameter("value", value)
                 .getSingleResult();
@@ -56,11 +56,11 @@ public class PlayerRepository extends Repository<PlayerModel, PlayerAttribute, P
   }
 
   public @NotNull CompletableFuture<@NotNull Void> add(final @NotNull PlayerModel playerToAdd) {
-    return CompletableFuture.runAsync(() -> this.getSession().persist(playerToAdd));
+    return CompletableFuture.runAsync(() -> this.getStatelessSession().insert(playerToAdd));
   }
 
   public @NotNull CompletableFuture<@NotNull Void> update(
       final @NotNull PlayerModel playerToUpdate) {
-    return CompletableFuture.runAsync(() -> this.getSession().merge(playerToUpdate));
+    return CompletableFuture.runAsync(() -> this.getStatelessSession().update(playerToUpdate));
   }
 }

@@ -2,19 +2,19 @@ package net.mineasterisk.mc.repository;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class Repository<T, U, V> {
-  private final @NotNull Session session;
+  private final @NotNull StatelessSession statelessSession;
 
-  public Repository(final @NotNull Session session) {
-    this.session = session;
+  public Repository(final @NotNull StatelessSession statelessSession) {
+    this.statelessSession = statelessSession;
   }
 
-  public @NotNull Session getSession() {
-    return this.session;
+  public @NotNull StatelessSession getStatelessSession() {
+    return this.statelessSession;
   }
 
   public abstract @NotNull CompletableFuture<@Nullable T> get(

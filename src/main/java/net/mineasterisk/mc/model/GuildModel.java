@@ -2,7 +2,6 @@ package net.mineasterisk.mc.model;
 
 import jakarta.persistence.*;
 import java.time.Instant;
-import java.util.HashSet;
 import java.util.Set;
 import net.mineasterisk.mc.constant.status.GuildStatus;
 import org.jetbrains.annotations.NotNull;
@@ -157,23 +156,5 @@ public final class GuildModel {
     for (PlayerModel player : players) {
       player.setGuild(this);
     }
-  }
-
-  public void addPlayer(final @NotNull PlayerModel player) {
-    this.players.add(player);
-    player.setGuild(this);
-  }
-
-  public void removePlayer(final @NotNull PlayerModel player) {
-    this.players.remove(player);
-    player.setGuild(null);
-  }
-
-  public void clearPlayers() {
-    for (PlayerModel player : this.players) {
-      player.setGuild(null);
-    }
-
-    this.players = new HashSet<>();
   }
 }

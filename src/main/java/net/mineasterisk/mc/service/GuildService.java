@@ -13,18 +13,23 @@ import net.mineasterisk.mc.model.PlayerModel;
 import net.mineasterisk.mc.repository.GuildRepository;
 import net.mineasterisk.mc.repository.PlayerRepository;
 import org.bukkit.entity.Player;
-import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.jetbrains.annotations.NotNull;
 
 public class GuildService extends Service<GuildModel> {
-  public GuildService(@NotNull Session session) {
-    super(session);
+  public GuildService(final @NotNull StatelessSession statelessSession) {
+    super(statelessSession);
   }
 
   public @NotNull CompletableFuture<@NotNull Void> add(
       final @NotNull Player performedBy, final @NotNull GuildModel guildToAdd) {
     return CompletableFuture.supplyAsync(
         () -> {
+          final PlayerRepository playerRepository =
+              new PlayerRepository(this.getStatelessSession());
+
+          final GuildRepository guildRepository = new GuildRepository(this.getStatelessSession());
+
           if (!(performedBy.getUniqueId().equals(guildToAdd.getOwner().getUuid()))) {
             throw new ValidationException(
                 "Not allowed to add Guild for other Player",
@@ -35,8 +40,7 @@ public class GuildService extends Service<GuildModel> {
                     guildToAdd.getOwner().getUuid()));
           }
 
-          PlayerRepository playerRepository = new PlayerRepository(this.getSession());
-          PlayerModel player =
+          final PlayerModel player =
               playerRepository
                   .get(
                       PlayerAttribute.UUID,
@@ -59,8 +63,6 @@ public class GuildService extends Service<GuildModel> {
                     performedBy.getUniqueId(), player.getGuild().getName()));
           }
 
-          GuildRepository guildRepository = new GuildRepository(this.getSession());
-
           return guildRepository.add(guildToAdd).join();
         });
   }
@@ -69,6 +71,9 @@ public class GuildService extends Service<GuildModel> {
       final @NotNull Player performedBy, final @NotNull GuildModel guildToUpdate) {
     return CompletableFuture.supplyAsync(
         () -> {
+          final PlayerRepository playerRepository =
+              new PlayerRepository(this.getStatelessSession());
+          final GuildRepository guildRepository = new GuildRepository(this.getStatelessSession());
           if (!(performedBy.getUniqueId().equals(guildToUpdate.getOwner().getUuid()))) {
             throw new ValidationException(
                 "Not allowed to update Guild for other Player",
@@ -79,10 +84,8 @@ public class GuildService extends Service<GuildModel> {
                     guildToUpdate.getOwner().getUuid()));
           }
 
-          PlayerModel player =
-              new PlayerRepository(this.getSession())
-                  .get(PlayerAttribute.UUID, performedBy.getUniqueId())
-                  .join();
+          final PlayerModel player =
+              playerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
 
           if (player == null) {
             throw new MissingEntityException(
@@ -91,8 +94,8 @@ public class GuildService extends Service<GuildModel> {
                 PlayerModel.class);
           }
 
-          GuildRepository guildRepository = new GuildRepository(this.getSession());
-          GuildModel guild = guildRepository.get(GuildAttribute.ID, guildToUpdate.getId()).join();
+          final GuildModel guild =
+              guildRepository.get(GuildAttribute.ID, guildToUpdate.getId()).join();
 
           if (guild == null) {
             throw new MissingEntityException(

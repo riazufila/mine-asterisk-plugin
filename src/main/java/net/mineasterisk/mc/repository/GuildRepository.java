@@ -8,13 +8,13 @@ import net.mineasterisk.mc.constant.attribute.GuildAttribute;
 import net.mineasterisk.mc.constant.forcefetch.GuildForceFetch;
 import net.mineasterisk.mc.model.GuildModel;
 import net.mineasterisk.mc.util.PluginUtil;
-import org.hibernate.Session;
+import org.hibernate.StatelessSession;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class GuildRepository extends Repository<GuildModel, GuildAttribute, GuildForceFetch> {
-  public GuildRepository(final @NotNull Session session) {
-    super(session);
+  public GuildRepository(final @NotNull StatelessSession statelessSession) {
+    super(statelessSession);
   }
 
   public @NotNull CompletableFuture<@Nullable GuildModel> get(
@@ -30,7 +30,7 @@ public class GuildRepository extends Repository<GuildModel, GuildAttribute, Guil
         () -> {
           try {
             final char alias = 'g';
-            StringJoiner query =
+            final StringJoiner query =
                 new StringJoiner(" ").add(String.format("from %s %c", GuildModel.entity, alias));
 
             if (forceFetches != null) {
@@ -54,7 +54,7 @@ public class GuildRepository extends Repository<GuildModel, GuildAttribute, Guil
 
             query.add(String.format("where %c.%s = :value", alias, attribute.getAttribute()));
 
-            return this.getSession()
+            return this.getStatelessSession()
                 .createSelectionQuery(query.toString(), GuildModel.class)
                 .setParameter("value", value)
                 .getSingleResult();
@@ -67,10 +67,10 @@ public class GuildRepository extends Repository<GuildModel, GuildAttribute, Guil
   }
 
   public @NotNull CompletableFuture<@NotNull Void> add(final @NotNull GuildModel guildToAdd) {
-    return CompletableFuture.runAsync(() -> this.getSession().persist(guildToAdd));
+    return CompletableFuture.runAsync(() -> this.getStatelessSession().insert(guildToAdd));
   }
 
   public @NotNull CompletableFuture<@NotNull Void> update(final @NotNull GuildModel guildToUpdate) {
-    return CompletableFuture.runAsync(() -> this.getSession().merge(guildToUpdate));
+    return CompletableFuture.runAsync(() -> this.getStatelessSession().update(guildToUpdate));
   }
 }
