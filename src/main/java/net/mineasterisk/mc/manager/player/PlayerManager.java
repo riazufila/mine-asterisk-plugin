@@ -26,11 +26,14 @@ public class PlayerManager implements Listener {
     try {
       Player performedBy = event.getPlayer();
       PlayerModel playerToAdd = new PlayerModel(Instant.now(), performedBy.getUniqueId(), null);
+      PlayerRepository playerRepository = new PlayerRepository(session);
       PlayerModel player =
-          new PlayerRepository(session).get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
+          playerRepository.get(PlayerAttribute.UUID, performedBy.getUniqueId()).join();
+
+      PlayerService playerService = new PlayerService(session);
 
       if (player == null) {
-        new PlayerService(session).add(performedBy, playerToAdd).join();
+        playerService.add(performedBy, playerToAdd).join();
       }
 
       session.getTransaction().commit();

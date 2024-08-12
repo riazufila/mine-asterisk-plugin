@@ -150,8 +150,9 @@ public class GuildCommand extends Command {
             String.format("Player %s doesn't have a Guild", performedBy.getUniqueId()));
       }
 
+      GuildRepository guildRepository = new GuildRepository(session);
       GuildModel guild =
-          new GuildRepository(session)
+          guildRepository
               .get(GuildAttribute.ID, player.getGuild().getId(), Set.of(GuildForceFetch.PLAYERS))
               .join();
 
