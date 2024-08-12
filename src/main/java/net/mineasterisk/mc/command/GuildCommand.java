@@ -44,13 +44,14 @@ public class GuildCommand extends Command {
         .handler(context -> this.create(context, nameArgument));
   }
 
+  @SuppressWarnings("TryFinallyCanBeTryWithResources")
   private void create(
       final @NotNull CommandContext<@NotNull CommandSourceStack> context,
       final @NotNull String nameArgument) {
     final StatelessSession statelessSession = HibernateUtil.getStatelessSession();
     final Transaction transaction = statelessSession.beginTransaction();
 
-    try (statelessSession) {
+    try {
       final CommandSender sender = context.sender().getSender();
       final String name = context.get(nameArgument);
       final GuildService guildService = new GuildService(statelessSession);
@@ -69,6 +70,8 @@ public class GuildCommand extends Command {
     } catch (Exception exception) {
       transaction.rollback();
       this.exceptionHandler(exception, context.sender().getSender(), "create Guild");
+    } finally {
+      statelessSession.close();
     }
   }
 
@@ -76,11 +79,12 @@ public class GuildCommand extends Command {
     return manager.commandBuilder(this.rootCommandName).literal("disband").handler(this::disband);
   }
 
+  @SuppressWarnings("TryFinallyCanBeTryWithResources")
   private void disband(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     final StatelessSession statelessSession = HibernateUtil.getStatelessSession();
     final Transaction transaction = statelessSession.beginTransaction();
 
-    try (statelessSession) {
+    try {
       final CommandSender sender = context.sender().getSender();
       final GuildService guildService = new GuildService(statelessSession);
 
@@ -98,6 +102,8 @@ public class GuildCommand extends Command {
     } catch (Exception exception) {
       transaction.rollback();
       this.exceptionHandler(exception, context.sender().getSender(), "disband Guild");
+    } finally {
+      statelessSession.close();
     }
   }
 

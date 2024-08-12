@@ -123,13 +123,14 @@ public class GuildService extends Service<GuildModel> {
 
           if (player.getGuild() == null) {
             throw new ValidationException(
-                "Encountered error",
+                "No Guild",
                 String.format("Player %s doesn't have a Guild", performedBy.getUniqueId()));
           }
 
           final GuildModel guild =
               guildRepository
-                  .get(GuildAttribute.ID, player.getGuild(), Set.of(GuildForceFetch.PLAYERS))
+                  .get(
+                      GuildAttribute.ID, player.getGuild().getId(), Set.of(GuildForceFetch.PLAYERS))
                   .join();
 
           if (guild == null) {

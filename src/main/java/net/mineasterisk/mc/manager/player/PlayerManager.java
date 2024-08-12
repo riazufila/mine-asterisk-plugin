@@ -19,12 +19,13 @@ import org.hibernate.Transaction;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerManager implements Listener {
+  @SuppressWarnings("TryFinallyCanBeTryWithResources")
   @EventHandler
   public void onPlayerJoin(final @NotNull PlayerLoginEvent event) {
     final StatelessSession statelessSession = HibernateUtil.getStatelessSession();
     final Transaction transaction = statelessSession.beginTransaction();
 
-    try (statelessSession) {
+    try {
       final Player performedBy = event.getPlayer();
       final PlayerModel playerToAdd =
           new PlayerModel(Instant.now(), performedBy.getUniqueId(), null);
@@ -51,6 +52,8 @@ public class PlayerManager implements Listener {
               String.format(
                   "Unable to initialize Player %s: %s",
                   event.getPlayer().getUniqueId(), exception));
+    } finally {
+      statelessSession.close();
     }
   }
 }
