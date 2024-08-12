@@ -41,25 +41,6 @@ public class GuildService extends Service<GuildModel> {
           final PlayerService playerService = new PlayerService(this.getStatelessSession());
           final Integer nameMaxLength = 10;
 
-          if (name.length() > nameMaxLength) {
-            throw new ValidationException(
-                String.format(
-                    "Guild name should be no longer than %d characters long", nameMaxLength),
-                String.format(
-                    "Player %s is trying to add a Guild with a name longer than %d characters, %s",
-                    performedBy.getUniqueId(), nameMaxLength, name));
-          }
-
-          final GuildModel isGuildExist = guildRepository.get(GuildAttribute.NAME, name).join();
-
-          if (isGuildExist != null) {
-            throw new ValidationException(
-                "Guild name exists",
-                String.format(
-                    "Player %s is trying to add Guild %s but the name is taken",
-                    performedBy.getUniqueId(), name));
-          }
-
           final PlayerModel player =
               playerRepository
                   .get(
@@ -86,20 +67,39 @@ public class GuildService extends Service<GuildModel> {
                   GuildStatus.ACTIVE,
                   Collections.emptySet());
 
-          if (!(performedBy.getUniqueId().equals(guild.getOwner().getUuid()))) {
-            throw new ValidationException(
-                "Not allowed to add Guild for other Player",
-                String.format(
-                    "Player %s is trying to add Guild %s for Player %s",
-                    performedBy.getUniqueId(), guild.getName(), guild.getOwner().getUuid()));
-          }
-
           if (player.getGuild() != null) {
             throw new ValidationException(
                 "Already in a Guild",
                 String.format(
                     "Player %s have an existing Guild %s",
                     performedBy.getUniqueId(), player.getGuild().getName()));
+          }
+
+          final GuildModel isGuildExist = guildRepository.get(GuildAttribute.NAME, name).join();
+
+          if (isGuildExist != null) {
+            throw new ValidationException(
+                "Guild name exists",
+                String.format(
+                    "Player %s is trying to add Guild %s but the name is taken",
+                    performedBy.getUniqueId(), name));
+          }
+
+          if (name.length() > nameMaxLength) {
+            throw new ValidationException(
+                String.format(
+                    "Guild name should be no longer than %d characters long", nameMaxLength),
+                String.format(
+                    "Player %s is trying to add a Guild with a name longer than %d characters, %s",
+                    performedBy.getUniqueId(), nameMaxLength, name));
+          }
+
+          if (!(performedBy.getUniqueId().equals(guild.getOwner().getUuid()))) {
+            throw new ValidationException(
+                "Not allowed to add Guild for other Player",
+                String.format(
+                    "Player %s is trying to add Guild %s for Player %s",
+                    performedBy.getUniqueId(), guild.getName(), guild.getOwner().getUuid()));
           }
 
           guildRepository.add(guild).join();
