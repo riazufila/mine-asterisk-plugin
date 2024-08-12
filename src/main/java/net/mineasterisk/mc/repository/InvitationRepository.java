@@ -63,12 +63,12 @@ public class InvitationRepository
         });
   }
 
-  public @NotNull CompletableFuture<@NotNull Void> add(
+  public @NotNull CompletableFuture<@Nullable Void> add(
       final @NotNull InvitationModel invitationToAdd) {
     return CompletableFuture.runAsync(() -> this.getStatelessSession().insert(invitationToAdd));
   }
 
-  public @NotNull CompletableFuture<@NotNull Void> update(
+  public @NotNull CompletableFuture<@Nullable Void> update(
       final @NotNull InvitationModel invitationToUpdate) {
     return CompletableFuture.runAsync(() -> this.getStatelessSession().update(invitationToUpdate));
   }

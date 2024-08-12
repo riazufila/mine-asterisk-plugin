@@ -98,7 +98,7 @@ public class GuildService extends Service<GuildModel> {
         });
   }
 
-  public @NotNull CompletableFuture<@NotNull Void> update(
+  public @NotNull CompletableFuture<@Nullable Void> update(
       final @NotNull Player performedBy, final @NotNull GuildModel guildToUpdate) {
     return CompletableFuture.supplyAsync(
         () -> {

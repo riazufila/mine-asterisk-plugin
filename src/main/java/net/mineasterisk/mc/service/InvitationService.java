@@ -13,13 +13,14 @@ import net.mineasterisk.mc.repository.PlayerRepository;
 import org.bukkit.entity.Player;
 import org.hibernate.StatelessSession;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class InvitationService extends Service<InvitationModel> {
   public InvitationService(final @NotNull StatelessSession statelessSession) {
     super(statelessSession);
   }
 
-  public @NotNull CompletableFuture<@NotNull Void> add(
+  public @NotNull CompletableFuture<@Nullable Void> add(
       final @NotNull Player performedBy, final @NotNull InvitationModel invitationToAdd) {
     return CompletableFuture.supplyAsync(
         () -> {
@@ -115,7 +116,7 @@ public class InvitationService extends Service<InvitationModel> {
         });
   }
 
-  public @NotNull CompletableFuture<@NotNull Void> update(
+  public @NotNull CompletableFuture<@Nullable Void> update(
       final @NotNull Player performedBy, final @NotNull InvitationModel invitationToUpdate) {
     return CompletableFuture.supplyAsync(
         () -> {

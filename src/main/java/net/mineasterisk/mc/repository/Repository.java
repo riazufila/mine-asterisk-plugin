@@ -25,7 +25,8 @@ public abstract class Repository<T, U, V> {
       final @NotNull Object value,
       final @Nullable Set<@NotNull V> forceFetches);
 
-  public abstract @NotNull CompletableFuture<@NotNull Void> add(final @NotNull T entityToAdd);
+  public abstract @NotNull CompletableFuture<@Nullable Void> add(final @NotNull T entityToAdd);
 
-  public abstract @NotNull CompletableFuture<@NotNull Void> update(final @NotNull T entityToUpdate);
+  public abstract @NotNull CompletableFuture<@Nullable Void> update(
+      final @NotNull T entityToUpdate);
 }

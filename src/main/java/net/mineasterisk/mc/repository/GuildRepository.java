@@ -66,11 +66,12 @@ public class GuildRepository extends Repository<GuildModel, GuildAttribute, Guil
         });
   }
 
-  public @NotNull CompletableFuture<@NotNull Void> add(final @NotNull GuildModel guildToAdd) {
+  public @NotNull CompletableFuture<@Nullable Void> add(final @NotNull GuildModel guildToAdd) {
     return CompletableFuture.runAsync(() -> this.getStatelessSession().insert(guildToAdd));
   }
 
-  public @NotNull CompletableFuture<@NotNull Void> update(final @NotNull GuildModel guildToUpdate) {
+  public @NotNull CompletableFuture<@Nullable Void> update(
+      final @NotNull GuildModel guildToUpdate) {
     return CompletableFuture.runAsync(() -> this.getStatelessSession().update(guildToUpdate));
   }
 }

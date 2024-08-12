@@ -55,11 +55,11 @@ public class PlayerRepository extends Repository<PlayerModel, PlayerAttribute, P
         });
   }
 
-  public @NotNull CompletableFuture<@NotNull Void> add(final @NotNull PlayerModel playerToAdd) {
+  public @NotNull CompletableFuture<@Nullable Void> add(final @NotNull PlayerModel playerToAdd) {
     return CompletableFuture.runAsync(() -> this.getStatelessSession().insert(playerToAdd));
   }
 
-  public @NotNull CompletableFuture<@NotNull Void> update(
+  public @NotNull CompletableFuture<@Nullable Void> update(
       final @NotNull PlayerModel playerToUpdate) {
     return CompletableFuture.runAsync(() -> this.getStatelessSession().update(playerToUpdate));
   }
