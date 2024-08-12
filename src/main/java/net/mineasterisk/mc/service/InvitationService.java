@@ -161,7 +161,7 @@ public class InvitationService extends Service<InvitationModel> {
                     "Inviter %s is trying to update Player %s's invitation to Guild %s, but isn't in a Guild",
                     inviter.getUuid(),
                     invitationToUpdate.getInvitee().getUuid(),
-                    inviter.getGuild().getName()));
+                    invitationToUpdate.getGuild().getName()));
           }
 
           if (inviter.getGuild().getId() == invitationToUpdate.getGuild().getId()) {

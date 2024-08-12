@@ -14,7 +14,6 @@ import java.time.Instant;
 import java.util.UUID;
 import net.mineasterisk.mc.constant.status.InvitationStatus;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 @Entity(name = InvitationModel.entity)
 public final class InvitationModel {
@@ -61,7 +60,7 @@ public final class InvitationModel {
       final @NotNull Instant createdAt,
       final @NotNull PlayerModel inviter,
       final @NotNull PlayerModel invitee,
-      final @Nullable GuildModel guild,
+      final @NotNull GuildModel guild,
       final @NotNull InvitationStatus status) {
     this.createdAt = createdAt;
     this.inviter = inviter;
