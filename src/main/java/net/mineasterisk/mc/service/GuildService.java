@@ -39,6 +39,17 @@ public class GuildService extends Service<GuildModel> {
 
           final GuildRepository guildRepository = new GuildRepository(this.getStatelessSession());
           final PlayerService playerService = new PlayerService(this.getStatelessSession());
+          final Integer nameMaxLength = 10;
+
+          if (name.length() > nameMaxLength) {
+            throw new ValidationException(
+                String.format(
+                    "Guild name should be no longer than %d characters long", nameMaxLength),
+                String.format(
+                    "Player %s is trying to add a Guild with a name longer than %d characters, %s",
+                    performedBy.getUniqueId(), nameMaxLength, name));
+          }
+
           final PlayerModel player =
               playerRepository
                   .get(
