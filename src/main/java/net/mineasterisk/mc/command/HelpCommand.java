@@ -56,12 +56,11 @@ public class HelpCommand {
                             .map(Suggestion::suggestion)
                             .collect(Collectors.toList())))
         .handler(
-            context -> {
-              HelpQueryResult<CommandSourceStack> result =
-                  help.query(HelpQuery.of(context.sender(), context.get(commandArgument)));
-
-              this.printHelp(context.sender(), context.get(commandArgument), result);
-            });
+            context ->
+                this.printHelp(
+                    context.sender(),
+                    context.get(commandArgument),
+                    help.query(HelpQuery.of(context.sender(), context.get(commandArgument)))));
   }
 
   private void printHelp(
