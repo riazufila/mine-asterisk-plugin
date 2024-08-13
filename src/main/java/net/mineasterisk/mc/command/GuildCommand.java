@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.incendo.cloud.Command.Builder;
-import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.paper.PaperCommandManager;
 import org.incendo.cloud.parser.standard.StringParser;
 import org.jetbrains.annotations.NotNull;
@@ -41,19 +40,15 @@ public class GuildCommand extends Command {
         .commandBuilder(this.rootCommandName)
         .literal("create")
         .required(nameArgument, StringParser.greedyStringParser())
-        .handler(context -> this.create(context, nameArgument));
+        .handler(context -> this.create(context.sender().getSender(), context.get(nameArgument)));
   }
 
   @SuppressWarnings("TryFinallyCanBeTryWithResources")
-  private void create(
-      final @NotNull CommandContext<@NotNull CommandSourceStack> context,
-      final @NotNull String nameArgument) {
+  private void create(final @NotNull CommandSender sender, final @NotNull String name) {
     final StatelessSession statelessSession = HibernateUtil.getStatelessSession();
     final Transaction transaction = statelessSession.beginTransaction();
 
     try {
-      final CommandSender sender = context.sender().getSender();
-      final String name = context.get(nameArgument);
       final GuildService guildService = new GuildService(statelessSession);
 
       if (!(sender instanceof Player performedBy)) {
@@ -69,23 +64,25 @@ public class GuildCommand extends Command {
       performedBy.sendMessage(Component.text("Created Guild").color(NamedTextColor.GREEN));
     } catch (Exception exception) {
       transaction.rollback();
-      this.exceptionHandler(exception, context.sender().getSender(), "create Guild");
+      this.exceptionHandler(exception, sender, "create Guild");
     } finally {
       statelessSession.close();
     }
   }
 
   private @NotNull Builder<@NotNull CommandSourceStack> disbandCommand() {
-    return manager.commandBuilder(this.rootCommandName).literal("disband").handler(this::disband);
+    return manager
+        .commandBuilder(this.rootCommandName)
+        .literal("disband")
+        .handler(context -> this.disband(context.sender().getSender()));
   }
 
   @SuppressWarnings("TryFinallyCanBeTryWithResources")
-  private void disband(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
+  private void disband(final @NotNull CommandSender sender) {
     final StatelessSession statelessSession = HibernateUtil.getStatelessSession();
     final Transaction transaction = statelessSession.beginTransaction();
 
     try {
-      final CommandSender sender = context.sender().getSender();
       final GuildService guildService = new GuildService(statelessSession);
 
       if (!(sender instanceof Player performedBy)) {
@@ -101,7 +98,7 @@ public class GuildCommand extends Command {
       performedBy.sendMessage(Component.text("Disbanded Guild").color(NamedTextColor.GREEN));
     } catch (Exception exception) {
       transaction.rollback();
-      this.exceptionHandler(exception, context.sender().getSender(), "disband Guild");
+      this.exceptionHandler(exception, sender, "disband Guild");
     } finally {
       statelessSession.close();
     }
