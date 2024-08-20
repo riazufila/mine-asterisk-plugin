@@ -1,18 +1,17 @@
 package net.mineasterisk.mc.util;
 
 public class LoaderUtil {
-  public static boolean startup() {
-    try {
-      HibernateUtil.loadSessionFactory();
-      CommandUtil.register();
-      EventUtil.register();
+  public static void preLoad() {
+    CommandUtil.register();
+    EventUtil.register();
+    CacheUtil.load();
 
-      return true;
-    } catch (Exception exception) {
-      PluginUtil.getLogger()
-          .severe(String.format("Unable to load startup configurations: %s", exception));
+    PluginUtil.getLogger().info("Pre-loaded configuration(s) and resource(s)");
+  }
 
-      return false;
-    }
+  public static void postLoad() {
+    CacheUtil.persist();
+
+    PluginUtil.getLogger().info("Post-loaded configuration(s) and resource(s)");
   }
 }

@@ -1,7 +1,7 @@
 package net.mineasterisk.mc.util;
 
 import net.mineasterisk.mc.MineAsterisk;
-import net.mineasterisk.mc.manager.player.PlayerManager;
+import net.mineasterisk.mc.service.access.AccessService;
 import org.bukkit.plugin.PluginManager;
 
 public class EventUtil {
@@ -9,6 +9,8 @@ public class EventUtil {
     final MineAsterisk plugin = PluginUtil.get();
     final PluginManager manager = plugin.getServer().getPluginManager();
 
-    manager.registerEvents(new PlayerManager(), plugin);
+    manager.registerEvents(new AccessService(), plugin);
+
+    PluginUtil.getLogger().info("Registered event(s)");
   }
 }

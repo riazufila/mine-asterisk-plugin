@@ -1,30 +1,26 @@
 package net.mineasterisk.mc.util;
 
-import io.papermc.paper.command.brigadier.CommandSourceStack;
-import net.mineasterisk.mc.command.GuildCommand;
+import io.papermc.paper.command.brigadier.Commands;
+import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.mineasterisk.mc.command.HelpCommand;
-import org.incendo.cloud.execution.ExecutionCoordinator;
-import org.incendo.cloud.help.HelpHandler;
-import org.incendo.cloud.paper.PaperCommandManager;
-import org.jetbrains.annotations.NotNull;
+import net.mineasterisk.mc.command.TeamCommand;
+import org.bukkit.plugin.Plugin;
 
+@SuppressWarnings("UnstableApiUsage")
 public class CommandUtil {
   public static void register() {
-    final PaperCommandManager<CommandSourceStack> manager = CommandUtil.getCommandManager();
-    final HelpHandler<CommandSourceStack> help = CommandUtil.getHelp(manager);
+    final LifecycleEventManager<Plugin> manager = PluginUtil.getLifecycleManager();
 
-    new GuildCommand(manager).build().forEach(manager::command);
-    new HelpCommand(manager, help).build().forEach(manager::command);
-  }
+    manager.registerEventHandler(
+        LifecycleEvents.COMMANDS,
+        event -> {
+          final Commands commands = event.registrar();
 
-  private static @NotNull PaperCommandManager<@NotNull CommandSourceStack> getCommandManager() {
-    return PaperCommandManager.builder()
-        .executionCoordinator(ExecutionCoordinator.asyncCoordinator())
-        .buildOnEnable(PluginUtil.get());
-  }
+          commands.register(new TeamCommand().build());
+          commands.register(new HelpCommand(commands.getDispatcher()).build());
+        });
 
-  private static @NotNull HelpHandler<@NotNull CommandSourceStack> getHelp(
-      @NotNull PaperCommandManager<@NotNull CommandSourceStack> manager) {
-    return manager.createHelpHandler();
+    PluginUtil.getLogger().info("Registered command(s)");
   }
 }
