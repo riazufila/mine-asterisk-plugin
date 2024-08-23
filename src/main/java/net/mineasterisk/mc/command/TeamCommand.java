@@ -88,12 +88,14 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
     return source.getSender().hasPermission(PermissionConstant.TEAM_OWNER.toString());
   }
 
+  @SuppressWarnings("SameReturnValue")
   private int info(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     context.getSource().getSender().sendPlainMessage("TODO: Team info command");
 
     return Command.SINGLE_SUCCESS;
   }
 
+  @SuppressWarnings("SameReturnValue")
   private int create(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
@@ -124,6 +126,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
     return Command.SINGLE_SUCCESS;
   }
 
+  @SuppressWarnings("SameReturnValue")
   private int disband(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
@@ -151,6 +154,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
     return Command.SINGLE_SUCCESS;
   }
 
+  @SuppressWarnings("SameReturnValue")
   private int sendInvite(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
@@ -194,6 +198,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
     return Command.SINGLE_SUCCESS;
   }
 
+  @SuppressWarnings("SameReturnValue")
   private int acceptInvite(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
@@ -237,6 +242,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
     return Command.SINGLE_SUCCESS;
   }
 
+  @SuppressWarnings("SameReturnValue")
   private int removeInvite(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
@@ -280,6 +286,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
     return Command.SINGLE_SUCCESS;
   }
 
+  @SuppressWarnings("SameReturnValue")
   private int kick(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     context.getSource().getSender().sendPlainMessage("TODO: Team kick command");
 

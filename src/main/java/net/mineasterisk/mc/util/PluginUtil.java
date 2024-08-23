@@ -1,7 +1,6 @@
 package net.mineasterisk.mc.util;
 
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
-import java.io.File;
 import java.util.logging.Logger;
 import net.mineasterisk.mc.MineAsterisk;
 import org.bukkit.Server;
@@ -24,10 +23,6 @@ public class PluginUtil {
 
   public static @NotNull Scoreboard getMainScoreboard() {
     return PluginUtil.getServer().getScoreboardManager().getMainScoreboard();
-  }
-
-  public static @NotNull File getDataFolder() {
-    return PluginUtil.PLUGIN.getDataFolder();
   }
 
   @SuppressWarnings("UnstableApiUsage")

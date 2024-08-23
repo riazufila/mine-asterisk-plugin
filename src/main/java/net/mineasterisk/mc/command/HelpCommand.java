@@ -43,6 +43,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
         .build();
   }
 
+  @SuppressWarnings("SameReturnValue")
   private int generalHelp(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
@@ -93,6 +94,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
     return builder.buildFuture();
   }
 
+  @SuppressWarnings("SameReturnValue")
   private int filteredHelp(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
