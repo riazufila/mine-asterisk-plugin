@@ -53,6 +53,12 @@ public class AccessService implements Listener {
     player.updateCommands();
   }
 
+  public void removeIfOffline(final @NotNull UUID uuid, final @NotNull String permission) {
+    final AccessCache accessCache = new AccessCache();
+
+    accessCache.remove(uuid, permission);
+  }
+
   private void attach(final @NotNull Player player) {
     final AccessCache accessCache = new AccessCache();
     final Set<String> permissionsCached = accessCache.get(player.getUniqueId());

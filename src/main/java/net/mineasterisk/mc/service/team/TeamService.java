@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.constant.PermissionConstant;
@@ -13,6 +14,7 @@ import net.mineasterisk.mc.exception.ValidationException;
 import net.mineasterisk.mc.model.Invitation;
 import net.mineasterisk.mc.service.access.AccessService;
 import net.mineasterisk.mc.util.PluginUtil;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -61,14 +63,24 @@ public class TeamService {
           String.format("Player %s (%s) isn't in a Team", player.getName(), player.getUniqueId()));
     }
 
-    team.unregister();
-
     final AccessService accessService = new AccessService();
 
-    accessService.remove(player, PermissionConstant.TEAM_OWNER.toString());
-    accessService.remove(player, PermissionConstant.TEAM_MEMBER.toString());
+    //noinspection deprecation
+    for (OfflinePlayer offlinePlayer : team.getPlayers()) {
+      final Player member = offlinePlayer.getPlayer();
 
-    // TODO: Remove other Players' permission.
+      if (member == null) {
+        final UUID uuid = offlinePlayer.getUniqueId();
+
+        accessService.removeIfOffline(uuid, PermissionConstant.TEAM_MEMBER.toString());
+      } else {
+        accessService.remove(member, PermissionConstant.TEAM_MEMBER.toString());
+      }
+    }
+
+    accessService.remove(player, PermissionConstant.TEAM_OWNER.toString());
+
+    team.unregister();
   }
 
   public void sendInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
