@@ -288,7 +288,41 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
 
   @SuppressWarnings("SameReturnValue")
   private int kick(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
-    context.getSource().getSender().sendPlainMessage("TODO: Team kick command");
+    final CommandSourceStack source = context.getSource();
+    final CommandSender sender = source.getSender();
+
+    try {
+      if (!(sender instanceof Player kicker)) {
+        throw new EntityException(
+            String.format(
+                "Sender %s isn't a Player and tries to execute command", sender.getName()));
+      }
+
+      final TeamService teamService = new TeamService();
+      final Player kicked =
+          context
+              .getArgument("player", PlayerSelectorArgumentResolver.class)
+              .resolve(source)
+              .getFirst();
+
+      teamService.kick(kicker, kicked);
+
+      kicker.sendMessage(
+          Component.text(String.format("Kicked %s from the Team", kicked.getName()))
+              .color(NamedTextColor.GREEN));
+
+      kicked.sendMessage(
+          Component.text(String.format("%s kicked you from the Team", kicker.getName()))
+              .color(NamedTextColor.RED));
+
+      PluginUtil.getLogger()
+          .info(
+              String.format(
+                  "Player %s (%s) kicked Player %s (%s) from the Team",
+                  kicker.getName(), kicker.getUniqueId(), kicked.getName(), kicked.getUniqueId()));
+    } catch (Exception exception) {
+      ExceptionUtil.handleCommand(exception, sender, "Team kick");
+    }
 
     return Command.SINGLE_SUCCESS;
   }

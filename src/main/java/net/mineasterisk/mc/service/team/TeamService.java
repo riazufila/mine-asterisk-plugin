@@ -231,6 +231,45 @@ public class TeamService {
     PluginUtil.getScheduler().cancelTask(invitation.getKey());
   }
 
+  public void kick(final @NotNull Player kicker, final @NotNull Player kicked) {
+    final Team kickerTeam = this.get(kicker);
+    final Team kickedTeam = this.get(kicked);
+
+    if (kickerTeam == null) {
+      throw new ValidationException(
+          "Not in a Team",
+          String.format("Player %s (%s) isn't in a Team", kicker.getName(), kicker.getUniqueId()));
+    }
+
+    if (kickedTeam == null) {
+      throw new ValidationException(
+          "Player isn't in a Team",
+          String.format(
+              "Player %s (%s) is being kicked but isn't in a Team",
+              kicked.getName(), kicked.getUniqueId()));
+    }
+
+    if (!kickerTeam.getName().equals(kickedTeam.getName())) {
+      throw new ValidationException(
+          "Not in the same Team",
+          String.format(
+              "Player %s (%s) is trying to kick out Player %s (%s) but isn't in the Team",
+              kicker.getName(), kicker.getUniqueId(), kicked.getName(), kicked.getUniqueId()));
+    }
+
+    if (kicker.getName().equals(kicked.getName())) {
+      throw new ValidationException(
+          "Not allowed to kick yourself",
+          String.format(
+              "Player %s (%s) is trying to kick itself", kicker.getName(), kicker.getUniqueId()));
+    }
+
+    final AccessService accessService = new AccessService();
+
+    kickerTeam.removeEntity(kicked);
+    accessService.remove(kicked, PermissionConstant.TEAM_MEMBER.toString());
+  }
+
   private @Nullable Map.Entry<Integer, Invitation> getInvitationByInviter(
       final @NotNull Player inviter) {
     final Optional<Map.Entry<Integer, Invitation>> invitation =
