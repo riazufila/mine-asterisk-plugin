@@ -28,9 +28,9 @@ public class AccessRepository extends Repository {
           final HashMap<UUID, Set<String>> playersAccesses = new HashMap<>();
           final StringJoiner sql = new StringJoiner(" ");
 
-          sql.add("SELECT entity.uuid, permission.value");
-          sql.add("FROM entity");
-          sql.add("INNER JOIN access ON entity.id = access.entity_id");
+          sql.add("SELECT player.uuid, permission.value");
+          sql.add("FROM player");
+          sql.add("INNER JOIN access ON player.id = access.player_id");
           sql.add("INNER JOIN permission ON access.permission_id = permission.id");
 
           try {
@@ -69,15 +69,15 @@ public class AccessRepository extends Repository {
 
           deleteSql.add("DELETE access");
           deleteSql.add("FROM access");
-          deleteSql.add("INNER JOIN entity ON access.entity_id = entity.id");
+          deleteSql.add("INNER JOIN player ON access.player_id = player.id");
           deleteSql.add("INNER JOIN permission ON access.permission_id = permission.id");
-          deleteSql.add("WHERE entity.uuid = ?");
+          deleteSql.add("WHERE player.uuid = ?");
 
-          insertSql.add("INSERT INTO access (entity_id, permission_id)");
-          insertSql.add("SELECT entity.id, permission.id");
-          insertSql.add("FROM entity");
+          insertSql.add("INSERT INTO access (player_id, permission_id)");
+          insertSql.add("SELECT player.id, permission.id");
+          insertSql.add("FROM player");
           insertSql.add("INNER JOIN permission ON permission.value = ?");
-          insertSql.add("WHERE entity.uuid = ?");
+          insertSql.add("WHERE player.uuid = ?");
 
           try {
             final PreparedStatement deleteStatement =

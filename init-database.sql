@@ -3,7 +3,7 @@ CREATE DATABASE `mine-asterisk`;
 
 USE `mine-asterisk`;
 
-CREATE TABLE entity (
+CREATE TABLE player (
     id INT NOT NULL AUTO_INCREMENT,
     uuid VARCHAR(36) NOT NULL,
     PRIMARY KEY (id)
@@ -16,13 +16,13 @@ CREATE TABLE permission (
 );
 
 CREATE TABLE access (
-    entity_id INT NOT NULL,
+    player_id INT NOT NULL,
     permission_id INT NOT NULL,
-    CONSTRAINT `foreign_key_access_entity_entity_id` FOREIGN KEY (entity_id)
-        REFERENCES entity (id),
+    CONSTRAINT `foreign_key_access_player_player_id` FOREIGN KEY (player_id)
+        REFERENCES player (id),
     CONSTRAINT `foreign_key_access_permission_permission_id` FOREIGN KEY (permission_id)
         REFERENCES permission (id),
-    UNIQUE `unique_access` (`entity_id` , `permission_id`)
+    UNIQUE `unique_access` (`player_id` , `permission_id`)
 );
 
 INSERT INTO permission VALUES
