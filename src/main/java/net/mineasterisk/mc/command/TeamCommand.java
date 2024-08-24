@@ -69,23 +69,23 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
   private boolean canCreate(final @NotNull CommandSourceStack source) {
     CommandSender sender = source.getSender();
 
-    return !(sender.hasPermission(PermissionConstant.TEAM_OWNER.toString())
+    return !(sender.hasPermission(PermissionConstant.TEAM_LEADER.toString())
         || sender.hasPermission(PermissionConstant.TEAM_MEMBER.toString()));
   }
 
   private boolean canRead(final @NotNull CommandSourceStack source) {
     CommandSender sender = source.getSender();
 
-    return sender.hasPermission(PermissionConstant.TEAM_OWNER.toString())
+    return sender.hasPermission(PermissionConstant.TEAM_LEADER.toString())
         || sender.hasPermission(PermissionConstant.TEAM_MEMBER.toString());
   }
 
   private boolean canUpdate(final @NotNull CommandSourceStack source) {
-    return source.getSender().hasPermission(PermissionConstant.TEAM_OWNER.toString());
+    return source.getSender().hasPermission(PermissionConstant.TEAM_LEADER.toString());
   }
 
   private boolean canDelete(final @NotNull CommandSourceStack source) {
-    return source.getSender().hasPermission(PermissionConstant.TEAM_OWNER.toString());
+    return source.getSender().hasPermission(PermissionConstant.TEAM_LEADER.toString());
   }
 
   @SuppressWarnings("SameReturnValue")

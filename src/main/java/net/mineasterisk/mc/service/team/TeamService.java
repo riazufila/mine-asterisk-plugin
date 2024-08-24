@@ -50,7 +50,7 @@ public class TeamService {
             Component.text(name).color(NamedTextColor.GRAY),
             Component.text('.').color(NamedTextColor.GRAY)));
 
-    accessService.add(player, PermissionConstant.TEAM_OWNER.toString());
+    accessService.add(player, PermissionConstant.TEAM_LEADER.toString());
     accessService.add(player, PermissionConstant.TEAM_MEMBER.toString());
   }
 
@@ -78,7 +78,7 @@ public class TeamService {
       }
     }
 
-    accessService.remove(player, PermissionConstant.TEAM_OWNER.toString());
+    accessService.remove(player, PermissionConstant.TEAM_LEADER.toString());
 
     team.unregister();
   }

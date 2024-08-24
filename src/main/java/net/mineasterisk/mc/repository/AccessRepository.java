@@ -15,9 +15,8 @@ import net.mineasterisk.mc.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("resource")
 public class AccessRepository extends Repository {
-  public AccessRepository(@NotNull Connection connection) {
+  public AccessRepository(final @NotNull Connection connection) {
     super(connection);
   }
 
@@ -80,9 +79,11 @@ public class AccessRepository extends Repository {
           insertSql.add("WHERE player.uuid = ?");
 
           try {
+            @SuppressWarnings("resource")
             final PreparedStatement deleteStatement =
                 this.getConnection().prepareStatement(deleteSql.toString());
 
+            @SuppressWarnings("resource")
             final PreparedStatement insertStatement =
                 this.getConnection().prepareStatement(insertSql.toString());
 
