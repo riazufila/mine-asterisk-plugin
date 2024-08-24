@@ -3,7 +3,7 @@ package net.mineasterisk.mc.service.access;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
-import net.mineasterisk.mc.cache.AccessCache;
+import net.mineasterisk.mc.cache.access.AccessCache;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,38 +30,42 @@ public class AccessService implements Listener {
   public void add(final @NotNull Player player, final @NotNull String permission) {
     final PermissionAttachment permissionAttachment = this.get(player);
     final AccessCache accessCache = new AccessCache();
+    final UUID uuid = player.getUniqueId();
 
     if (player.hasPermission(permission)) {
       return;
     }
 
     permissionAttachment.setPermission(permission, true);
-    accessCache.put(player.getUniqueId(), permission);
     player.updateCommands();
+
+    accessCache.get(uuid).addAccess(permission);
   }
 
   public void remove(final @NotNull Player player, final @NotNull String permission) {
     final PermissionAttachment permissionAttachment = this.get(player);
     final AccessCache accessCache = new AccessCache();
+    final UUID uuid = player.getUniqueId();
 
     if (!player.hasPermission(permission)) {
       return;
     }
 
     permissionAttachment.unsetPermission(permission);
-    accessCache.remove(player.getUniqueId(), permission);
     player.updateCommands();
+
+    accessCache.get(uuid).removeAccess(permission);
   }
 
   public void removeIfOffline(final @NotNull UUID uuid, final @NotNull String permission) {
     final AccessCache accessCache = new AccessCache();
 
-    accessCache.remove(uuid, permission);
+    accessCache.get(uuid).removeAccess(permission);
   }
 
   private void attach(final @NotNull Player player) {
     final AccessCache accessCache = new AccessCache();
-    final Set<String> permissionsCached = accessCache.get(player.getUniqueId());
+    final Set<String> permissionsCached = accessCache.get(player.getUniqueId()).getAccesses();
 
     if (permissionsCached.isEmpty()) {
       return;

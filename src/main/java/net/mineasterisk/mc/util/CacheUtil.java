@@ -2,7 +2,7 @@ package net.mineasterisk.mc.util;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import net.mineasterisk.mc.cache.AccessCache;
+import net.mineasterisk.mc.cache.access.AccessCache;
 import net.mineasterisk.mc.repository.AccessRepository;
 
 class CacheUtil {
@@ -31,7 +31,7 @@ class CacheUtil {
       final AccessRepository accessRepository = new AccessRepository(connection);
       final AccessCache accessCache = new AccessCache();
 
-      accessRepository.updatePlayersAccesses(accessCache.getDirtyEntries()).join();
+      accessRepository.updatePlayersAccesses(accessCache.getAllDirty()).join();
       connection.commit();
 
       PluginUtil.getLogger().info("Persisted cache into database if any");

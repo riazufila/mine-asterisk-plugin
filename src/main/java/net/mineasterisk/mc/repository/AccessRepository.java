@@ -7,10 +7,10 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import net.mineasterisk.mc.cache.access.Access;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,11 +20,11 @@ public class AccessRepository extends Repository {
     super(connection);
   }
 
-  public @NotNull CompletableFuture<@NotNull HashMap<@NotNull UUID, @NotNull Set<String>>>
+  public @NotNull CompletableFuture<@NotNull HashMap<@NotNull UUID, @NotNull Access>>
       getAllPlayersAccesses() {
     return CompletableFuture.supplyAsync(
         () -> {
-          final HashMap<UUID, Set<String>> playersAccesses = new HashMap<>();
+          final HashMap<UUID, Access> playersAccesses = new HashMap<>();
           final StringJoiner sql = new StringJoiner(" ");
 
           sql.add("SELECT player.uuid, permission.value");
@@ -40,7 +40,10 @@ public class AccessRepository extends Repository {
                   UUID uuid = UUID.fromString(result.getString("uuid"));
                   String permission = result.getString("value");
 
-                  playersAccesses.computeIfAbsent(uuid, key -> new HashSet<>()).add(permission);
+                  playersAccesses
+                      .computeIfAbsent(uuid, key -> new Access(new HashSet<>()))
+                      .getAccesses()
+                      .add(permission);
                 }
               }
             }
@@ -56,7 +59,7 @@ public class AccessRepository extends Repository {
   }
 
   public @NotNull CompletableFuture<@Nullable Void> updatePlayersAccesses(
-      final @NotNull HashMap<@NotNull UUID, @NotNull Set<String>> playersAccesses) {
+      final @NotNull HashMap<@NotNull UUID, @NotNull Access> playersAccesses) {
     return CompletableFuture.runAsync(
         () -> {
           if (playersAccesses.isEmpty()) {
@@ -87,13 +90,13 @@ public class AccessRepository extends Repository {
             final PreparedStatement insertStatement =
                 this.getConnection().prepareStatement(insertSql.toString());
 
-            for (final Map.Entry<UUID, Set<String>> entry : playersAccesses.entrySet()) {
+            for (final Map.Entry<UUID, Access> entry : playersAccesses.entrySet()) {
               UUID uuid = entry.getKey();
 
               deleteStatement.setString(1, String.valueOf(uuid));
               deleteStatement.addBatch();
 
-              for (final String permission : entry.getValue()) {
+              for (final String permission : entry.getValue().getAccesses()) {
                 insertStatement.setString(1, permission);
                 insertStatement.setString(2, String.valueOf(uuid));
                 insertStatement.addBatch();
