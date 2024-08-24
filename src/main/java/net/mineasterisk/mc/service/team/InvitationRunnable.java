@@ -6,7 +6,7 @@ import net.mineasterisk.mc.model.Invitation;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-public class InvitationRunnable extends BukkitRunnable {
+class InvitationRunnable extends BukkitRunnable {
   private final int loop;
   private final @NotNull Invitation invitation;
   private int count = 0;

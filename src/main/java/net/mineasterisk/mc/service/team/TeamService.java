@@ -25,7 +25,7 @@ public class TeamService {
   private static final @NotNull Map<@NotNull Integer, @NotNull Invitation> INVITATIONS =
       new HashMap<>();
 
-  public @Nullable Team get(final @NotNull Player player) {
+  private @Nullable Team get(final @NotNull Player player) {
     return PluginUtil.getMainScoreboard().getEntityTeam(player);
   }
 
@@ -298,7 +298,7 @@ public class TeamService {
     return invitation.orElse(null);
   }
 
-  public void addInvitationTask(final int taskId, final @NotNull Invitation invitation) {
+  protected void addInvitationTask(final int taskId, final @NotNull Invitation invitation) {
     if (TeamService.INVITATIONS.containsKey(taskId)) {
       return;
     }
@@ -306,7 +306,7 @@ public class TeamService {
     TeamService.INVITATIONS.put(taskId, invitation);
   }
 
-  public void removeInvitationTask(final int taskId) {
+  protected void removeInvitationTask(final int taskId) {
     if (!TeamService.INVITATIONS.containsKey(taskId)) {
       return;
     }

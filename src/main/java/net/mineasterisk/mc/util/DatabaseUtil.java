@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class DatabaseUtil {
   private static HikariDataSource dataSource;
 
-  public static void initialize() {
+  private static void initialize() {
     DatabaseUtil.dataSource = new HikariDataSource(DatabaseUtil.configure());
   }
 

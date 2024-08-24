@@ -10,7 +10,7 @@ public class Repository {
     this.connection = connection;
   }
 
-  public @NotNull Connection getConnection() {
+  protected @NotNull Connection getConnection() {
     return this.connection;
   }
 }

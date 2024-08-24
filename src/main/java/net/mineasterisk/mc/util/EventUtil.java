@@ -5,8 +5,8 @@ import net.mineasterisk.mc.service.access.AccessService;
 import net.mineasterisk.mc.service.player.PlayerService;
 import org.bukkit.plugin.PluginManager;
 
-public class EventUtil {
-  public static void register() {
+class EventUtil {
+  protected static void register() {
     final MineAsterisk plugin = PluginUtil.get();
     final PluginManager manager = plugin.getServer().getPluginManager();
 

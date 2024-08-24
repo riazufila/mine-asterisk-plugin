@@ -80,7 +80,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
     return Command.SINGLE_SUCCESS;
   }
 
-  public @NotNull CompletableFuture<Suggestions> filteredHelpSuggestions(
+  private @NotNull CompletableFuture<Suggestions> filteredHelpSuggestions(
       final @NotNull CommandContext<@NotNull CommandSourceStack> context,
       final @NotNull SuggestionsBuilder builder) {
     final CommandSourceStack source = context.getSource();

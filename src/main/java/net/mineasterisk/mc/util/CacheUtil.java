@@ -5,8 +5,8 @@ import java.sql.SQLException;
 import net.mineasterisk.mc.cache.AccessCache;
 import net.mineasterisk.mc.repository.AccessRepository;
 
-public class CacheUtil {
-  public static void load() {
+class CacheUtil {
+  protected static void load() {
     try {
       try (final Connection connection = DatabaseUtil.getConnection()) {
         final AccessRepository accessRepository = new AccessRepository(connection);
@@ -24,7 +24,7 @@ public class CacheUtil {
     }
   }
 
-  public static void persist() {
+  protected static void persist() {
     final Connection connection = DatabaseUtil.getConnection();
     try {
 

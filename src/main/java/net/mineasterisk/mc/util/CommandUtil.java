@@ -8,8 +8,8 @@ import net.mineasterisk.mc.command.TeamCommand;
 import org.bukkit.plugin.Plugin;
 
 @SuppressWarnings("UnstableApiUsage")
-public class CommandUtil {
-  public static void register() {
+class CommandUtil {
+  protected static void register() {
     final LifecycleEventManager<Plugin> manager = PluginUtil.getLifecycleManager();
 
     manager.registerEventHandler(
