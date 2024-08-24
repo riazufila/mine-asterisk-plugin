@@ -30,6 +30,7 @@ public class TeamService {
   }
 
   public void create(final @NotNull Player player, final @NotNull String name) {
+    final Scoreboard scoreboard = PluginUtil.getMainScoreboard();
     final Team playerTeam = this.get(player);
 
     if (playerTeam != null) {
@@ -39,7 +40,14 @@ public class TeamService {
               "Player %s (%s) is already in a Team", player.getName(), player.getUniqueId()));
     }
 
-    final Scoreboard scoreboard = PluginUtil.getMainScoreboard();
+    if (scoreboard.getTeam(name) != null) {
+      throw new ValidationException(
+          "Team name is taken",
+          String.format(
+              "Player %s (%s) is trying to create a Team but the name is taken",
+              player.getName(), player.getUniqueId()));
+    }
+
     final Team team = scoreboard.registerNewTeam(name);
     final AccessService accessService = new AccessService();
 
