@@ -6,10 +6,10 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
-import io.papermc.paper.command.brigadier.argument.ArgumentTypes;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.mineasterisk.mc.command.parser.PlayerExceptSelf;
 import net.mineasterisk.mc.constant.PermissionConstant;
 import net.mineasterisk.mc.exception.EntityException;
 import net.mineasterisk.mc.service.team.TeamService;
@@ -37,25 +37,25 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                 .then(
                     Commands.literal("send")
                         .then(
-                            Commands.argument("player", ArgumentTypes.player())
+                            Commands.argument("player", new PlayerExceptSelf())
                                 .executes(this::sendInvite))
                         .requires(this::canUpdate))
                 .then(
                     Commands.literal("accept")
                         .then(
-                            Commands.argument("player", ArgumentTypes.player())
+                            Commands.argument("player", new PlayerExceptSelf())
                                 .executes(this::acceptInvite))
                         .requires(this::canCreate))
                 .then(
                     Commands.literal("remove")
                         .then(
-                            Commands.argument("player", ArgumentTypes.player())
+                            Commands.argument("player", new PlayerExceptSelf())
                                 .executes(this::removeInvite))
                         .requires(this::canUpdate))
                 .requires(source -> this.canUpdate(source) || this.canCreate(source)))
         .then(
             Commands.literal("kick")
-                .then(Commands.argument("player", ArgumentTypes.player()).executes(this::kick))
+                .then(Commands.argument("player", new PlayerExceptSelf()).executes(this::kick))
                 .requires(this::canUpdate))
         .requires(
             source ->
