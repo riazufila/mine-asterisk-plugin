@@ -1,12 +1,12 @@
-package net.mineasterisk.mc.service.team;
+package net.mineasterisk.mc.service.team.invitation;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.mineasterisk.mc.model.Invitation;
+import net.mineasterisk.mc.service.team.TeamService;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
-class InvitationRunnable extends BukkitRunnable {
+public class InvitationRunnable extends BukkitRunnable {
   private final int loop;
   private final @NotNull Invitation invitation;
   private int count = 0;

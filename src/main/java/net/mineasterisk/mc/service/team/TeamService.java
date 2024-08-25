@@ -11,8 +11,9 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.constant.PermissionConstant;
 import net.mineasterisk.mc.exception.ValidationException;
-import net.mineasterisk.mc.model.Invitation;
 import net.mineasterisk.mc.service.access.AccessService;
+import net.mineasterisk.mc.service.team.invitation.Invitation;
+import net.mineasterisk.mc.service.team.invitation.InvitationRunnable;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -298,7 +299,7 @@ public class TeamService {
     return invitation.orElse(null);
   }
 
-  protected void addInvitationTask(final int taskId, final @NotNull Invitation invitation) {
+  public void addInvitationTask(final int taskId, final @NotNull Invitation invitation) {
     if (TeamService.INVITATIONS.containsKey(taskId)) {
       return;
     }
@@ -306,7 +307,7 @@ public class TeamService {
     TeamService.INVITATIONS.put(taskId, invitation);
   }
 
-  protected void removeInvitationTask(final int taskId) {
+  public void removeInvitationTask(final int taskId) {
     if (!TeamService.INVITATIONS.containsKey(taskId)) {
       return;
     }

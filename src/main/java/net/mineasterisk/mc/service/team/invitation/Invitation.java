@@ -1,4 +1,4 @@
-package net.mineasterisk.mc.model;
+package net.mineasterisk.mc.service.team.invitation;
 
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
