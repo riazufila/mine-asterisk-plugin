@@ -2,32 +2,33 @@ package net.mineasterisk.mc.service.player;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.repository.PlayerRepository;
 import net.mineasterisk.mc.util.DatabaseUtil;
 import net.mineasterisk.mc.util.PluginUtil;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
-import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerService implements Listener {
   @EventHandler
-  public void onPlayerLogin(@NotNull PlayerLoginEvent event) {
+  public void onPlayerLogin(@NotNull AsyncPlayerPreLoginEvent event) {
     final Connection connection = DatabaseUtil.getConnection();
-    final Player player = event.getPlayer();
-    final Result result = event.getResult();
+    final String name = event.getName();
+    final UUID uuid = event.getUniqueId();
+    final Result result = event.getLoginResult();
     final Component component = Component.text("Encountered error").color(NamedTextColor.RED);
 
     try {
       final PlayerRepository playerRepository = new PlayerRepository(connection);
-      final boolean isPlayerExist = playerRepository.isPlayerExist(player.getUniqueId()).join();
+      final boolean isPlayerExist = playerRepository.isPlayerExist(uuid).join();
 
       if (!isPlayerExist) {
-        playerRepository.insert(player.getUniqueId()).join();
+        playerRepository.insert(uuid).join();
         connection.commit();
       }
 
@@ -41,8 +42,8 @@ public class PlayerService implements Listener {
         PluginUtil.getLogger()
             .severe(
                 String.format(
-                    "Encountered error while rolling back transaction during inserting Player into database: %s",
-                    exception));
+                    "Encountered error while rolling back transaction during inserting Player %s (%s) into database: %s",
+                    name, uuid, exception));
 
         return;
       }
@@ -52,7 +53,8 @@ public class PlayerService implements Listener {
       PluginUtil.getLogger()
           .severe(
               String.format(
-                  "Encountered error while inserting Player into database: %s", exception));
+                  "Encountered error while inserting Player %s (%s) into database: %s",
+                  name, uuid, exception));
     } finally {
       try {
         connection.close();
@@ -60,8 +62,8 @@ public class PlayerService implements Listener {
         PluginUtil.getLogger()
             .severe(
                 String.format(
-                    "Encountered error while closing connection during inserting Player into database: %s",
-                    exception));
+                    "Encountered error while closing connection during inserting Player %s (%s) into database: %s",
+                    name, uuid, exception));
       }
     }
   }
