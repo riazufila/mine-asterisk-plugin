@@ -36,7 +36,7 @@ public class AccessRepository extends Repository {
             try (final PreparedStatement statement =
                 this.getConnection().prepareStatement(sql.toString())) {
               try (final ResultSet result = statement.executeQuery()) {
-                if (result.next()) {
+                while (result.next()) {
                   UUID uuid = UUID.fromString(result.getString("uuid"));
                   String permission = result.getString("value");
 

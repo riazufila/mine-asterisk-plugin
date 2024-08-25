@@ -18,13 +18,8 @@ public class AccessService implements Listener {
       PERMISSION_ATTACHMENTS = new HashMap<>();
 
   private PermissionAttachment get(final @NotNull Player player) {
-    final UUID uuid = player.getUniqueId();
-
-    if (AccessService.PERMISSION_ATTACHMENTS.containsKey(uuid)) {
-      return AccessService.PERMISSION_ATTACHMENTS.get(uuid);
-    }
-
-    return player.addAttachment(PluginUtil.get());
+    return AccessService.PERMISSION_ATTACHMENTS.computeIfAbsent(
+        player.getUniqueId(), key -> player.addAttachment(PluginUtil.get()));
   }
 
   public void add(final @NotNull Player player, final @NotNull String permission) {
