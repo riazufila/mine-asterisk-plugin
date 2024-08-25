@@ -24,9 +24,13 @@ public class PlayerService implements Listener {
 
     try {
       final PlayerRepository playerRepository = new PlayerRepository(connection);
+      final boolean isPlayerExist = playerRepository.isPlayerExist(player.getUniqueId()).join();
 
-      playerRepository.insertIfNotExist(player.getUniqueId()).join();
-      connection.commit();
+      if (!isPlayerExist) {
+        playerRepository.insert(player.getUniqueId()).join();
+        connection.commit();
+      }
+
       event.allow();
     } catch (SQLException exception) {
       try {
