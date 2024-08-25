@@ -1,6 +1,5 @@
 package net.mineasterisk.mc.util;
 
-import java.util.concurrent.CompletionException;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.exception.ValidationException;
@@ -14,14 +13,9 @@ public class ExceptionUtil {
       final @NotNull CommandSender sender,
       final @NotNull String command) {
     String message = "Encountered error";
-    Throwable throwable = exception;
 
-    if (exception instanceof CompletionException) {
-      throwable = exception.getCause();
-    }
-
-    if (throwable instanceof ValidationException) {
-      message = ((ValidationException) throwable).getClientMessage();
+    if (exception instanceof ValidationException) {
+      message = ((ValidationException) exception).getClientMessage();
     }
 
     PluginUtil.getLogger()
