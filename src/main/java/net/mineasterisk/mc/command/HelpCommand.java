@@ -55,10 +55,10 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
 
-      final String[] usages =
+      final List<String> usages =
           this.getAllUsagesExceptHelp(this.dispatcher.getRoot(), source, null, true);
 
-      if (usages.length > 0) {
+      if (!usages.isEmpty()) {
         player.sendMessage(Component.text(String.join("\n", usages)).color(NamedTextColor.YELLOW));
         PluginUtil.getLogger()
             .info(
@@ -80,14 +80,14 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
     return Command.SINGLE_SUCCESS;
   }
 
-  private @NotNull CompletableFuture<Suggestions> filteredHelpSuggestions(
+  private @NotNull CompletableFuture<@NotNull Suggestions> filteredHelpSuggestions(
       final @NotNull CommandContext<@NotNull CommandSourceStack> context,
       final @NotNull SuggestionsBuilder builder) {
     final CommandSourceStack source = context.getSource();
-    final String[] usages =
+    final List<String> usages =
         this.getAllUsagesExceptHelp(this.dispatcher.getRoot(), source, null, false);
 
-    Arrays.stream(usages)
+    usages.stream()
         .filter(usage -> usage.startsWith(builder.getRemaining()))
         .forEach(builder::suggest);
 
@@ -107,10 +107,10 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
       }
 
       final String COMMAND = context.getArgument("command", String.class);
-      final String[] usages =
+      final List<String> usages =
           this.getAllUsagesExceptHelp(this.dispatcher.getRoot(), source, COMMAND, true);
 
-      if (usages.length > 0) {
+      if (!usages.isEmpty()) {
         player.sendMessage(Component.text(String.join("\n", usages)).color(NamedTextColor.YELLOW));
         PluginUtil.getLogger()
             .info(
@@ -132,7 +132,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
     return Command.SINGLE_SUCCESS;
   }
 
-  private String[] getAllUsagesExceptHelp(
+  private @NotNull List<@NotNull String> getAllUsagesExceptHelp(
       final @NotNull RootCommandNode<@NotNull CommandSourceStack> root,
       final @NotNull CommandSourceStack source,
       final @Nullable String command,
@@ -172,6 +172,6 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
               results.add(STRICT ? FORMATTED_USAGE : REPLACED_USAGE);
             });
 
-    return results.toArray(new String[0]);
+    return results;
   }
 }

@@ -275,6 +275,7 @@ public class TeamService {
       for (final Team team : PluginUtil.getMainScoreboard().getTeams()) {
         if (team.hasEntry(offlineKicked.getName())) {
           kickedTeam = team;
+
           break;
         }
       }
