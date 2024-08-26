@@ -8,6 +8,8 @@ import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.SelectorArgumentResolver;
+import java.util.List;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.command.parser.OfflinePlayerInTeamExceptSelf;
@@ -150,10 +152,12 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
       }
 
       final TeamService teamService = new TeamService();
+      final List<Player> members = teamService.disband(player);
+      final Component component = Component.text("Team disbanded");
 
-      teamService.disband(player);
+      player.sendMessage(component.color(NamedTextColor.GREEN));
+      Audience.audience(members).sendMessage(component.color(NamedTextColor.YELLOW));
 
-      player.sendMessage(Component.text("Team disbanded").color(NamedTextColor.GREEN));
       PluginUtil.getLogger()
           .info(
               String.format(

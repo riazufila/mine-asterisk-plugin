@@ -2,11 +2,12 @@ package net.mineasterisk.mc.service.team;
 
 import io.papermc.paper.util.Tick;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.constant.PermissionConstant;
@@ -59,7 +60,7 @@ public class TeamService {
     accessService.add(player, PermissionConstant.TEAM_MEMBER.toString());
   }
 
-  public void disband(final @NotNull Player player) {
+  public @NotNull List<@NotNull Player> disband(final @NotNull Player player) {
     final Team team = PluginUtil.getMainScoreboard().getEntityTeam(player);
 
     if (team == null) {
@@ -69,23 +70,30 @@ public class TeamService {
     }
 
     final AccessService accessService = new AccessService();
+    final List<Player> members = new ArrayList<>();
 
     //noinspection deprecation
     for (OfflinePlayer offlinePlayer : team.getPlayers()) {
       final Player member = offlinePlayer.getPlayer();
 
       if (member == null) {
-        final UUID uuid = offlinePlayer.getUniqueId();
+        accessService.removeIfOffline(
+            offlinePlayer.getUniqueId(), PermissionConstant.TEAM_MEMBER.toString());
 
-        accessService.removeIfOffline(uuid, PermissionConstant.TEAM_MEMBER.toString());
-      } else {
-        accessService.remove(member, PermissionConstant.TEAM_MEMBER.toString());
+        continue;
+      }
+
+      accessService.remove(member, PermissionConstant.TEAM_MEMBER.toString());
+
+      if (!member.getUniqueId().equals(player.getUniqueId())) {
+        members.add(member);
       }
     }
 
     accessService.remove(player, PermissionConstant.TEAM_LEADER.toString());
-
     team.unregister();
+
+    return members;
   }
 
   public void sendInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
