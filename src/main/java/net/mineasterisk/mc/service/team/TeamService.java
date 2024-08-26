@@ -236,9 +236,34 @@ public class TeamService {
     PluginUtil.getScheduler().cancelTask(invitation.getKey());
   }
 
-  public void kick(final @NotNull Player kicker, final @NotNull Player kicked) {
+  public void kick(final @NotNull Player kicker, final @NotNull OfflinePlayer offlineKicked) {
+    final Player kicked = offlineKicked.getPlayer();
     final Team kickerTeam = PluginUtil.getMainScoreboard().getEntityTeam(kicker);
-    final Team kickedTeam = PluginUtil.getMainScoreboard().getEntityTeam(kicked);
+    Team kickedTeam = null;
+
+    if (!offlineKicked.hasPlayedBefore()) {
+      throw new ValidationException(
+          "Encountered error",
+          String.format(
+              "Offline Player (%s) haven't played in the server.", offlineKicked.getUniqueId()));
+    }
+
+    if (offlineKicked.getName() == null) {
+      throw new ValidationException(
+          "Encountered error",
+          String.format("Offline Player (%s) doesn't have a name.", offlineKicked.getUniqueId()));
+    }
+
+    if (kicked != null) {
+      kickedTeam = PluginUtil.getMainScoreboard().getEntityTeam(kicked);
+    } else {
+      for (final Team team : PluginUtil.getMainScoreboard().getTeams()) {
+        if (team.hasEntry(offlineKicked.getName())) {
+          kickedTeam = team;
+          break;
+        }
+      }
+    }
 
     if (kickerTeam == null) {
       throw new ValidationException(
@@ -251,7 +276,7 @@ public class TeamService {
           "Player isn't in a Team",
           String.format(
               "Player %s (%s) is being kicked but isn't in a Team",
-              kicked.getName(), kicked.getUniqueId()));
+              offlineKicked.getName(), offlineKicked.getUniqueId()));
     }
 
     if (!kickerTeam.getName().equals(kickedTeam.getName())) {
@@ -259,10 +284,13 @@ public class TeamService {
           "Not in the same Team",
           String.format(
               "Player %s (%s) is trying to kick out Player %s (%s) but isn't in the Team",
-              kicker.getName(), kicker.getUniqueId(), kicked.getName(), kicked.getUniqueId()));
+              kicker.getName(),
+              kicker.getUniqueId(),
+              offlineKicked.getName(),
+              offlineKicked.getUniqueId()));
     }
 
-    if (kicker.getName().equals(kicked.getName())) {
+    if (kicker.getName().equals(offlineKicked.getName())) {
       throw new ValidationException(
           "Not allowed to kick yourself",
           String.format(
@@ -271,8 +299,14 @@ public class TeamService {
 
     final AccessService accessService = new AccessService();
 
-    kickerTeam.removeEntity(kicked);
-    accessService.remove(kicked, PermissionConstant.TEAM_MEMBER.toString());
+    if (kicked != null) {
+      kickerTeam.removeEntity(kicked);
+      accessService.remove(kicked, PermissionConstant.TEAM_MEMBER.toString());
+    } else {
+      kickerTeam.removeEntry(offlineKicked.getName());
+      accessService.removeIfOffline(
+          offlineKicked.getUniqueId(), PermissionConstant.TEAM_MEMBER.toString());
+    }
   }
 
   private @Nullable Map.Entry<Integer, Invitation> getInvitationByInviter(

@@ -7,14 +7,17 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
+import io.papermc.paper.command.brigadier.argument.resolvers.selector.SelectorArgumentResolver;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.mineasterisk.mc.command.parser.OfflinePlayerInTeamExceptSelf;
 import net.mineasterisk.mc.command.parser.PlayerExceptSelf;
 import net.mineasterisk.mc.constant.PermissionConstant;
 import net.mineasterisk.mc.exception.EntityException;
 import net.mineasterisk.mc.service.team.TeamService;
 import net.mineasterisk.mc.util.ExceptionUtil;
 import net.mineasterisk.mc.util.PluginUtil;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -55,7 +58,9 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                 .requires(source -> this.canUpdate(source) || this.canCreate(source)))
         .then(
             Commands.literal("kick")
-                .then(Commands.argument("player", new PlayerExceptSelf()).executes(this::kick))
+                .then(
+                    Commands.argument("player", new OfflinePlayerInTeamExceptSelf())
+                        .executes(this::kick))
                 .requires(this::canUpdate))
         .requires(
             source ->
@@ -299,27 +304,38 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
       }
 
       final TeamService teamService = new TeamService();
-      final Player kicked =
-          context
-              .getArgument("player", PlayerSelectorArgumentResolver.class)
-              .resolve(source)
-              .getFirst();
 
-      teamService.kick(kicker, kicked);
+      @SuppressWarnings("unchecked")
+      final OfflinePlayer offlineKicked =
+          context
+              .getArgument(
+                  "player",
+                  (Class<SelectorArgumentResolver<OfflinePlayer>>)
+                      (Class<?>) SelectorArgumentResolver.class)
+              .resolve(source);
+
+      teamService.kick(kicker, offlineKicked);
 
       kicker.sendMessage(
-          Component.text(String.format("Kicked %s from the Team", kicked.getName()))
+          Component.text(String.format("Kicked %s from the Team", offlineKicked.getName()))
               .color(NamedTextColor.GREEN));
 
-      kicked.sendMessage(
-          Component.text(String.format("%s kicked you from the Team", kicker.getName()))
-              .color(NamedTextColor.RED));
+      if (offlineKicked.getPlayer() != null) {
+        offlineKicked
+            .getPlayer()
+            .sendMessage(
+                Component.text(String.format("%s kicked you from the Team", kicker.getName()))
+                    .color(NamedTextColor.RED));
+      }
 
       PluginUtil.getLogger()
           .info(
               String.format(
                   "Player %s (%s) kicked Player %s (%s) from the Team",
-                  kicker.getName(), kicker.getUniqueId(), kicked.getName(), kicked.getUniqueId()));
+                  kicker.getName(),
+                  kicker.getUniqueId(),
+                  offlineKicked.getName(),
+                  offlineKicked.getUniqueId()));
     } catch (Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "Team kick");
     }
