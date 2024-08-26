@@ -20,6 +20,7 @@ import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -62,6 +63,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                     Commands.argument("player", new OfflinePlayerInTeamExceptSelf())
                         .executes(this::kick))
                 .requires(this::canUpdate))
+        .then(Commands.literal("leave").requires(this::canLeave).executes(this::leave))
         .requires(
             source ->
                 this.canCreate(source)
@@ -91,6 +93,10 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
 
   private boolean canDelete(final @NotNull CommandSourceStack source) {
     return source.getSender().hasPermission(PermissionConstant.TEAM_LEADER.toString());
+  }
+
+  private boolean canLeave(final @NotNull CommandSourceStack source) {
+    return source.getSender().hasPermission(PermissionConstant.TEAM_MEMBER.toString());
   }
 
   @SuppressWarnings("SameReturnValue")
@@ -338,6 +344,38 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                   offlineKicked.getUniqueId()));
     } catch (Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "Team kick");
+    }
+
+    return Command.SINGLE_SUCCESS;
+  }
+
+  @SuppressWarnings("SameReturnValue")
+  private int leave(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
+    final CommandSourceStack source = context.getSource();
+    final CommandSender sender = source.getSender();
+
+    try {
+      if (!(sender instanceof Player player)) {
+        throw new EntityException(
+            String.format(
+                "Sender %s isn't a Player and tries to execute command", sender.getName()));
+      }
+
+      final TeamService teamService = new TeamService();
+      final Team team = teamService.leave(player);
+
+      player.sendMessage(Component.text("Left Team").color(NamedTextColor.GREEN));
+
+      team.sendMessage(
+          Component.text(String.format("%s left the Team", player.getName()))
+              .color(NamedTextColor.YELLOW));
+
+      PluginUtil.getLogger()
+          .info(
+              String.format(
+                  "Player %s (%s) left its Team", player.getName(), player.getUniqueId()));
+    } catch (Exception exception) {
+      ExceptionUtil.handleCommand(exception, sender, "leave Team");
     }
 
     return Command.SINGLE_SUCCESS;

@@ -309,6 +309,23 @@ public class TeamService {
     }
   }
 
+  public @NotNull Team leave(final @NotNull Player player) {
+    final Team team = PluginUtil.getMainScoreboard().getEntityTeam(player);
+
+    if (team == null) {
+      throw new ValidationException(
+          "Not in a Team",
+          String.format("Player %s (%s) isn't in a Team", player.getName(), player.getUniqueId()));
+    }
+
+    final AccessService accessService = new AccessService();
+
+    team.removeEntity(player);
+    accessService.remove(player, PermissionConstant.TEAM_MEMBER.toString());
+
+    return team;
+  }
+
   private @Nullable Map.Entry<Integer, Invitation> getInvitationByInviter(
       final @NotNull Player inviter) {
     final Optional<Map.Entry<Integer, Invitation>> invitation =
