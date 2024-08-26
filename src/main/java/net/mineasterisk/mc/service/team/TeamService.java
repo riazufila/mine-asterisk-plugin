@@ -26,13 +26,9 @@ public class TeamService {
   private static final @NotNull Map<@NotNull Integer, @NotNull Invitation> INVITATIONS =
       new HashMap<>();
 
-  private @Nullable Team get(final @NotNull Player player) {
-    return PluginUtil.getMainScoreboard().getEntityTeam(player);
-  }
-
   public void create(final @NotNull Player player, final @NotNull String name) {
     final Scoreboard scoreboard = PluginUtil.getMainScoreboard();
-    final Team playerTeam = this.get(player);
+    final Team playerTeam = PluginUtil.getMainScoreboard().getEntityTeam(player);
 
     if (playerTeam != null) {
       throw new ValidationException(
@@ -64,7 +60,7 @@ public class TeamService {
   }
 
   public void disband(final @NotNull Player player) {
-    final Team team = this.get(player);
+    final Team team = PluginUtil.getMainScoreboard().getEntityTeam(player);
 
     if (team == null) {
       throw new ValidationException(
@@ -93,8 +89,8 @@ public class TeamService {
   }
 
   public void sendInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
-    final Team inviterTeam = this.get(inviter);
-    final Team inviteeTeam = this.get(invitee);
+    final Team inviterTeam = PluginUtil.getMainScoreboard().getEntityTeam(inviter);
+    final Team inviteeTeam = PluginUtil.getMainScoreboard().getEntityTeam(invitee);
 
     if (inviter.getUniqueId().equals(invitee.getUniqueId())) {
       throw new ValidationException(
@@ -128,8 +124,8 @@ public class TeamService {
   }
 
   public void acceptInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
-    final Team inviterTeam = this.get(inviter);
-    final Team inviteeTeam = this.get(invitee);
+    final Team inviterTeam = PluginUtil.getMainScoreboard().getEntityTeam(inviter);
+    final Team inviteeTeam = PluginUtil.getMainScoreboard().getEntityTeam(invitee);
     final Map.Entry<Integer, Invitation> invitation = this.getInvitationByInviter(inviter);
 
     if (invitation == null) {
@@ -193,8 +189,8 @@ public class TeamService {
   }
 
   public void removeInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
-    final Team inviterTeam = this.get(inviter);
-    final Team inviteeTeam = this.get(invitee);
+    final Team inviterTeam = PluginUtil.getMainScoreboard().getEntityTeam(inviter);
+    final Team inviteeTeam = PluginUtil.getMainScoreboard().getEntityTeam(invitee);
     final Map.Entry<Integer, Invitation> invitation = this.getInvitationByInvitee(invitee);
 
     if (invitation == null) {
@@ -241,8 +237,8 @@ public class TeamService {
   }
 
   public void kick(final @NotNull Player kicker, final @NotNull Player kicked) {
-    final Team kickerTeam = this.get(kicker);
-    final Team kickedTeam = this.get(kicked);
+    final Team kickerTeam = PluginUtil.getMainScoreboard().getEntityTeam(kicker);
+    final Team kickedTeam = PluginUtil.getMainScoreboard().getEntityTeam(kicked);
 
     if (kickerTeam == null) {
       throw new ValidationException(
