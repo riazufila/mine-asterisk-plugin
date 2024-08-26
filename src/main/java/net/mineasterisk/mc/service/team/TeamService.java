@@ -117,10 +117,15 @@ public class TeamService {
     final Invitation invitation = new Invitation(inviterTeam, inviter, invitee);
     final InvitationRunnable invitationRunnable = new InvitationRunnable(10, invitation);
 
-    invitationRunnable.runTaskTimerAsynchronously(
-        PluginUtil.get(),
-        Tick.tick().fromDuration(Duration.ofSeconds(0)),
-        Tick.tick().fromDuration(Duration.ofSeconds(1)));
+    final int taskId =
+        invitationRunnable
+            .runTaskTimerAsynchronously(
+                PluginUtil.get(),
+                Tick.tick().fromDuration(Duration.ofSeconds(0)),
+                Tick.tick().fromDuration(Duration.ofSeconds(1)))
+            .getTaskId();
+
+    this.addInvitationTask(taskId, invitation);
   }
 
   public void acceptInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
@@ -186,6 +191,7 @@ public class TeamService {
     }
 
     PluginUtil.getScheduler().cancelTask(invitation.getKey());
+    this.removeInvitationTask(invitation.getKey());
   }
 
   public void removeInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
@@ -234,6 +240,7 @@ public class TeamService {
     }
 
     PluginUtil.getScheduler().cancelTask(invitation.getKey());
+    this.removeInvitationTask(invitation.getKey());
   }
 
   public void kick(final @NotNull Player kicker, final @NotNull OfflinePlayer offlineKicked) {
