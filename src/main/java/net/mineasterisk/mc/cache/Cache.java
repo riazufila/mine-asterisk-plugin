@@ -17,7 +17,7 @@ public interface Cache<T, U extends Cacheable> {
 
   void put(final @NotNull T key, final @NotNull U value);
 
-  void putAll(@NotNull HashMap<@NotNull T, @NotNull U> cache);
+  int putAll(@NotNull HashMap<@NotNull T, @NotNull U> cache);
 
   void remove(final @NotNull T key, final @NotNull U value);
 

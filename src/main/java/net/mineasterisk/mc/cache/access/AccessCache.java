@@ -56,8 +56,10 @@ public class AccessCache implements Cache<@NotNull UUID, @NotNull Access> {
   }
 
   @Override
-  public void putAll(final @NotNull HashMap<@NotNull UUID, @NotNull Access> entries) {
+  public int putAll(final @NotNull HashMap<@NotNull UUID, @NotNull Access> entries) {
     AccessCache.CACHE.putAll(entries);
+
+    return entries.size();
   }
 
   @Override

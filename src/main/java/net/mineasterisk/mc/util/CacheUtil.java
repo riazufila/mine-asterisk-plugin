@@ -23,8 +23,15 @@ public class CacheUtil {
         final AccessRepository accessRepository = new AccessRepository(connection);
         final AccessCache accessCache = new AccessCache();
         final AccessCacheRunnable accessCacheRunnable = new AccessCacheRunnable();
+        final int accessEntriesCount =
+            accessCache.putAll(accessRepository.getAllPlayersAccesses().join());
 
-        accessCache.putAll(accessRepository.getAllPlayersAccesses().join());
+        if (accessEntriesCount > 0) {
+          PluginUtil.getLogger()
+              .info(String.format("Loaded %s access entries into cache", accessEntriesCount));
+        } else {
+          PluginUtil.getLogger().info("No access entries to load into cache");
+        }
 
         final int accessCacheRunnableTaskId =
             accessCacheRunnable
@@ -34,10 +41,13 @@ public class CacheUtil {
                     Tick.tick().fromDuration(Duration.ofHours(1)))
                 .getTaskId();
 
+        PluginUtil.getLogger()
+            .info(
+                String.format(
+                    "Running access cache syncer with task ID %d", accessCacheRunnableTaskId));
+
         CacheUtil.SYNCERS.add(accessCacheRunnableTaskId);
       }
-
-      PluginUtil.getLogger().info("Loaded persistent data into cache if any");
     } catch (SQLException exception) {
       PluginUtil.getLogger()
           .severe(String.format("Encountered error while loading cache: %s", exception));
@@ -55,6 +65,9 @@ public class CacheUtil {
 
         if (!isTaskCurrentlyRunning) {
           PluginUtil.getScheduler().cancelTask(taskId);
+        } else {
+          PluginUtil.getLogger()
+              .info(String.format("Syncer with task ID %d is currently running", taskId));
         }
       }
 
@@ -85,13 +98,26 @@ public class CacheUtil {
       accessesDirtyEntries =
           accessRepository.updatePlayersAccesses(accessCache.getAllDirty()).join();
 
+      final int accessDirtyEntriesCount = accessesDirtyEntries.size();
+
+      if (accessDirtyEntriesCount > 0) {
+        PluginUtil.getLogger()
+            .info(String.format("Persisted %s dirty access cache", accessesDirtyEntries.size()));
+      } else {
+        PluginUtil.getLogger().info("No dirty access cache to persist");
+      }
+
       if (isClearDirty && !accessesDirtyEntries.isEmpty()) {
         accessCache.setDirty(false, accessesDirtyEntries);
+
+        PluginUtil.getLogger()
+            .info(
+                String.format(
+                    "Clearing dirty state for %s persisted access cache",
+                    accessesDirtyEntries.size()));
       }
 
       connection.commit();
-
-      PluginUtil.getLogger().info("Persisted cache into database if any");
     } catch (SQLException exception) {
       try {
         if (isClearDirty && !accessesDirtyEntries.isEmpty()) {

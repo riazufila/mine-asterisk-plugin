@@ -105,8 +105,18 @@ public class AccessRepository extends Repository {
               }
             }
 
-            deleteStatement.executeBatch();
-            insertStatement.executeBatch();
+            final int[] deleteCounts = deleteStatement.executeBatch();
+            final int[] insertCounts = insertStatement.executeBatch();
+
+            for (int i = 0; i < deleteCounts.length; i++) {
+              PluginUtil.getLogger()
+                  .info(String.format("Delete count for batch %d: %d", i + 1, deleteCounts[i]));
+            }
+
+            for (int i = 0; i < insertCounts.length; i++) {
+              PluginUtil.getLogger()
+                  .info(String.format("Insert count for batch %d: %d", i + 1, insertCounts[i]));
+            }
 
             return playersAccesses;
           } catch (SQLException exception) {
