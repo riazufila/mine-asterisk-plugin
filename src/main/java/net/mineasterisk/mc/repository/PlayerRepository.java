@@ -34,7 +34,7 @@ public class PlayerRepository extends Repository {
                     String.format(
                         "Encountered error while checking if Player exist: %s", exception));
 
-            return false;
+            throw new RuntimeException(exception);
           }
         });
   }
@@ -52,6 +52,8 @@ public class PlayerRepository extends Repository {
           } catch (SQLException exception) {
             PluginUtil.getLogger()
                 .severe(String.format("Encountered error while inserting Player: %s", exception));
+
+            throw new RuntimeException(exception);
           }
         });
   }

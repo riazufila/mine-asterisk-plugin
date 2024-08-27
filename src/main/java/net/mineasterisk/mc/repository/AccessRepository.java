@@ -46,14 +46,16 @@ public class AccessRepository extends Repository {
                 }
               }
             }
+
+            return playersAccesses;
           } catch (SQLException exception) {
             PluginUtil.getLogger()
                 .severe(
                     String.format(
                         "Encountered error while getting all Players' accesses: %s", exception));
-          }
 
-          return playersAccesses;
+            throw new RuntimeException(exception);
+          }
         });
   }
 
