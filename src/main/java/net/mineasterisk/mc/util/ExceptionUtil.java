@@ -12,18 +12,18 @@ public class ExceptionUtil {
       final @NotNull Exception exception,
       final @NotNull CommandSender sender,
       final @NotNull String command) {
-    String message = "Encountered error";
+    String clientMessage = "Encountered error";
 
     if (exception instanceof ValidationException) {
-      message = ((ValidationException) exception).getClientMessage();
+      clientMessage = ((ValidationException) exception).getClientMessage();
+    }
+
+    if (sender instanceof Player player) {
+      player.sendMessage(Component.text(clientMessage).color(NamedTextColor.RED));
     }
 
     PluginUtil.getLogger()
         .severe(
             String.format("Encountered error while executing %s command: %s", command, exception));
-
-    if (sender instanceof Player performedBy) {
-      performedBy.sendMessage(Component.text(message).color(NamedTextColor.RED));
-    }
   }
 }

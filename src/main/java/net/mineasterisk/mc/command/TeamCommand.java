@@ -3,6 +3,7 @@ package net.mineasterisk.mc.command;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import io.papermc.paper.command.brigadier.CommandSourceStack;
 import io.papermc.paper.command.brigadier.Commands;
@@ -15,7 +16,6 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.command.parser.OfflinePlayerInTeamExceptSelf;
 import net.mineasterisk.mc.command.parser.PlayerExceptSelf;
 import net.mineasterisk.mc.constant.PermissionConstant;
-import net.mineasterisk.mc.exception.EntityException;
 import net.mineasterisk.mc.service.team.TeamService;
 import net.mineasterisk.mc.util.ExceptionUtil;
 import net.mineasterisk.mc.util.PluginUtil;
@@ -108,7 +108,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
 
     try {
       if (!(sender instanceof Player player)) {
-        throw new EntityException(
+        throw new IllegalStateException(
             String.format(
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
@@ -138,7 +138,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
 
     try {
       if (!(sender instanceof Player player)) {
-        throw new EntityException(
+        throw new IllegalStateException(
             String.format(
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
@@ -169,7 +169,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
 
     try {
       if (!(sender instanceof Player player)) {
-        throw new EntityException(
+        throw new IllegalStateException(
             String.format(
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
@@ -193,13 +193,14 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
   }
 
   @SuppressWarnings("SameReturnValue")
-  private int sendInvite(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
+  private int sendInvite(final @NotNull CommandContext<@NotNull CommandSourceStack> context)
+      throws CommandSyntaxException {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
 
     try {
       if (!(sender instanceof Player inviter)) {
-        throw new EntityException(
+        throw new IllegalStateException(
             String.format(
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
@@ -229,6 +230,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                   inviter.getUniqueId(),
                   invitee.getName(),
                   invitee.getUniqueId()));
+    } catch (CommandSyntaxException exception) {
+      throw exception;
     } catch (Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "send Team invitation");
     }
@@ -237,13 +240,14 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
   }
 
   @SuppressWarnings("SameReturnValue")
-  private int acceptInvite(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
+  private int acceptInvite(final @NotNull CommandContext<@NotNull CommandSourceStack> context)
+      throws CommandSyntaxException {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
 
     try {
       if (!(sender instanceof Player invitee)) {
-        throw new EntityException(
+        throw new IllegalStateException(
             String.format(
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
@@ -273,6 +277,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                   invitee.getUniqueId(),
                   inviter.getName(),
                   inviter.getUniqueId()));
+    } catch (CommandSyntaxException exception) {
+      throw exception;
     } catch (Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "accept Team invitation");
     }
@@ -281,13 +287,14 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
   }
 
   @SuppressWarnings("SameReturnValue")
-  private int removeInvite(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
+  private int removeInvite(final @NotNull CommandContext<@NotNull CommandSourceStack> context)
+      throws CommandSyntaxException {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
 
     try {
       if (!(sender instanceof Player inviter)) {
-        throw new EntityException(
+        throw new IllegalStateException(
             String.format(
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
@@ -317,6 +324,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                   inviter.getUniqueId(),
                   invitee.getName(),
                   invitee.getUniqueId()));
+    } catch (CommandSyntaxException exception) {
+      throw exception;
     } catch (Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "remove Team invitation");
     }
@@ -325,13 +334,14 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
   }
 
   @SuppressWarnings("SameReturnValue")
-  private int kick(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
+  private int kick(final @NotNull CommandContext<@NotNull CommandSourceStack> context)
+      throws CommandSyntaxException {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
 
     try {
       if (!(sender instanceof Player kicker)) {
-        throw new EntityException(
+        throw new IllegalStateException(
             String.format(
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
@@ -369,6 +379,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                   kicker.getUniqueId(),
                   offlineKicked.getName(),
                   offlineKicked.getUniqueId()));
+    } catch (CommandSyntaxException exception) {
+      throw exception;
     } catch (Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "Team kick");
     }
@@ -383,7 +395,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
 
     try {
       if (!(sender instanceof Player player)) {
-        throw new EntityException(
+        throw new IllegalStateException(
             String.format(
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }

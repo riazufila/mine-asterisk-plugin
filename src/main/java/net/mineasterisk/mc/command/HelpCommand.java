@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.mineasterisk.mc.exception.EntityException;
 import net.mineasterisk.mc.util.ExceptionUtil;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.command.CommandSender;
@@ -50,7 +49,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
 
     try {
       if (!(sender instanceof Player player)) {
-        throw new EntityException(
+        throw new IllegalStateException(
             String.format(
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
@@ -101,7 +100,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
 
     try {
       if (!(sender instanceof Player player)) {
-        throw new EntityException(
+        throw new IllegalStateException(
             String.format(
                 "Sender %s is not a Player and tries to execute command", sender.getName()));
       }

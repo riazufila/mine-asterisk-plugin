@@ -12,7 +12,6 @@ import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.SelectorArgumentResolver;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import net.mineasterisk.mc.exception.EntityException;
 import net.mineasterisk.mc.exception.ValidationException;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.OfflinePlayer;
@@ -34,7 +33,7 @@ public class OfflinePlayerInTeamExceptSelf
       final CommandSender sender = source.getSender();
 
       if (!(sender instanceof Player player)) {
-        throw new EntityException(
+        throw new IllegalStateException(
             String.format(
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
@@ -82,7 +81,7 @@ public class OfflinePlayerInTeamExceptSelf
     final CommandSender sender = source.getSender();
 
     if (!(sender instanceof Player player)) {
-      throw new EntityException(
+      throw new IllegalStateException(
           String.format("Sender %s isn't a Player and tries to execute command", sender.getName()));
     }
 
