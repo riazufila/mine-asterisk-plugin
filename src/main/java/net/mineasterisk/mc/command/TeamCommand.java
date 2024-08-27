@@ -101,7 +101,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
   }
 
   private boolean canLeave(final @NotNull CommandSourceStack source) {
-    return source.getSender().hasPermission(PermissionConstant.TEAM_MEMBER.toString());
+    return !source.getSender().hasPermission(PermissionConstant.TEAM_LEADER.toString())
+        && source.getSender().hasPermission(PermissionConstant.TEAM_MEMBER.toString());
   }
 
   @SuppressWarnings("SameReturnValue")
