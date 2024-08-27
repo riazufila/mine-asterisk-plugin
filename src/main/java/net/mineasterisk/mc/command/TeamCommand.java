@@ -30,7 +30,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
   @Override
   public @NotNull LiteralCommandNode<@NotNull CommandSourceStack> build() {
     return Commands.literal("team")
-        .then(Commands.literal("info").requires(this::canRead).executes(this::info))
+        .then(Commands.literal("information").requires(this::canRead).executes(this::information))
         .then(
             Commands.literal("create")
                 .then(
@@ -102,8 +102,31 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
   }
 
   @SuppressWarnings("SameReturnValue")
-  private int info(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
-    context.getSource().getSender().sendPlainMessage("TODO: Team info command");
+  private int information(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
+    final CommandSourceStack source = context.getSource();
+    final CommandSender sender = source.getSender();
+
+    try {
+      if (!(sender instanceof Player player)) {
+        throw new EntityException(
+            String.format(
+                "Sender %s isn't a Player and tries to execute command", sender.getName()));
+      }
+
+      final TeamService teamService = new TeamService();
+
+      // TODO: Return team leader.
+      // TODO: Return team members.
+      // TODO: Send information to player.
+
+      PluginUtil.getLogger()
+          .info(
+              String.format(
+                  "Player %s (%s) retrieved its Team information",
+                  player.getName(), player.getUniqueId()));
+    } catch (Exception exception) {
+      ExceptionUtil.handleCommand(exception, sender, "Team information");
+    }
 
     return Command.SINGLE_SUCCESS;
   }
