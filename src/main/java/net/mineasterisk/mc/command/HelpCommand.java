@@ -135,7 +135,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
       final @NotNull RootCommandNode<@NotNull CommandSourceStack> root,
       final @NotNull CommandSourceStack source,
       final @Nullable String command,
-      final boolean STRICT) {
+      final boolean isStrict) {
     final List<String> results = new ArrayList<>();
     final String[] usages = this.dispatcher.getAllUsage(root, source, true);
     final String NAMESPACE = PluginUtil.get().getName().toLowerCase();
@@ -161,14 +161,14 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
                   }
 
                   if (i == commandNodes.length - 1) {
-                    results.add(STRICT ? FORMATTED_USAGE : REPLACED_USAGE);
+                    results.add(isStrict ? FORMATTED_USAGE : REPLACED_USAGE);
                   }
                 }
 
                 return;
               }
 
-              results.add(STRICT ? FORMATTED_USAGE : REPLACED_USAGE);
+              results.add(isStrict ? FORMATTED_USAGE : REPLACED_USAGE);
             });
 
     return results;

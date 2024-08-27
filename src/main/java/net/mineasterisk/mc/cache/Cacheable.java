@@ -1,13 +1,13 @@
 package net.mineasterisk.mc.cache;
 
 public class Cacheable {
-  private boolean dirty = false;
+  private boolean isDirty = false;
 
   public boolean isDirty() {
-    return this.dirty;
+    return this.isDirty;
   }
 
   protected void setDirty() {
-    this.dirty = true;
+    this.isDirty = true;
   }
 }

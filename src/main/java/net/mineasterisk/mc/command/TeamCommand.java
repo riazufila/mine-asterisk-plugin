@@ -120,7 +120,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
       final List<TeamMember> members = teamService.getMembers(player);
       final String leaderName =
           members.stream()
-              .filter(TeamMember::leader)
+              .filter(TeamMember::isLeader)
               .findFirst()
               .map(TeamMember::name)
               .orElseThrow(
@@ -131,7 +131,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                               player.getName(), player.getUniqueId())));
 
       final List<String> membersNames =
-          members.stream().filter(member -> !member.leader()).map(TeamMember::name).toList();
+          members.stream().filter(member -> !member.isLeader()).map(TeamMember::name).toList();
 
       final TextComponent leaderComponent = Component.text(String.format("Leader: %s", leaderName));
       final TextComponent membersComponent =
