@@ -10,6 +10,7 @@ public class LoaderUtil {
   }
 
   public static void postLoad() {
+    CacheUtil.finishAllSyncer();
     CacheUtil.persist(false);
 
     PluginUtil.getLogger().info("Post-loaded configuration(s) and resource(s)");

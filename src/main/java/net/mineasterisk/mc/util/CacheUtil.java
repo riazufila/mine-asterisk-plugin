@@ -5,13 +5,18 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import net.mineasterisk.mc.cache.access.Access;
 import net.mineasterisk.mc.cache.access.AccessCache;
 import net.mineasterisk.mc.cache.access.AccessCacheRunnable;
 import net.mineasterisk.mc.repository.AccessRepository;
+import org.jetbrains.annotations.NotNull;
 
 public class CacheUtil {
+  private static final Set<@NotNull Integer> SYNCERS = new HashSet<>();
+
   protected static void load() {
     try {
       try (final Connection connection = DatabaseUtil.getConnection()) {
@@ -20,10 +25,16 @@ public class CacheUtil {
         final AccessCacheRunnable accessCacheRunnable = new AccessCacheRunnable();
 
         accessCache.putAll(accessRepository.getAllPlayersAccesses().join());
-        accessCacheRunnable.runTaskTimerAsynchronously(
-            PluginUtil.get(),
-            Tick.tick().fromDuration(Duration.ofHours(1)),
-            Tick.tick().fromDuration(Duration.ofHours(1)));
+
+        final int accessCacheRunnableTaskId =
+            accessCacheRunnable
+                .runTaskTimerAsynchronously(
+                    PluginUtil.get(),
+                    Tick.tick().fromDuration(Duration.ofHours(1)),
+                    Tick.tick().fromDuration(Duration.ofHours(1)))
+                .getTaskId();
+
+        CacheUtil.SYNCERS.add(accessCacheRunnableTaskId);
       }
 
       PluginUtil.getLogger().info("Loaded persistent data into cache if any");
@@ -32,6 +43,35 @@ public class CacheUtil {
           .severe(String.format("Encountered error while loading cache: %s", exception));
 
       throw new RuntimeException(exception);
+    }
+  }
+
+  protected static void finishAllSyncer() {
+    boolean isAnyTaskCurrentlyRunning = true;
+
+    while (isAnyTaskCurrentlyRunning) {
+      for (final Integer taskId : CacheUtil.SYNCERS) {
+        final boolean isTaskCurrentlyRunning = PluginUtil.getScheduler().isCurrentlyRunning(taskId);
+
+        if (!isTaskCurrentlyRunning) {
+          PluginUtil.getScheduler().cancelTask(taskId);
+        }
+      }
+
+      isAnyTaskCurrentlyRunning =
+          CacheUtil.SYNCERS.stream()
+              .anyMatch(taskId -> PluginUtil.getScheduler().isCurrentlyRunning(taskId));
+
+      if (isAnyTaskCurrentlyRunning) {
+        try {
+          PluginUtil.getLogger()
+              .info("Sleeping thread for a minute, as at least one syncer is still running");
+          Thread.sleep(Duration.ofMinutes(1));
+        } catch (InterruptedException exception) {
+          PluginUtil.getLogger()
+              .severe("Encountered error while making thread sleep on finishing all cache syncer");
+        }
+      }
     }
   }
 
