@@ -16,6 +16,11 @@ public class AccessCache implements Cache<@NotNull UUID, @NotNull Access> {
   }
 
   @Override
+  public @NotNull HashMap<@NotNull UUID, @NotNull Access> getAll() {
+    return AccessCache.CACHE;
+  }
+
+  @Override
   public @NotNull HashMap<@NotNull UUID, @NotNull Access> getAllDirty() {
     final HashMap<UUID, Access> dirtyEntries = new HashMap<>();
 

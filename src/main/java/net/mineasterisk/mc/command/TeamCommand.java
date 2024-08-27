@@ -12,10 +12,13 @@ import io.papermc.paper.command.brigadier.argument.resolvers.selector.SelectorAr
 import java.util.List;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.command.parser.OfflinePlayerInTeamExceptSelf;
 import net.mineasterisk.mc.command.parser.PlayerExceptSelf;
 import net.mineasterisk.mc.constant.PermissionConstant;
+import net.mineasterisk.mc.service.team.TeamMember;
 import net.mineasterisk.mc.service.team.TeamService;
 import net.mineasterisk.mc.util.ExceptionUtil;
 import net.mineasterisk.mc.util.PluginUtil;
@@ -114,10 +117,32 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
       }
 
       final TeamService teamService = new TeamService();
+      final List<TeamMember> members = teamService.getMembers(player);
+      final String leaderName =
+          members.stream()
+              .filter(TeamMember::leader)
+              .findFirst()
+              .map(TeamMember::name)
+              .orElseThrow(
+                  () ->
+                      new IllegalStateException(
+                          String.format(
+                              "Encountered error while Player %s (%s) is getting Team information",
+                              player.getName(), player.getUniqueId())));
 
-      // TODO: Return team leader.
-      // TODO: Return team members.
-      // TODO: Send information to player.
+      final List<String> membersNames =
+          members.stream().filter(member -> !member.leader()).map(TeamMember::name).toList();
+
+      final TextComponent leaderComponent = Component.text(String.format("Leader: %s", leaderName));
+      final TextComponent membersComponent =
+          Component.text(
+              String.format(
+                  "Member(s): %s",
+                  !membersNames.isEmpty() ? String.join(", ", membersNames) : '-'));
+
+      player.sendMessage(
+          Component.join(JoinConfiguration.newlines(), leaderComponent, membersComponent)
+              .color(NamedTextColor.YELLOW));
 
       PluginUtil.getLogger()
           .info(

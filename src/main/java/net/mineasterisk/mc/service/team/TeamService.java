@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.mineasterisk.mc.cache.access.Access;
+import net.mineasterisk.mc.cache.access.AccessCache;
 import net.mineasterisk.mc.constant.PermissionConstant;
 import net.mineasterisk.mc.exception.ValidationException;
 import net.mineasterisk.mc.service.access.AccessService;
@@ -26,6 +29,43 @@ import org.jetbrains.annotations.Nullable;
 public class TeamService {
   private static final @NotNull Map<@NotNull Integer, @NotNull Invitation> INVITATIONS =
       new HashMap<>();
+
+  public @NotNull List<@NotNull TeamMember> getMembers(final @NotNull Player player) {
+    final Team team = PluginUtil.getMainScoreboard().getEntityTeam(player);
+
+    if (team == null) {
+      throw new ValidationException(
+          "Not in a Team",
+          String.format("Player %s (%s) isn't in a Team", player.getName(), player.getUniqueId()));
+    }
+
+    final AccessCache accessCache = new AccessCache();
+    final List<TeamMember> members = new ArrayList<>();
+
+    for (final Map.Entry<UUID, Access> entry : accessCache.getAll().entrySet()) {
+      final UUID uuid = entry.getKey();
+      final Access access = entry.getValue();
+
+      //noinspection deprecation
+      for (final OfflinePlayer member : team.getPlayers()) {
+        if (!member.hasPlayedBefore() || member.getName() == null) {
+          continue;
+        }
+
+        if (!member.getUniqueId().equals(uuid)) {
+          continue;
+        }
+
+        if (access.getAccesses().contains(PermissionConstant.TEAM_LEADER.toString())) {
+          members.add(new TeamMember(member.getName(), true));
+        } else {
+          members.add(new TeamMember(member.getName(), false));
+        }
+      }
+    }
+
+    return members;
+  }
 
   public void create(final @NotNull Player player, final @NotNull String name) {
     final Scoreboard scoreboard = PluginUtil.getMainScoreboard();

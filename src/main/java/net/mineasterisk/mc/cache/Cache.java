@@ -8,6 +8,8 @@ public interface Cache<T, U> {
   @NotNull
   U get(final @NotNull T key);
 
+  HashMap<@NotNull T, @NotNull U> getAll();
+
   HashMap<@NotNull T, @NotNull U> getAllDirty();
 
   void put(final @NotNull T key, final @NotNull U value);
