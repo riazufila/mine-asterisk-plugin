@@ -7,7 +7,7 @@ public class Cacheable {
     return this.isDirty;
   }
 
-  protected void setDirty() {
-    this.isDirty = true;
+  public void setDirty(final boolean isDirty) {
+    this.isDirty = isDirty;
   }
 }

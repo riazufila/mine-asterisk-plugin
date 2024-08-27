@@ -21,7 +21,7 @@ public class Access extends Cacheable {
     }
 
     this.accesses.add(access);
-    this.setDirty();
+    this.setDirty(true);
   }
 
   public void removeAccess(final @NotNull String access) {
@@ -30,6 +30,6 @@ public class Access extends Cacheable {
     }
 
     this.accesses.remove(access);
-    this.setDirty();
+    this.setDirty(true);
   }
 }

@@ -13,7 +13,6 @@ import java.util.concurrent.CompletableFuture;
 import net.mineasterisk.mc.cache.access.Access;
 import net.mineasterisk.mc.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class AccessRepository extends Repository {
   public AccessRepository(final @NotNull Connection connection) {
@@ -58,12 +57,13 @@ public class AccessRepository extends Repository {
         });
   }
 
-  public @NotNull CompletableFuture<@Nullable Void> updatePlayersAccesses(
-      final @NotNull HashMap<@NotNull UUID, @NotNull Access> playersAccesses) {
-    return CompletableFuture.runAsync(
+  public @NotNull CompletableFuture<@NotNull HashMap<@NotNull UUID, @NotNull Access>>
+      updatePlayersAccesses(
+          final @NotNull HashMap<@NotNull UUID, @NotNull Access> playersAccesses) {
+    return CompletableFuture.supplyAsync(
         () -> {
           if (playersAccesses.isEmpty()) {
-            return;
+            return new HashMap<>();
           }
 
           final StringJoiner deleteSql = new StringJoiner(" ");
@@ -105,11 +105,15 @@ public class AccessRepository extends Repository {
 
             deleteStatement.executeBatch();
             insertStatement.executeBatch();
+
+            return playersAccesses;
           } catch (SQLException exception) {
             PluginUtil.getLogger()
                 .severe(
                     String.format(
                         "Encountered error while updating Players' accesses: %s", exception));
+
+            throw new RuntimeException(exception);
           }
         });
   }
