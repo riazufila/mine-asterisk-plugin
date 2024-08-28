@@ -55,6 +55,7 @@ public class OfflinePlayerInTeamExceptSelf
                   offlinePlayerInTeam ->
                       offlinePlayerInTeam.hasPlayedBefore()
                           && offlinePlayerInTeam.getName() != null
+                          && !offlinePlayerInTeam.getName().equals(player.getName())
                           && offlinePlayerInTeam.getName().equals(playerName))
               .findFirst();
 
