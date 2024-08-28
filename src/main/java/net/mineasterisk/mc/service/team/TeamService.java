@@ -3,12 +3,12 @@ package net.mineasterisk.mc.service.team;
 import io.papermc.paper.util.Tick;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.cache.access.Access;
@@ -27,8 +27,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class TeamService {
-  private static final @NotNull Map<@NotNull Integer, @NotNull Invitation> INVITATIONS =
-      new HashMap<>();
+  private static final @NotNull ConcurrentHashMap<@NotNull Integer, @NotNull Invitation>
+      INVITATIONS = new ConcurrentHashMap<>();
 
   public @NotNull List<@NotNull TeamMember> getMembers(final @NotNull Player player) {
     final Team team = PluginUtil.getMainScoreboard().getEntityTeam(player);
