@@ -48,7 +48,7 @@ public class TeamService {
 
       //noinspection deprecation
       for (final OfflinePlayer member : team.getPlayers()) {
-        if (!member.hasPlayedBefore() || member.getName() == null) {
+        if ((!member.hasPlayedBefore() && !member.isOnline()) || member.getName() == null) {
           continue;
         }
 
@@ -296,7 +296,7 @@ public class TeamService {
     final Team kickerTeam = PluginUtil.getMainScoreboard().getEntityTeam(kicker);
     Team kickedTeam = null;
 
-    if (!offlineKicked.hasPlayedBefore()) {
+    if (!offlineKicked.hasPlayedBefore() && !offlineKicked.isOnline()) {
       throw new ValidationException(
           "Encountered error",
           String.format(

@@ -53,7 +53,7 @@ public class OfflinePlayerInTeamExceptSelf
           team.getPlayers().stream()
               .filter(
                   offlinePlayerInTeam ->
-                      offlinePlayerInTeam.hasPlayedBefore()
+                      (offlinePlayerInTeam.hasPlayedBefore() || offlinePlayerInTeam.isOnline())
                           && offlinePlayerInTeam.getName() != null
                           && !offlinePlayerInTeam.getName().equals(player.getName())
                           && offlinePlayerInTeam.getName().equals(playerName))
@@ -99,7 +99,7 @@ public class OfflinePlayerInTeamExceptSelf
     team.getPlayers().stream()
         .filter(
             offlinePlayerInTeam ->
-                offlinePlayerInTeam.hasPlayedBefore()
+                (offlinePlayerInTeam.hasPlayedBefore() || offlinePlayerInTeam.isOnline())
                     && offlinePlayerInTeam.getName() != null
                     && !offlinePlayerInTeam.getName().equals(player.getName()))
         .forEach(offlinePlayerInTeam -> builder.suggest(offlinePlayerInTeam.getName()));
