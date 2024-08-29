@@ -3,6 +3,7 @@ package net.mineasterisk.mc.util;
 import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.command.HelpCommand;
 import net.mineasterisk.mc.command.TeamCommand;
 import org.bukkit.plugin.Plugin;
@@ -10,7 +11,7 @@ import org.bukkit.plugin.Plugin;
 @SuppressWarnings("UnstableApiUsage")
 class CommandUtil {
   protected static void register() {
-    final LifecycleEventManager<Plugin> manager = PluginUtil.getLifecycleManager();
+    final LifecycleEventManager<Plugin> manager = MineAsterisk.getInstance().getLifecycleManager();
 
     manager.registerEventHandler(
         LifecycleEvents.COMMANDS,
@@ -21,6 +22,6 @@ class CommandUtil {
           commands.register(new HelpCommand(commands.getDispatcher()).build());
         });
 
-    PluginUtil.getLogger().info("Registered command(s)");
+    MineAsterisk.getInstance().getLogger().info("Registered command(s)");
   }
 }

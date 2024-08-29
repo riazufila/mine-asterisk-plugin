@@ -5,9 +5,9 @@ import java.sql.SQLException;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.repository.PlayerRepository;
 import net.mineasterisk.mc.util.DatabaseUtil;
-import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -39,7 +39,8 @@ public class PlayerService implements Listener {
       } catch (SQLException innerException) {
         event.disallow(result, component);
 
-        PluginUtil.getLogger()
+        MineAsterisk.getInstance()
+            .getLogger()
             .severe(
                 String.format(
                     "Encountered error while rolling back transaction during inserting Player %s (%s) into database: %s",
@@ -50,7 +51,8 @@ public class PlayerService implements Listener {
 
       event.disallow(result, component);
 
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .severe(
               String.format(
                   "Encountered error while inserting Player %s (%s) into database: %s",
@@ -59,7 +61,8 @@ public class PlayerService implements Listener {
       try {
         connection.close();
       } catch (SQLException exception) {
-        PluginUtil.getLogger()
+        MineAsterisk.getInstance()
+            .getLogger()
             .severe(
                 String.format(
                     "Encountered error while closing connection during inserting Player %s (%s) into database: %s",

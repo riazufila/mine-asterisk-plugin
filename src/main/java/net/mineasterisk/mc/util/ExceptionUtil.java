@@ -2,6 +2,7 @@ package net.mineasterisk.mc.util;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.exception.ValidationException;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -22,7 +23,8 @@ public class ExceptionUtil {
       player.sendMessage(Component.text(clientMessage).color(NamedTextColor.RED));
     }
 
-    PluginUtil.getLogger()
+    MineAsterisk.getInstance()
+        .getLogger()
         .severe(
             String.format("Encountered error while executing %s command: %s", command, exception));
   }

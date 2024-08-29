@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.util.ExceptionUtil;
-import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -59,14 +59,16 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
 
       if (!usages.isEmpty()) {
         player.sendMessage(Component.text(String.join("\n", usages)).color(NamedTextColor.YELLOW));
-        PluginUtil.getLogger()
+        MineAsterisk.getInstance()
+            .getLogger()
             .info(
                 String.format(
                     "Player %s (%s) retrieved general help",
                     player.getName(), player.getUniqueId()));
       } else {
         player.sendMessage(Component.text("No commands to display").color(NamedTextColor.RED));
-        PluginUtil.getLogger()
+        MineAsterisk.getInstance()
+            .getLogger()
             .info(
                 String.format(
                     "Player %s (%s) retrieved general help but there's nothing to display",
@@ -111,14 +113,16 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
 
       if (!usages.isEmpty()) {
         player.sendMessage(Component.text(String.join("\n", usages)).color(NamedTextColor.YELLOW));
-        PluginUtil.getLogger()
+        MineAsterisk.getInstance()
+            .getLogger()
             .info(
                 String.format(
                     "Player %s (%s) retrieved filtered help",
                     player.getName(), player.getUniqueId()));
       } else {
         player.sendMessage(Component.text("No commands to display").color(NamedTextColor.RED));
-        PluginUtil.getLogger()
+        MineAsterisk.getInstance()
+            .getLogger()
             .info(
                 String.format(
                     "Player %s (%s) retrieved filtered help but there's nothing to display",
@@ -138,7 +142,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
       final boolean isStrict) {
     final List<String> results = new ArrayList<>();
     final String[] usages = this.dispatcher.getAllUsage(root, source, true);
-    final String NAMESPACE = PluginUtil.get().getName().toLowerCase();
+    final String NAMESPACE = MineAsterisk.getInstance().getName().toLowerCase();
 
     Arrays.stream(usages)
         .filter(

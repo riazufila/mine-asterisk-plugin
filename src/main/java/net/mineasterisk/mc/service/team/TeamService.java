@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.cache.access.Access;
 import net.mineasterisk.mc.cache.access.AccessCache;
 import net.mineasterisk.mc.constant.PermissionConstant;
@@ -18,10 +19,10 @@ import net.mineasterisk.mc.exception.ValidationException;
 import net.mineasterisk.mc.service.access.AccessService;
 import net.mineasterisk.mc.service.team.invitation.Invitation;
 import net.mineasterisk.mc.service.team.invitation.InvitationRunnable;
-import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,9 @@ public class TeamService {
       INVITATIONS = new ConcurrentHashMap<>();
 
   public @NotNull List<@NotNull TeamMember> getMembers(final @NotNull Player player) {
-    final Team team = PluginUtil.getMainScoreboard().getEntityTeam(player);
+    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
+    final Scoreboard scoreboard = manager.getMainScoreboard();
+    final Team team = scoreboard.getEntityTeam(player);
 
     if (team == null) {
       throw new ValidationException(
@@ -68,8 +71,9 @@ public class TeamService {
   }
 
   public void create(final @NotNull Player player, final @NotNull String name) {
-    final Scoreboard scoreboard = PluginUtil.getMainScoreboard();
-    final Team playerTeam = PluginUtil.getMainScoreboard().getEntityTeam(player);
+    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
+    final Scoreboard scoreboard = manager.getMainScoreboard();
+    final Team playerTeam = scoreboard.getEntityTeam(player);
 
     if (playerTeam != null) {
       throw new ValidationException(
@@ -101,7 +105,9 @@ public class TeamService {
   }
 
   public @NotNull List<@NotNull Player> disband(final @NotNull Player player) {
-    final Team team = PluginUtil.getMainScoreboard().getEntityTeam(player);
+    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
+    final Scoreboard scoreboard = manager.getMainScoreboard();
+    final Team team = scoreboard.getEntityTeam(player);
 
     if (team == null) {
       throw new ValidationException(
@@ -137,8 +143,10 @@ public class TeamService {
   }
 
   public void sendInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
-    final Team inviterTeam = PluginUtil.getMainScoreboard().getEntityTeam(inviter);
-    final Team inviteeTeam = PluginUtil.getMainScoreboard().getEntityTeam(invitee);
+    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
+    final Scoreboard scoreboard = manager.getMainScoreboard();
+    final Team inviterTeam = scoreboard.getEntityTeam(inviter);
+    final Team inviteeTeam = scoreboard.getEntityTeam(invitee);
 
     if (inviter.getUniqueId().equals(invitee.getUniqueId())) {
       throw new ValidationException(
@@ -168,7 +176,7 @@ public class TeamService {
     final int taskId =
         invitationRunnable
             .runTaskTimerAsynchronously(
-                PluginUtil.get(),
+                MineAsterisk.getInstance(),
                 Tick.tick().fromDuration(Duration.ofSeconds(0)),
                 Tick.tick().fromDuration(Duration.ofSeconds(1)))
             .getTaskId();
@@ -177,8 +185,10 @@ public class TeamService {
   }
 
   public void acceptInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
-    final Team inviterTeam = PluginUtil.getMainScoreboard().getEntityTeam(inviter);
-    final Team inviteeTeam = PluginUtil.getMainScoreboard().getEntityTeam(invitee);
+    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
+    final Scoreboard scoreboard = manager.getMainScoreboard();
+    final Team inviterTeam = scoreboard.getEntityTeam(inviter);
+    final Team inviteeTeam = scoreboard.getEntityTeam(invitee);
     final Map.Entry<Integer, Invitation> invitation = this.getInvitationByInviter(inviter);
 
     if (invitation == null) {
@@ -238,13 +248,15 @@ public class TeamService {
               team.getName()));
     }
 
-    PluginUtil.getScheduler().cancelTask(invitation.getKey());
+    MineAsterisk.getInstance().getServer().getScheduler().cancelTask(invitation.getKey());
     this.removeInvitationTask(invitation.getKey());
   }
 
   public void removeInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
-    final Team inviterTeam = PluginUtil.getMainScoreboard().getEntityTeam(inviter);
-    final Team inviteeTeam = PluginUtil.getMainScoreboard().getEntityTeam(invitee);
+    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
+    final Scoreboard scoreboard = manager.getMainScoreboard();
+    final Team inviterTeam = scoreboard.getEntityTeam(inviter);
+    final Team inviteeTeam = scoreboard.getEntityTeam(invitee);
     final Map.Entry<Integer, Invitation> invitation = this.getInvitationByInvitee(invitee);
 
     if (invitation == null) {
@@ -287,13 +299,15 @@ public class TeamService {
               "Invitee %s (%s) is already in a Team", invitee.getName(), invitee.getUniqueId()));
     }
 
-    PluginUtil.getScheduler().cancelTask(invitation.getKey());
+    MineAsterisk.getInstance().getServer().getScheduler().cancelTask(invitation.getKey());
     this.removeInvitationTask(invitation.getKey());
   }
 
   public void kick(final @NotNull Player kicker, final @NotNull OfflinePlayer offlineKicked) {
+    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
+    final Scoreboard scoreboard = manager.getMainScoreboard();
+    final Team kickerTeam = scoreboard.getEntityTeam(kicker);
     final Player kicked = offlineKicked.getPlayer();
-    final Team kickerTeam = PluginUtil.getMainScoreboard().getEntityTeam(kicker);
     Team kickedTeam = null;
 
     if (!offlineKicked.hasPlayedBefore() && !offlineKicked.isOnline()) {
@@ -310,9 +324,9 @@ public class TeamService {
     }
 
     if (kicked != null) {
-      kickedTeam = PluginUtil.getMainScoreboard().getEntityTeam(kicked);
+      kickedTeam = scoreboard.getEntityTeam(kicked);
     } else {
-      for (final Team team : PluginUtil.getMainScoreboard().getTeams()) {
+      for (final Team team : scoreboard.getTeams()) {
         if (team.hasEntry(offlineKicked.getName())) {
           kickedTeam = team;
 
@@ -366,7 +380,9 @@ public class TeamService {
   }
 
   public @NotNull Team leave(final @NotNull Player player) {
-    final Team team = PluginUtil.getMainScoreboard().getEntityTeam(player);
+    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
+    final Scoreboard scoreboard = manager.getMainScoreboard();
+    final Team team = scoreboard.getEntityTeam(player);
 
     if (team == null) {
       throw new ValidationException(

@@ -8,10 +8,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.cache.access.Access;
 import net.mineasterisk.mc.cache.access.AccessCache;
 import net.mineasterisk.mc.cache.access.AccessCacheRunnable;
 import net.mineasterisk.mc.repository.AccessRepository;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.jetbrains.annotations.NotNull;
 
 public class CacheUtil {
@@ -27,21 +29,23 @@ public class CacheUtil {
             accessCache.putAll(accessRepository.getAllPlayersAccesses().join());
 
         if (accessEntriesCount > 0) {
-          PluginUtil.getLogger()
+          MineAsterisk.getInstance()
+              .getLogger()
               .info(String.format("Loaded %s access entries into cache", accessEntriesCount));
         } else {
-          PluginUtil.getLogger().info("No access entries to load into cache");
+          MineAsterisk.getInstance().getLogger().info("No access entries to load into cache");
         }
 
         final int accessCacheRunnableTaskId =
             accessCacheRunnable
                 .runTaskTimerAsynchronously(
-                    PluginUtil.get(),
+                    MineAsterisk.getInstance(),
                     Tick.tick().fromDuration(Duration.ofHours(1)),
                     Tick.tick().fromDuration(Duration.ofHours(1)))
                 .getTaskId();
 
-        PluginUtil.getLogger()
+        MineAsterisk.getInstance()
+            .getLogger()
             .info(
                 String.format(
                     "Running access cache syncer with task ID %d", accessCacheRunnableTaskId));
@@ -49,7 +53,8 @@ public class CacheUtil {
         CacheUtil.SYNCERS.add(accessCacheRunnableTaskId);
       }
     } catch (SQLException exception) {
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .severe(String.format("Encountered error while loading cache: %s", exception));
 
       throw new RuntimeException(exception);
@@ -57,31 +62,34 @@ public class CacheUtil {
   }
 
   protected static void finishAllSyncer() {
+    final BukkitScheduler scheduler = MineAsterisk.getInstance().getServer().getScheduler();
     boolean isAnyTaskCurrentlyRunning = true;
 
     while (isAnyTaskCurrentlyRunning) {
       for (final Integer taskId : CacheUtil.SYNCERS) {
-        final boolean isTaskCurrentlyRunning = PluginUtil.getScheduler().isCurrentlyRunning(taskId);
+        final boolean isTaskCurrentlyRunning = scheduler.isCurrentlyRunning(taskId);
 
         if (!isTaskCurrentlyRunning) {
-          PluginUtil.getScheduler().cancelTask(taskId);
+          scheduler.cancelTask(taskId);
         } else {
-          PluginUtil.getLogger()
+          MineAsterisk.getInstance()
+              .getLogger()
               .info(String.format("Syncer with task ID %d is currently running", taskId));
         }
       }
 
       isAnyTaskCurrentlyRunning =
-          CacheUtil.SYNCERS.stream()
-              .anyMatch(taskId -> PluginUtil.getScheduler().isCurrentlyRunning(taskId));
+          CacheUtil.SYNCERS.stream().anyMatch(scheduler::isCurrentlyRunning);
 
       if (isAnyTaskCurrentlyRunning) {
         try {
-          PluginUtil.getLogger()
+          MineAsterisk.getInstance()
+              .getLogger()
               .info("Sleeping thread for a minute, as at least one syncer is still running");
           Thread.sleep(Duration.ofMinutes(1));
         } catch (InterruptedException exception) {
-          PluginUtil.getLogger()
+          MineAsterisk.getInstance()
+              .getLogger()
               .severe("Encountered error while making thread sleep on finishing all cache syncer");
         }
       }
@@ -101,16 +109,18 @@ public class CacheUtil {
       final int accessDirtyEntriesCount = accessesDirtyEntries.size();
 
       if (accessDirtyEntriesCount > 0) {
-        PluginUtil.getLogger()
+        MineAsterisk.getInstance()
+            .getLogger()
             .info(String.format("Persisted %s dirty access cache", accessesDirtyEntries.size()));
       } else {
-        PluginUtil.getLogger().info("No dirty access cache to persist");
+        MineAsterisk.getInstance().getLogger().info("No dirty access cache to persist");
       }
 
       if (isClearDirty && !accessesDirtyEntries.isEmpty()) {
         accessCache.setDirty(false, accessesDirtyEntries);
 
-        PluginUtil.getLogger()
+        MineAsterisk.getInstance()
+            .getLogger()
             .info(
                 String.format(
                     "Clearing dirty state for %s persisted access cache",
@@ -126,7 +136,8 @@ public class CacheUtil {
 
         connection.rollback();
       } catch (SQLException innerException) {
-        PluginUtil.getLogger()
+        MineAsterisk.getInstance()
+            .getLogger()
             .severe(
                 String.format(
                     "Encountered error while rolling back transaction during persisting cache: %s",
@@ -135,7 +146,8 @@ public class CacheUtil {
         throw new RuntimeException(innerException);
       }
 
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .severe(String.format("Encountered error while persisting cache: %s", exception));
 
       throw new RuntimeException(exception);
@@ -143,7 +155,8 @@ public class CacheUtil {
       try {
         connection.close();
       } catch (SQLException exception) {
-        PluginUtil.getLogger()
+        MineAsterisk.getInstance()
+            .getLogger()
             .severe(
                 String.format(
                     "Encountered error while closing connection during persisting cache: %s",

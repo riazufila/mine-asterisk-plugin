@@ -10,8 +10,8 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.cache.access.Access;
-import net.mineasterisk.mc.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class AccessRepository extends Repository {
@@ -49,7 +49,8 @@ public class AccessRepository extends Repository {
 
             return playersAccesses;
           } catch (SQLException exception) {
-            PluginUtil.getLogger()
+            MineAsterisk.getInstance()
+                .getLogger()
                 .severe(
                     String.format(
                         "Encountered error while getting all Players' accesses: %s", exception));
@@ -109,18 +110,21 @@ public class AccessRepository extends Repository {
             final int[] insertCounts = insertStatement.executeBatch();
 
             for (int i = 0; i < deleteCounts.length; i++) {
-              PluginUtil.getLogger()
+              MineAsterisk.getInstance()
+                  .getLogger()
                   .info(String.format("Delete count for batch %d: %d", i + 1, deleteCounts[i]));
             }
 
             for (int i = 0; i < insertCounts.length; i++) {
-              PluginUtil.getLogger()
+              MineAsterisk.getInstance()
+                  .getLogger()
                   .info(String.format("Insert count for batch %d: %d", i + 1, insertCounts[i]));
             }
 
             return playersAccesses;
           } catch (SQLException exception) {
-            PluginUtil.getLogger()
+            MineAsterisk.getInstance()
+                .getLogger()
                 .severe(
                     String.format(
                         "Encountered error while updating Players' accesses: %s", exception));

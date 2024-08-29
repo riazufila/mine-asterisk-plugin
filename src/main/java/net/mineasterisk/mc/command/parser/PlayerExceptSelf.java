@@ -13,7 +13,7 @@ import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSele
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import net.mineasterisk.mc.util.PluginUtil;
+import net.mineasterisk.mc.MineAsterisk;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +56,7 @@ public class PlayerExceptSelf
     final CommandSourceStack source = (CommandSourceStack) context.getSource();
     final CommandSender sender = source.getSender();
 
-    PluginUtil.getServer().getOnlinePlayers().stream()
+    MineAsterisk.getInstance().getServer().getOnlinePlayers().stream()
         .filter(player -> !player.getName().equals(sender.getName()))
         .forEach(player -> builder.suggest(player.getName()));
 

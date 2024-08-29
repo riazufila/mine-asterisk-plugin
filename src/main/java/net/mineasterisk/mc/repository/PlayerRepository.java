@@ -6,7 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import net.mineasterisk.mc.util.PluginUtil;
+import net.mineasterisk.mc.MineAsterisk;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +29,8 @@ public class PlayerRepository extends Repository {
               }
             }
           } catch (SQLException exception) {
-            PluginUtil.getLogger()
+            MineAsterisk.getInstance()
+                .getLogger()
                 .severe(
                     String.format(
                         "Encountered error while checking if Player exist: %s", exception));
@@ -50,7 +51,8 @@ public class PlayerRepository extends Repository {
               statement.executeUpdate();
             }
           } catch (SQLException exception) {
-            PluginUtil.getLogger()
+            MineAsterisk.getInstance()
+                .getLogger()
                 .severe(String.format("Encountered error while inserting Player: %s", exception));
 
             throw new RuntimeException(exception);

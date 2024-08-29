@@ -1,12 +1,25 @@
 package net.mineasterisk.mc;
 
 import net.mineasterisk.mc.util.LoaderUtil;
-import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class MineAsterisk extends JavaPlugin {
+  private static @Nullable MineAsterisk instance;
+
+  public static @NotNull MineAsterisk getInstance() {
+    if (MineAsterisk.instance == null) {
+      throw new IllegalStateException("Plugin instance is not initialized");
+    }
+
+    return MineAsterisk.instance;
+  }
+
   @Override
   public void onEnable() {
+    MineAsterisk.instance = this;
+
     try {
       LoaderUtil.preLoad();
 
@@ -14,7 +27,7 @@ public class MineAsterisk extends JavaPlugin {
     } catch (Exception exception) {
       this.getServer().getPluginManager().disablePlugin(this);
 
-      PluginUtil.getLogger()
+      this.getLogger()
           .severe(String.format("Encountered error while enabling Plugin: %s", exception));
     }
   }
@@ -26,7 +39,7 @@ public class MineAsterisk extends JavaPlugin {
 
       this.getLogger().info("Plugin disabled");
     } catch (Exception exception) {
-      PluginUtil.getLogger()
+      this.getLogger()
           .severe(String.format("Encountered error while disabling Plugin: %s", exception));
     }
   }

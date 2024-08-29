@@ -21,13 +21,14 @@ public class DatabaseUtil {
     if (DatabaseUtil.dataSource == null) {
       DatabaseUtil.initialize();
 
-      PluginUtil.getLogger().info("Initialized data source");
+      MineAsterisk.getInstance().getLogger().info("Initialized data source");
     }
 
     try {
       return DatabaseUtil.dataSource.getConnection();
     } catch (SQLException exception) {
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .severe(String.format("Encountered error while getting connection: %s", exception));
 
       throw new RuntimeException(exception);
@@ -50,7 +51,8 @@ public class DatabaseUtil {
         return new HikariConfig(properties);
       }
     } catch (IOException exception) {
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .severe(String.format("Encountered error while configuring HikariCP: %s", exception));
 
       throw new RuntimeException(exception);

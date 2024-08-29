@@ -15,13 +15,13 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.JoinConfiguration;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.command.parser.OfflinePlayerInTeamExceptSelf;
 import net.mineasterisk.mc.command.parser.PlayerExceptSelf;
 import net.mineasterisk.mc.constant.PermissionConstant;
 import net.mineasterisk.mc.service.team.TeamMember;
 import net.mineasterisk.mc.service.team.TeamService;
 import net.mineasterisk.mc.util.ExceptionUtil;
-import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -145,7 +145,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
           Component.join(JoinConfiguration.newlines(), leaderComponent, membersComponent)
               .color(NamedTextColor.YELLOW));
 
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .info(
               String.format(
                   "Player %s (%s) retrieved its Team information",
@@ -177,7 +178,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
       player.sendMessage(
           Component.text(String.format("Team %s created", NAME)).color(NamedTextColor.GREEN));
 
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .info(
               String.format(
                   "Player %s (%s) created Team %s", player.getName(), player.getUniqueId(), NAME));
@@ -207,7 +209,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
       player.sendMessage(component.color(NamedTextColor.GREEN));
       Audience.audience(members).sendMessage(component.color(NamedTextColor.YELLOW));
 
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .info(
               String.format(
                   "Player %s (%s) disbanded its Team", player.getName(), player.getUniqueId()));
@@ -248,7 +251,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
           Component.text(String.format("Received Team invitation from %s", inviter.getName()))
               .color(NamedTextColor.YELLOW));
 
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .info(
               String.format(
                   "Player %s (%s) invited Player %s (%s) to its Team",
@@ -295,7 +299,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
           Component.text(String.format("Team invitation to %s is accepted", invitee.getName()))
               .color(NamedTextColor.GREEN));
 
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .info(
               String.format(
                   "Player %s (%s) accepted Team invitation from Player %s (%s)",
@@ -342,7 +347,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
           Component.text(String.format("Team invitation from %s is removed", inviter.getName()))
               .color(NamedTextColor.RED));
 
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .info(
               String.format(
                   "Player %s (%s) removed Team invitation for Player %s (%s)",
@@ -397,7 +403,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                     .color(NamedTextColor.RED));
       }
 
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .info(
               String.format(
                   "Player %s (%s) kicked Player %s (%s) from the Team",
@@ -435,7 +442,8 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
           Component.text(String.format("%s left the Team", player.getName()))
               .color(NamedTextColor.YELLOW));
 
-      PluginUtil.getLogger()
+      MineAsterisk.getInstance()
+          .getLogger()
           .info(
               String.format(
                   "Player %s (%s) left its Team", player.getName(), player.getUniqueId()));

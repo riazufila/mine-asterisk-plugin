@@ -3,8 +3,8 @@ package net.mineasterisk.mc.service.access;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
+import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.cache.access.AccessCache;
-import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -19,7 +19,7 @@ public class AccessService implements Listener {
 
   private PermissionAttachment get(final @NotNull Player player) {
     return AccessService.PERMISSION_ATTACHMENTS.computeIfAbsent(
-        player.getUniqueId(), key -> player.addAttachment(PluginUtil.get()));
+        player.getUniqueId(), key -> player.addAttachment(MineAsterisk.getInstance()));
   }
 
   public void add(final @NotNull Player player, final @NotNull String permission) {
@@ -73,7 +73,8 @@ public class AccessService implements Listener {
 
     player.updateCommands();
 
-    PluginUtil.getLogger()
+    MineAsterisk.getInstance()
+        .getLogger()
         .info(
             String.format(
                 "Attached Permission(s) to Player %s %s", player.getName(), player.getUniqueId()));

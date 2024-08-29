@@ -12,8 +12,8 @@ import io.papermc.paper.command.brigadier.argument.CustomArgumentType;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.SelectorArgumentResolver;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.exception.ValidationException;
-import net.mineasterisk.mc.util.PluginUtil;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -38,7 +38,9 @@ public class OfflinePlayerInTeamExceptSelf
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
 
-      final Scoreboard scoreboard = PluginUtil.getMainScoreboard();
+      final Scoreboard scoreboard =
+          MineAsterisk.getInstance().getServer().getScoreboardManager().getMainScoreboard();
+
       final Team team = scoreboard.getEntityTeam(player);
 
       if (team == null) {
@@ -86,7 +88,9 @@ public class OfflinePlayerInTeamExceptSelf
           String.format("Sender %s isn't a Player and tries to execute command", sender.getName()));
     }
 
-    final Scoreboard scoreboard = PluginUtil.getMainScoreboard();
+    final Scoreboard scoreboard =
+        MineAsterisk.getInstance().getServer().getScoreboardManager().getMainScoreboard();
+
     final Team team = scoreboard.getEntityTeam(player);
 
     if (team == null) {
