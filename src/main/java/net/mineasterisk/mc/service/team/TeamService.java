@@ -171,7 +171,7 @@ public class TeamService {
     }
 
     final Invitation invitation = new Invitation(inviterTeam, inviter, invitee);
-    final InvitationRunnable invitationRunnable = new InvitationRunnable(10, invitation);
+    final InvitationRunnable invitationRunnable = new InvitationRunnable(30, invitation);
 
     final int taskId =
         invitationRunnable
