@@ -418,7 +418,7 @@ public class TeamService {
     return invitation.orElse(null);
   }
 
-  public void addInvitationTask(final int taskId, final @NotNull Invitation invitation) {
+  private void addInvitationTask(final int taskId, final @NotNull Invitation invitation) {
     if (TeamService.INVITATIONS.containsKey(taskId)) {
       return;
     }
