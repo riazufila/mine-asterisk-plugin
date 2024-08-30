@@ -3,12 +3,11 @@ package net.mineasterisk.mc.service.team;
 import io.papermc.paper.util.Tick;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.MineAsterisk;
@@ -28,8 +27,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class TeamService {
-  private static final @NotNull ConcurrentHashMap<@NotNull Integer, @NotNull Invitation>
-      INVITATIONS = new ConcurrentHashMap<>();
+  private static final @NotNull HashMap<@NotNull Integer, @NotNull Invitation> INVITATIONS =
+      new HashMap<>();
 
   public @NotNull List<@NotNull TeamMember> getMembers(final @NotNull Player player) {
     final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
@@ -163,6 +162,17 @@ public class TeamService {
               "Inviter %s (%s) isn't in a Team", inviter.getName(), inviter.getUniqueId()));
     }
 
+    final Map.Entry<Integer, Invitation> existingInvitation =
+        this.getInvitationByInviterAndInviteeAndTeam(inviter, invitee, inviterTeam);
+
+    if (existingInvitation != null) {
+      throw new ValidationException(
+          "Invitation exists",
+          String.format(
+              "Inviter %s (%s) is trying to send invitation to Invitee %s (%s) but it already exist",
+              inviter.getName(), inviter.getUniqueId(), invitee.getName(), invitee.getUniqueId()));
+    }
+
     if (inviteeTeam != null) {
       throw new ValidationException(
           "Player is already in a Team",
@@ -175,7 +185,7 @@ public class TeamService {
 
     final int taskId =
         invitationRunnable
-            .runTaskTimerAsynchronously(
+            .runTaskTimer(
                 MineAsterisk.getInstance(),
                 Tick.tick().fromDuration(Duration.ofSeconds(0)),
                 Tick.tick().fromDuration(Duration.ofSeconds(1)))
@@ -189,17 +199,6 @@ public class TeamService {
     final Scoreboard scoreboard = manager.getMainScoreboard();
     final Team inviterTeam = scoreboard.getEntityTeam(inviter);
     final Team inviteeTeam = scoreboard.getEntityTeam(invitee);
-    final Map.Entry<Integer, Invitation> invitation = this.getInvitationByInviter(inviter);
-
-    if (invitation == null) {
-      throw new ValidationException(
-          "Invitation doesn't exist",
-          String.format(
-              "Invitee %s (%s) is trying to accept Team invitation from Inviter %s (%s) but it doesn't exist",
-              invitee.getName(), invitee.getUniqueId(), inviter.getName(), inviter.getUniqueId()));
-    }
-
-    final Team team = invitation.getValue().team();
 
     if (invitee.getUniqueId().equals(inviter.getUniqueId())) {
       throw new ValidationException(
@@ -216,15 +215,18 @@ public class TeamService {
               "Inviter %s (%s) isn't in a Team", inviter.getName(), inviter.getUniqueId()));
     }
 
-    try {
-      team.getName();
-    } catch (IllegalStateException exception) {
+    final Map.Entry<Integer, Invitation> invitation =
+        this.getInvitationByInviterAndInviteeAndTeam(inviter, invitee, inviterTeam);
+
+    if (invitation == null) {
       throw new ValidationException(
-          "Inviter Team has been disbanded",
+          "Invitation doesn't exist",
           String.format(
-              "Inviter %s (%s) Team when the invitation was made has been disbanded",
-              inviter.getName(), inviter.getUniqueId()));
+              "Invitee %s (%s) is trying to accept Team invitation from Inviter %s (%s) but it doesn't exist",
+              invitee.getName(), invitee.getUniqueId(), inviter.getName(), inviter.getUniqueId()));
     }
+
+    final Team team = invitation.getValue().team();
 
     if (!inviterTeam.getName().equals(team.getName())) {
       throw new ValidationException(
@@ -241,22 +243,10 @@ public class TeamService {
               "Invitee %s (%s) is already in a Team", invitee.getName(), invitee.getUniqueId()));
     }
 
-    try {
-      final AccessService accessService = new AccessService();
+    final AccessService accessService = new AccessService();
 
-      team.addEntity(invitee);
-      accessService.add(invitee, PermissionConstant.TEAM_MEMBER.toString());
-    } catch (IllegalStateException exception) {
-      throw new ValidationException(
-          "Team doesn't exist",
-          String.format(
-              "Invitee %s (%s) is trying to accept Team invitation from Inviter %s (%s) but the Team %s doesn't exist",
-              invitee.getName(),
-              invitee.getUniqueId(),
-              inviter.getName(),
-              inviter.getUniqueId(),
-              team.getName()));
-    }
+    team.addEntity(invitee);
+    accessService.add(invitee, PermissionConstant.TEAM_MEMBER.toString());
 
     MineAsterisk.getInstance().getServer().getScheduler().cancelTask(invitation.getKey());
     this.removeInvitationTask(invitation.getKey());
@@ -266,18 +256,6 @@ public class TeamService {
     final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
     final Scoreboard scoreboard = manager.getMainScoreboard();
     final Team inviterTeam = scoreboard.getEntityTeam(inviter);
-    final Team inviteeTeam = scoreboard.getEntityTeam(invitee);
-    final Map.Entry<Integer, Invitation> invitation = this.getInvitationByInvitee(invitee);
-
-    if (invitation == null) {
-      throw new ValidationException(
-          "Invitation doesn't exist",
-          String.format(
-              "Inviter %s (%s) is trying to remove Team invitation to Invitee %s (%s) but it doesn't exist",
-              inviter.getName(), inviter.getUniqueId(), invitee.getName(), invitee.getUniqueId()));
-    }
-
-    final Team team = invitation.getValue().team();
 
     if (inviter.getUniqueId().equals(invitee.getUniqueId())) {
       throw new ValidationException(
@@ -294,15 +272,18 @@ public class TeamService {
               "Inviter %s (%s) isn't in a Team", inviter.getName(), inviter.getUniqueId()));
     }
 
-    try {
-      team.getName();
-    } catch (IllegalStateException exception) {
+    final Map.Entry<Integer, Invitation> invitation =
+        this.getInvitationByInviterAndInviteeAndTeam(inviter, invitee, inviterTeam);
+
+    if (invitation == null) {
       throw new ValidationException(
-          "Team from original invitation has been disbanded",
+          "Invitation doesn't exist",
           String.format(
-              "Inviter %s (%s) Team when the invitation was made has been disbanded",
-              inviter.getName(), inviter.getUniqueId()));
+              "Inviter %s (%s) is trying to remove Team invitation to Invitee %s (%s) but it doesn't exist",
+              inviter.getName(), inviter.getUniqueId(), invitee.getName(), invitee.getUniqueId()));
     }
+
+    final Team team = invitation.getValue().team();
 
     if (!inviterTeam.getName().equals(team.getName())) {
       throw new ValidationException(
@@ -310,13 +291,6 @@ public class TeamService {
           String.format(
               "Inviter %s (%s) is in Team %s but the invitation Team is %s",
               inviter.getName(), inviter.getUniqueId(), inviterTeam.getName(), team.getName()));
-    }
-
-    if (inviteeTeam != null) {
-      throw new ValidationException(
-          "Player is already in a Team",
-          String.format(
-              "Invitee %s (%s) is already in a Team", invitee.getName(), invitee.getUniqueId()));
     }
 
     MineAsterisk.getInstance().getServer().getScheduler().cancelTask(invitation.getKey());
@@ -418,24 +392,28 @@ public class TeamService {
     return team;
   }
 
-  private @Nullable Map.Entry<Integer, Invitation> getInvitationByInviter(
-      final @NotNull Player inviter) {
-    final Optional<Map.Entry<Integer, Invitation>> invitation =
-        TeamService.INVITATIONS.entrySet().stream()
-            .filter(entry -> entry.getValue().inviter().getUniqueId().equals(inviter.getUniqueId()))
-            .findFirst();
+  private @Nullable Map.Entry<Integer, Invitation> getInvitationByInviterAndInviteeAndTeam(
+      final @NotNull Player inviter,
+      final @NotNull Player invitee,
+      final @NotNull Team inviterTeam) {
+    try {
+      final Optional<Map.Entry<Integer, Invitation>> invitation =
+          TeamService.INVITATIONS.entrySet().stream()
+              .filter(
+                  entry ->
+                      entry.getValue().inviter().getUniqueId().equals(inviter.getUniqueId())
+                          && entry.getValue().invitee().getUniqueId().equals(invitee.getUniqueId())
+                          && entry.getValue().team().getName().equals(inviterTeam.getName()))
+              .findFirst();
 
-    return invitation.orElse(null);
-  }
-
-  private @Nullable Entry<Integer, Invitation> getInvitationByInvitee(
-      final @NotNull Player invitee) {
-    final Optional<Map.Entry<Integer, Invitation>> invitation =
-        TeamService.INVITATIONS.entrySet().stream()
-            .filter(entry -> entry.getValue().invitee().getUniqueId().equals(invitee.getUniqueId()))
-            .findFirst();
-
-    return invitation.orElse(null);
+      return invitation.orElse(null);
+    } catch (IllegalStateException exception) {
+      throw new ValidationException(
+          "Inviter Team when this invitation was made has been disbanded",
+          String.format(
+              "Inviter %s (%s) Team when the invitation was first made has been disbanded",
+              inviter.getName(), inviter.getUniqueId()));
+    }
   }
 
   private void addInvitationTask(final int taskId, final @NotNull Invitation invitation) {
