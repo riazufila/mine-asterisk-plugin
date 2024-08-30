@@ -216,9 +216,19 @@ public class TeamService {
               "Inviter %s (%s) isn't in a Team", inviter.getName(), inviter.getUniqueId()));
     }
 
+    try {
+      team.getName();
+    } catch (IllegalStateException exception) {
+      throw new ValidationException(
+          "Inviter Team has been disbanded",
+          String.format(
+              "Inviter %s (%s) Team when the invitation was made has been disbanded",
+              inviter.getName(), inviter.getUniqueId()));
+    }
+
     if (!inviterTeam.getName().equals(team.getName())) {
       throw new ValidationException(
-          "Inviter Team and the invitation's Team is different",
+          "Inviter Team has changed since the invitation is sent",
           String.format(
               "Inviter %s (%s) is in Team %s but the invitation Team is %s",
               inviter.getName(), inviter.getUniqueId(), inviterTeam.getName(), team.getName()));
@@ -284,9 +294,19 @@ public class TeamService {
               "Inviter %s (%s) isn't in a Team", inviter.getName(), inviter.getUniqueId()));
     }
 
+    try {
+      team.getName();
+    } catch (IllegalStateException exception) {
+      throw new ValidationException(
+          "Team from original invitation has been disbanded",
+          String.format(
+              "Inviter %s (%s) Team when the invitation was made has been disbanded",
+              inviter.getName(), inviter.getUniqueId()));
+    }
+
     if (!inviterTeam.getName().equals(team.getName())) {
       throw new ValidationException(
-          "Inviter Team and the invitation's Team is different",
+          "Team has changed since the invitation is sent",
           String.format(
               "Inviter %s (%s) is in Team %s but the invitation Team is %s",
               inviter.getName(), inviter.getUniqueId(), inviterTeam.getName(), team.getName()));
