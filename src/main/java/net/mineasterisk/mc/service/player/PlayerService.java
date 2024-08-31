@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class PlayerService implements Listener {
   @EventHandler
-  public void onPlayerLogin(@NotNull AsyncPlayerPreLoginEvent event) {
+  public void onAsyncPlayerPreLogin(@NotNull AsyncPlayerPreLoginEvent event) {
     final Connection connection = DatabaseUtil.getConnection();
     final String name = event.getName();
     final UUID uuid = event.getUniqueId();

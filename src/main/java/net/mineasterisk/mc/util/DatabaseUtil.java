@@ -13,15 +13,15 @@ import org.jetbrains.annotations.NotNull;
 public class DatabaseUtil {
   private static HikariDataSource dataSource;
 
-  private static void initialize() {
+  protected static void initialize() {
     DatabaseUtil.dataSource = new HikariDataSource(DatabaseUtil.configure());
+
+    MineAsterisk.getInstance().getLogger().info("Initialized data source");
   }
 
   public static @NotNull Connection getConnection() {
     if (DatabaseUtil.dataSource == null) {
       DatabaseUtil.initialize();
-
-      MineAsterisk.getInstance().getLogger().info("Initialized data source");
     }
 
     try {

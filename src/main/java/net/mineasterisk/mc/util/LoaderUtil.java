@@ -4,6 +4,7 @@ import net.mineasterisk.mc.MineAsterisk;
 
 public class LoaderUtil {
   public static void preLoad() {
+    DatabaseUtil.initialize();
     CommandUtil.register();
     EventUtil.register();
     CacheUtil.load();
