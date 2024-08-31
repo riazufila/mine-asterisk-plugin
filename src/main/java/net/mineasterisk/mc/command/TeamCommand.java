@@ -40,7 +40,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                     Commands.argument("name", StringArgumentType.greedyString())
                         .executes(this::create))
                 .requires(this::canCreate))
-        .then(Commands.literal("disband").requires(this::canDelete).executes(this::disband))
+        .then(Commands.literal("disband").requires(this::canDisband).executes(this::disband))
         .then(
             Commands.literal("invite")
                 .then(
@@ -48,7 +48,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                         .then(
                             Commands.argument("player", new PlayerExceptSelf())
                                 .executes(this::sendInvite))
-                        .requires(this::canUpdate))
+                        .requires(this::canUpdateTeamMember))
                 .then(
                     Commands.literal("accept")
                         .then(
@@ -60,21 +60,22 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                         .then(
                             Commands.argument("player", new PlayerExceptSelf())
                                 .executes(this::removeInvite))
-                        .requires(this::canUpdate))
-                .requires(source -> this.canUpdate(source) || this.canCreate(source)))
+                        .requires(this::canUpdateTeamMember))
+                .requires(source -> this.canUpdateTeamMember(source) || this.canCreate(source)))
         .then(
             Commands.literal("kick")
                 .then(
                     Commands.argument("player", new OfflinePlayerInTeamExceptSelf())
                         .executes(this::kick))
-                .requires(this::canUpdate))
+                .requires(this::canUpdateTeamMember))
         .then(Commands.literal("leave").requires(this::canLeave).executes(this::leave))
         .requires(
             source ->
                 this.canCreate(source)
                     || this.canRead(source)
-                    || this.canUpdate(source)
-                    || this.canDelete(source))
+                    || this.canUpdateTeamMember(source)
+                    || this.canDisband(source)
+                    || this.canLeave(source))
         .build();
   }
 
@@ -92,11 +93,11 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
         || sender.hasPermission(PermissionConstant.TEAM_MEMBER.toString());
   }
 
-  private boolean canUpdate(final @NotNull CommandSourceStack source) {
+  private boolean canUpdateTeamMember(final @NotNull CommandSourceStack source) {
     return source.getSender().hasPermission(PermissionConstant.TEAM_LEADER.toString());
   }
 
-  private boolean canDelete(final @NotNull CommandSourceStack source) {
+  private boolean canDisband(final @NotNull CommandSourceStack source) {
     return source.getSender().hasPermission(PermissionConstant.TEAM_LEADER.toString());
   }
 
