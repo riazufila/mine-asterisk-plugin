@@ -1,0 +1,7 @@
+name: mine-asterisk
+version: 1.0.0
+# noinspection SpellCheckingInspection
+main: net.mineasterisk.mc.MineAsterisk
+# noinspection SpellCheckingInspection
+author: riazufila
+api-version: '1.21'
