@@ -20,7 +20,7 @@ public interface Cache<T, U extends Cacheable> {
 
   int putAll(@NotNull HashMap<@NotNull T, @NotNull U> cache);
 
-  void remove(final @NotNull T key, final @NotNull U value);
+  void remove(final @NotNull T key);
 
   void removeAll();
 }

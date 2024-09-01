@@ -59,8 +59,8 @@ public class AccessCache implements Cache<@NotNull UUID, @NotNull Access> {
   }
 
   @Override
-  public void remove(final @NotNull UUID key, final @NotNull Access value) {
-    AccessCache.CACHE.put(key, value);
+  public void remove(final @NotNull UUID key) {
+    AccessCache.CACHE.remove(key);
   }
 
   @Override
