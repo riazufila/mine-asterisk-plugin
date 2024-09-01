@@ -344,6 +344,36 @@ class TeamServiceTest {
 
   @Test
   void
+      givenInviterAndInvitee_whenSendInvitationAndInvitationFromOldTeamExistsAndInviteeHasNoTeam_thenSendNewInvitation() {
+    final TeamService teamService = new TeamService();
+    final PlayerMock inviter = this.server.addPlayer();
+    final PlayerMock invitee = this.server.addPlayer();
+    final String oldTeamName = "Team0";
+    final String newTeamName = "Team0";
+
+    teamService.create(inviter, oldTeamName);
+    teamService.sendInvitation(inviter, invitee);
+    teamService.disband(inviter);
+    teamService.create(inviter, newTeamName);
+
+    Assertions.assertDoesNotThrow(() -> teamService.sendInvitation(inviter, invitee));
+    Assertions.assertTrue(
+        this.invitations.values().stream()
+            .anyMatch(
+                invitation -> {
+                  try {
+
+                    return invitation.invitee().getUniqueId().equals(invitee.getUniqueId())
+                        && invitation.inviter().getUniqueId().equals(inviter.getUniqueId())
+                        && invitation.team().getName().equals(newTeamName);
+                  } catch (IllegalStateException exception) {
+                    return false;
+                  }
+                }));
+  }
+
+  @Test
+  void
       givenInviterAndInvitee_whenAcceptInvitationAndInvitationDoesNotExist_thenThrowValidationException() {
     final TeamService teamService = new TeamService();
     final PlayerMock inviter = this.server.addPlayer();
@@ -421,7 +451,7 @@ class TeamServiceTest {
 
   @Test
   void
-      givenInviterAndInvitee_whenAcceptInvitationAndInviteeHasTeamAndInviteeIsTeamLeader_thenThrowValidationException() {
+      givenInviterAndInvitee_whenAcceptInvitationAndInviteeHasTeamAfterInvitationAndInviteeIsTeamLeader_thenThrowValidationException() {
     final TeamService teamService = new TeamService();
     final PlayerMock inviter = this.server.addPlayer();
     final PlayerMock invitee = this.server.addPlayer();
@@ -436,7 +466,7 @@ class TeamServiceTest {
 
   @Test
   void
-      givenInviterAndInvitee_whenAcceptInvitationAndInviteeHasTeamAndInviteeIsTeamMember_thenThrowValidationException() {
+      givenInviterAndInvitee_whenAcceptInvitationAndInviteeHasTeamAfterInvitationAndInviteeIsTeamMember_thenThrowValidationException() {
     final TeamService teamService = new TeamService();
     final PlayerMock inviter = this.server.addPlayer();
     final PlayerMock invitee = this.server.addPlayer();
@@ -503,6 +533,44 @@ class TeamServiceTest {
                     invitation.invitee().getUniqueId().equals(invitee.getUniqueId())
                         && invitation.inviter().getUniqueId().equals(inviter.getUniqueId())
                         && invitation.team().getName().equals(teamName)));
+  }
+
+  @Test
+  void
+      givenInviterAndInvitee_whenAcceptInvitationAndInviterDifferentTeamAndInviterResentInvitationAndInviteeHasNoTeam_thenAcceptNewInvitation() {
+    final TeamService teamService = new TeamService();
+    final ScoreboardManagerMock manager = this.server.getScoreboardManager();
+    final ScoreboardMock scoreboard = manager.getMainScoreboard();
+    final PlayerMock inviter = this.server.addPlayer();
+    final PlayerMock invitee = this.server.addPlayer();
+    final String oldTeamName = "Team0";
+    final String newTeamName = "Team1";
+
+    teamService.create(inviter, oldTeamName);
+    teamService.sendInvitation(inviter, invitee);
+    teamService.disband(inviter);
+    teamService.create(inviter, newTeamName);
+    teamService.sendInvitation(inviter, invitee);
+
+    Assertions.assertDoesNotThrow(() -> teamService.acceptInvitation(inviter, invitee));
+
+    final Team team = scoreboard.getEntityTeam(invitee);
+
+    Assertions.assertNotNull(team);
+    this.assertPlayerInTeamAndIsTeamMember(invitee, team);
+    Assertions.assertTrue(
+        this.invitations.values().stream()
+            .noneMatch(
+                invitation -> {
+                  try {
+
+                    return invitation.invitee().getUniqueId().equals(invitee.getUniqueId())
+                        && invitation.inviter().getUniqueId().equals(inviter.getUniqueId())
+                        && invitation.team().getName().equals(newTeamName);
+                  } catch (IllegalStateException exception) {
+                    return false;
+                  }
+                }));
   }
 
   @Test
@@ -633,7 +701,7 @@ class TeamServiceTest {
 
   @Test
   void
-      givenInviterAndInvitee_whenRemoveInvitationAndInviteeHasTeamAndInviteeIsTeamLeaderAndInviterHasSameTeam_thenRemoveInvitation() {
+      givenInviterAndInvitee_whenRemoveInvitationAndInviteeHasTeamAfterInvitationAndInviteeIsTeamLeaderAndInviterHasSameTeam_thenRemoveInvitation() {
     final TeamService teamService = new TeamService();
     final PlayerMock inviter = this.server.addPlayer();
     final PlayerMock invitee = this.server.addPlayer();
@@ -655,7 +723,7 @@ class TeamServiceTest {
 
   @Test
   void
-      givenInviterAndInvitee_whenRemoveInvitationAndInviteeHasTeamAndInviteeIsTeamMemberAndInviterHasSameTeam_thenRemoveInvitation() {
+      givenInviterAndInvitee_whenRemoveInvitationAndInviteeHasTeamAfterInvitationAndInviteeIsTeamMemberAndInviterHasSameTeam_thenRemoveInvitation() {
     final TeamService teamService = new TeamService();
     final PlayerMock inviter = this.server.addPlayer();
     final PlayerMock invitee = this.server.addPlayer();
@@ -676,6 +744,106 @@ class TeamServiceTest {
                     invitation.invitee().getUniqueId().equals(invitee.getUniqueId())
                         && invitation.inviter().getUniqueId().equals(inviter.getUniqueId())
                         && invitation.team().getName().equals(inviterTeamName)));
+  }
+
+  @Test
+  void
+      givenInviterAndInvitee_whenRemoveInvitationAndInviterHasDifferentTeamAndInviterResentInvitation_thenRemoveNewInvitation() {
+    final TeamService teamService = new TeamService();
+    final PlayerMock inviter = this.server.addPlayer();
+    final PlayerMock invitee = this.server.addPlayer();
+    final String oldInviterTeamName = "Team0";
+    final String newInviterTeamName = "Team1";
+
+    teamService.create(inviter, oldInviterTeamName);
+    teamService.sendInvitation(inviter, invitee);
+    teamService.disband(inviter);
+    teamService.create(inviter, newInviterTeamName);
+    teamService.sendInvitation(inviter, invitee);
+
+    Assertions.assertDoesNotThrow(() -> teamService.removeInvitation(inviter, invitee));
+    Assertions.assertTrue(
+        this.invitations.values().stream()
+            .noneMatch(
+                invitation -> {
+                  try {
+
+                    return invitation.invitee().getUniqueId().equals(invitee.getUniqueId())
+                        && invitation.inviter().getUniqueId().equals(inviter.getUniqueId())
+                        && invitation.team().getName().equals(newInviterTeamName);
+                  } catch (IllegalStateException exception) {
+                    return false;
+                  }
+                }));
+  }
+
+  @Test
+  void
+      givenInviterAndInvitee_whenRemoveInvitationAndInviterHasDifferentTeamAndInviterResentInvitationAndInviteeHasTeamAfterInvitationAndInviteeIsTeamLeader_thenRemoveNewInvitation() {
+    final TeamService teamService = new TeamService();
+    final PlayerMock inviter = this.server.addPlayer();
+    final PlayerMock invitee = this.server.addPlayer();
+    final String oldInviterTeamName = "Team0";
+    final String newInviterTeamName = "Team1";
+    final String inviteeTeamName = "Team2";
+
+    teamService.create(inviter, oldInviterTeamName);
+    teamService.sendInvitation(inviter, invitee);
+    teamService.disband(inviter);
+    teamService.create(inviter, newInviterTeamName);
+    teamService.sendInvitation(inviter, invitee);
+    teamService.create(invitee, inviteeTeamName);
+
+    Assertions.assertDoesNotThrow(() -> teamService.removeInvitation(inviter, invitee));
+    Assertions.assertTrue(
+        this.invitations.values().stream()
+            .noneMatch(
+                invitation -> {
+                  try {
+
+                    return invitation.invitee().getUniqueId().equals(invitee.getUniqueId())
+                        && invitation.inviter().getUniqueId().equals(inviter.getUniqueId())
+                        && invitation.team().getName().equals(newInviterTeamName);
+                  } catch (IllegalStateException exception) {
+                    return false;
+                  }
+                }));
+  }
+
+  @Test
+  void
+      givenInviterAndInvitee_whenRemoveInvitationAndInviterHasDifferentTeamAndInviterResentInvitationAndInviteeHasTeamAfterInvitationAndInviteeIsTeamMember_thenRemoveNewInvitation() {
+    final TeamService teamService = new TeamService();
+    final PlayerMock inviter = this.server.addPlayer();
+    final PlayerMock invitee = this.server.addPlayer();
+    final PlayerMock otherTeamLeader = this.server.addPlayer();
+    final String oldInviterTeamName = "Team0";
+    final String newInviterTeamName = "Team1";
+    final String otherTeamLeaderTeamName = "Team2";
+
+    teamService.create(inviter, oldInviterTeamName);
+    teamService.sendInvitation(inviter, invitee);
+    teamService.disband(inviter);
+    teamService.create(inviter, newInviterTeamName);
+    teamService.sendInvitation(inviter, invitee);
+    teamService.create(otherTeamLeader, otherTeamLeaderTeamName);
+    teamService.sendInvitation(otherTeamLeader, invitee);
+    teamService.acceptInvitation(otherTeamLeader, invitee);
+
+    Assertions.assertDoesNotThrow(() -> teamService.removeInvitation(inviter, invitee));
+    Assertions.assertTrue(
+        this.invitations.values().stream()
+            .noneMatch(
+                invitation -> {
+                  try {
+
+                    return invitation.invitee().getUniqueId().equals(invitee.getUniqueId())
+                        && invitation.inviter().getUniqueId().equals(inviter.getUniqueId())
+                        && invitation.team().getName().equals(newInviterTeamName);
+                  } catch (IllegalStateException exception) {
+                    return false;
+                  }
+                }));
   }
 
   @Test
