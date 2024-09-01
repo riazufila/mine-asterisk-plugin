@@ -396,24 +396,21 @@ public class TeamService {
       final @NotNull Player inviter,
       final @NotNull Player invitee,
       final @NotNull Team inviterTeam) {
-    try {
-      final Optional<Map.Entry<Integer, Invitation>> invitation =
-          TeamService.INVITATIONS.entrySet().stream()
-              .filter(
-                  entry ->
-                      entry.getValue().inviter().getUniqueId().equals(inviter.getUniqueId())
-                          && entry.getValue().invitee().getUniqueId().equals(invitee.getUniqueId())
-                          && entry.getValue().team().getName().equals(inviterTeam.getName()))
-              .findFirst();
+    final Optional<Map.Entry<Integer, Invitation>> invitation =
+        TeamService.INVITATIONS.entrySet().stream()
+            .filter(
+                entry -> {
+                  try {
+                    return entry.getValue().inviter().getUniqueId().equals(inviter.getUniqueId())
+                        && entry.getValue().invitee().getUniqueId().equals(invitee.getUniqueId())
+                        && entry.getValue().team().getName().equals(inviterTeam.getName());
+                  } catch (IllegalStateException exception) {
+                    return false;
+                  }
+                })
+            .findFirst();
 
-      return invitation.orElse(null);
-    } catch (IllegalStateException exception) {
-      throw new ValidationException(
-          "Inviter Team when this invitation was made has been disbanded",
-          String.format(
-              "Inviter %s (%s) Team when the invitation was first made has been disbanded",
-              inviter.getName(), inviter.getUniqueId()));
-    }
+    return invitation.orElse(null);
   }
 
   private void addInvitationTask(final int taskId, final @NotNull Invitation invitation) {
