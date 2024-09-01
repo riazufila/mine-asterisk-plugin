@@ -4,12 +4,12 @@ import io.papermc.paper.util.Tick;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.Duration;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import net.mineasterisk.mc.MineAsterisk;
-import net.mineasterisk.mc.cache.access.Access;
 import net.mineasterisk.mc.cache.access.AccessCache;
 import net.mineasterisk.mc.cache.access.AccessCacheRunnable;
 import net.mineasterisk.mc.repository.AccessRepository;
@@ -99,39 +99,35 @@ public class CacheUtil {
   public static void persist(final boolean isClearDirty) {
     final Connection connection = DatabaseUtil.getConnection();
     final AccessCache accessCache = new AccessCache();
-    HashMap<UUID, Access> accessesDirtyEntries = new HashMap<>();
+    List<UUID> dirtyAccesses = new ArrayList<>();
 
     try {
       final AccessRepository accessRepository = new AccessRepository(connection);
-      accessesDirtyEntries =
-          accessRepository.updatePlayersAccesses(accessCache.getAllDirty()).join();
+      dirtyAccesses = accessRepository.updatePlayersAccesses(accessCache.getAllDirty()).join();
 
-      final int accessDirtyEntriesCount = accessesDirtyEntries.size();
-
-      if (accessDirtyEntriesCount > 0) {
+      if (!dirtyAccesses.isEmpty()) {
         MineAsterisk.getInstance()
             .getLogger()
-            .info(String.format("Persisted %s dirty access cache", accessesDirtyEntries.size()));
+            .info(String.format("Persisted %s dirty access cache", dirtyAccesses.size()));
       } else {
         MineAsterisk.getInstance().getLogger().info("No dirty access cache to persist");
       }
 
-      if (isClearDirty && !accessesDirtyEntries.isEmpty()) {
-        accessCache.setDirty(false, accessesDirtyEntries);
+      if (isClearDirty && !dirtyAccesses.isEmpty()) {
+        accessCache.setDirty(false, dirtyAccesses);
 
         MineAsterisk.getInstance()
             .getLogger()
             .info(
                 String.format(
-                    "Clearing dirty state for %s persisted access cache",
-                    accessesDirtyEntries.size()));
+                    "Clearing dirty state for %s persisted access cache", dirtyAccesses.size()));
       }
 
       connection.commit();
     } catch (SQLException exception) {
       try {
-        if (isClearDirty && !accessesDirtyEntries.isEmpty()) {
-          accessCache.setDirty(true, accessesDirtyEntries);
+        if (isClearDirty && !dirtyAccesses.isEmpty()) {
+          accessCache.setDirty(true, dirtyAccesses);
         }
 
         connection.rollback();

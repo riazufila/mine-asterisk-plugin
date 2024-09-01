@@ -2,6 +2,7 @@ package net.mineasterisk.mc.cache.access;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,14 +40,9 @@ public class AccessCache implements Cache<@NotNull UUID, @NotNull Access> {
   }
 
   @Override
-  public void setDirty(
-      final boolean isDirty, final @NotNull HashMap<@NotNull UUID, @NotNull Access> dirtyEntries) {
-    for (final Map.Entry<UUID, Access> dirtyEntry : dirtyEntries.entrySet()) {
-      final Access access = dirtyEntry.getValue();
-
-      if (access.isDirty()) {
-        access.setDirty(isDirty);
-      }
+  public void setDirty(final boolean isDirty, final @NotNull List<@NotNull UUID> dirtyEntries) {
+    for (final UUID dirtyEntry : dirtyEntries) {
+      this.get(dirtyEntry).setDirty(isDirty);
     }
   }
 

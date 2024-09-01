@@ -4,8 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.UUID;
@@ -60,13 +62,12 @@ public class AccessRepository extends Repository {
         });
   }
 
-  public @NotNull CompletableFuture<@NotNull HashMap<@NotNull UUID, @NotNull Access>>
-      updatePlayersAccesses(
-          final @NotNull HashMap<@NotNull UUID, @NotNull Access> playersAccesses) {
+  public @NotNull CompletableFuture<@NotNull List<@NotNull UUID>> updatePlayersAccesses(
+      final @NotNull HashMap<@NotNull UUID, @NotNull Access> playersAccesses) {
     return CompletableFuture.supplyAsync(
         () -> {
           if (playersAccesses.isEmpty()) {
-            return new HashMap<>();
+            return new ArrayList<>();
           }
 
           final StringJoiner deleteSql = new StringJoiner(" ");
@@ -121,7 +122,7 @@ public class AccessRepository extends Repository {
                   .info(String.format("Insert count for batch %d: %d", i + 1, insertCounts[i]));
             }
 
-            return playersAccesses;
+            return playersAccesses.keySet().stream().toList();
           } catch (SQLException exception) {
             MineAsterisk.getInstance()
                 .getLogger()

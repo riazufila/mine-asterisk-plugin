@@ -1,6 +1,7 @@
 package net.mineasterisk.mc.cache;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +14,7 @@ public interface Cache<T, U extends Cacheable> {
 
   HashMap<@NotNull T, @NotNull U> getAllDirty();
 
-  void setDirty(final boolean isDirty, final @NotNull HashMap<@NotNull T, @NotNull U> dirtyEntries);
+  void setDirty(final boolean isDirty, final @NotNull List<@NotNull T> dirtyEntries);
 
   void put(final @NotNull T key, final @NotNull U value);
 
