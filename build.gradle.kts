@@ -19,6 +19,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("org.mockito:mockito-core:5.13.0")
     testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.118.1")
+    testImplementation("com.mysql:mysql-connector-j:9.0.0")
 }
 
 java {
