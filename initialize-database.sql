@@ -1,4 +1,5 @@
 DROP DATABASE IF EXISTS `mine-asterisk`;
+
 CREATE DATABASE `mine-asterisk`;
 
 USE `mine-asterisk`;
@@ -11,9 +12,10 @@ CREATE TABLE player (
 );
 
 CREATE TABLE permission (
-    id INT NOT NULL,
-    value VARCHAR(20) NOT NULL,
-    PRIMARY KEY (id)
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(20) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE `unique_name` (`name`)
 );
 
 CREATE TABLE access (
@@ -26,6 +28,6 @@ CREATE TABLE access (
     UNIQUE `unique_access` (`player_id`, `permission_id`)
 );
 
-INSERT INTO permission VALUES
+INSERT INTO permission (`id`, `name`) VALUES
 (1, "team.leader"),
 (2, "team.member");

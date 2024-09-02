@@ -6,14 +6,14 @@ public enum PermissionConstant {
   TEAM_LEADER("team.leader"),
   TEAM_MEMBER("team.member");
 
-  private final String value;
+  private final String name;
 
-  PermissionConstant(final @NotNull String value) {
-    this.value = value;
+  PermissionConstant(final @NotNull String name) {
+    this.name = name;
   }
 
   @Override
   public @NotNull String toString() {
-    return this.value;
+    return this.name;
   }
 }

@@ -28,7 +28,7 @@ public class AccessRepository extends Repository {
           final HashMap<UUID, Access> playersAccesses = new HashMap<>();
           final StringJoiner sql = new StringJoiner(" ");
 
-          sql.add("SELECT player.uuid, permission.value");
+          sql.add("SELECT player.uuid, permission.name");
           sql.add("FROM player");
           sql.add("INNER JOIN access ON player.id = access.player_id");
           sql.add("INNER JOIN permission ON access.permission_id = permission.id");
@@ -39,7 +39,7 @@ public class AccessRepository extends Repository {
               try (final ResultSet result = statement.executeQuery()) {
                 while (result.next()) {
                   UUID uuid = UUID.fromString(result.getString("uuid"));
-                  String permission = result.getString("value");
+                  String permission = result.getString("name");
 
                   playersAccesses
                       .computeIfAbsent(uuid, key -> new Access(new HashSet<>()))
@@ -82,7 +82,7 @@ public class AccessRepository extends Repository {
           insertSql.add("INSERT INTO access (player_id, permission_id)");
           insertSql.add("SELECT player.id, permission.id");
           insertSql.add("FROM player");
-          insertSql.add("INNER JOIN permission ON permission.value = ?");
+          insertSql.add("INNER JOIN permission ON permission.name = ?");
           insertSql.add("WHERE player.uuid = ?");
 
           try {
