@@ -1,6 +1,7 @@
 package net.mineasterisk.mc.repository;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.UUID;
@@ -20,23 +21,29 @@ class PlayerRepositoryTest {
   private Connection connection;
 
   @BeforeEach
-  public void setUp() {
+  public void setUp() throws SQLException {
     MockBukkit.mock();
     MockBukkit.load(MineAsterisk.class);
+    DatabaseUtil.initialize();
 
     this.connection = DatabaseUtil.getConnection();
+    final CallableStatement statement = this.connection.prepareCall("{CALL reset()}");
+
+    statement.execute();
   }
 
   @AfterEach
   public void tearDown() throws SQLException {
-    this.connection.rollback();
+    final CallableStatement statement = this.connection.prepareCall("{CALL reset()}");
+
+    statement.execute();
     this.connection.close();
     MockBukkit.unmock();
     loaderUtil.close();
   }
 
   @Test
-  void givenRandomUuid_whenCheckIsPlayerExist_thenReturnFalse() {
+  void givenRandomUuid_whenCheckIsPlayerExist_thenReturnFalse() throws SQLException {
     final PlayerRepository playerRepository = new PlayerRepository(this.connection);
     final UUID randomUuid = UUID.randomUUID();
     final boolean isPlayerExist = playerRepository.isPlayerExist(randomUuid).join();

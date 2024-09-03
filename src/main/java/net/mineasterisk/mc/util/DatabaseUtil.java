@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class DatabaseUtil {
   private static HikariDataSource dataSource;
 
-  protected static void initialize() {
+  public static void initialize() {
     DatabaseUtil.dataSource = new HikariDataSource(DatabaseUtil.configure());
 
     MineAsterisk.getInstance().getLogger().info("Initialized data source");
