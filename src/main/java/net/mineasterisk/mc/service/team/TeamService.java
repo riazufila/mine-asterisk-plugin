@@ -90,7 +90,7 @@ public class TeamService {
     }
 
     final Team team = scoreboard.registerNewTeam(name);
-    final AccessService accessService = new AccessService();
+    final AccessService accessService = new AccessService(player);
 
     team.addEntity(player);
     team.displayName(Component.text(name));
@@ -99,8 +99,8 @@ public class TeamService {
             Component.text(name).color(NamedTextColor.GRAY),
             Component.text('.').color(NamedTextColor.GRAY)));
 
-    accessService.add(player, PermissionConstant.TEAM_LEADER.toString());
-    accessService.add(player, PermissionConstant.TEAM_MEMBER.toString());
+    accessService.add(PermissionConstant.TEAM_LEADER.toString());
+    accessService.add(PermissionConstant.TEAM_MEMBER.toString());
   }
 
   public @NotNull List<@NotNull Player> disband(final @NotNull Player player) {
@@ -114,7 +114,7 @@ public class TeamService {
           String.format("Player %s (%s) isn't in a Team", player.getName(), player.getUniqueId()));
     }
 
-    final AccessService accessService = new AccessService();
+    final AccessService playerAccessService = new AccessService(player);
     final List<Player> members = new ArrayList<>();
 
     //noinspection deprecation
@@ -122,20 +122,19 @@ public class TeamService {
       final Player member = offlinePlayer.getPlayer();
 
       if (member == null) {
-        accessService.removeIfOffline(
-            offlinePlayer.getUniqueId(), PermissionConstant.TEAM_MEMBER.toString());
+        new AccessService(offlinePlayer).removeIfOffline(PermissionConstant.TEAM_MEMBER.toString());
 
         continue;
       }
 
-      accessService.remove(member, PermissionConstant.TEAM_MEMBER.toString());
+      new AccessService(member).remove(PermissionConstant.TEAM_MEMBER.toString());
 
       if (!member.getUniqueId().equals(player.getUniqueId())) {
         members.add(member);
       }
     }
 
-    accessService.remove(player, PermissionConstant.TEAM_LEADER.toString());
+    playerAccessService.remove(PermissionConstant.TEAM_LEADER.toString());
     team.unregister();
 
     return members;
@@ -243,10 +242,8 @@ public class TeamService {
               "Invitee %s (%s) is already in a Team", invitee.getName(), invitee.getUniqueId()));
     }
 
-    final AccessService accessService = new AccessService();
-
     team.addEntity(invitee);
-    accessService.add(invitee, PermissionConstant.TEAM_MEMBER.toString());
+    new AccessService(invitee).add(PermissionConstant.TEAM_MEMBER.toString());
 
     MineAsterisk.getInstance().getServer().getScheduler().cancelTask(invitation.getKey());
     this.removeInvitationTask(invitation.getKey());
@@ -361,15 +358,12 @@ public class TeamService {
               "Player %s (%s) is trying to kick itself", kicker.getName(), kicker.getUniqueId()));
     }
 
-    final AccessService accessService = new AccessService();
-
     if (kicked != null) {
       kickerTeam.removeEntity(kicked);
-      accessService.remove(kicked, PermissionConstant.TEAM_MEMBER.toString());
+      new AccessService(kicked).remove(PermissionConstant.TEAM_MEMBER.toString());
     } else {
       kickerTeam.removeEntry(offlineKicked.getName());
-      accessService.removeIfOffline(
-          offlineKicked.getUniqueId(), PermissionConstant.TEAM_MEMBER.toString());
+      new AccessService(offlineKicked).removeIfOffline(PermissionConstant.TEAM_MEMBER.toString());
     }
   }
 
@@ -384,10 +378,8 @@ public class TeamService {
           String.format("Player %s (%s) isn't in a Team", player.getName(), player.getUniqueId()));
     }
 
-    final AccessService accessService = new AccessService();
-
     team.removeEntity(player);
-    accessService.remove(player, PermissionConstant.TEAM_MEMBER.toString());
+    new AccessService(player).remove(PermissionConstant.TEAM_MEMBER.toString());
 
     return team;
   }

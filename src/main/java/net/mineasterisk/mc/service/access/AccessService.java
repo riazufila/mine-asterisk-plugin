@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.UUID;
 import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.cache.access.AccessCache;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,85 +13,113 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionAttachment;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class AccessService implements Listener {
   private static final @NotNull HashMap<@NotNull UUID, @NotNull PermissionAttachment>
       PERMISSION_ATTACHMENTS = new HashMap<>();
 
-  private PermissionAttachment get(final @NotNull Player player) {
-    return AccessService.PERMISSION_ATTACHMENTS.computeIfAbsent(
-        player.getUniqueId(), key -> player.addAttachment(MineAsterisk.getInstance()));
+  private @Nullable Player player = null;
+  private @Nullable OfflinePlayer offlinePlayer = null;
+
+  public AccessService() {}
+
+  public AccessService(final @NotNull Player player) {
+    this.player = player;
   }
 
-  public void add(final @NotNull Player player, final @NotNull String permission) {
-    final PermissionAttachment permissionAttachment = this.get(player);
-    final AccessCache accessCache = new AccessCache();
-    final UUID uuid = player.getUniqueId();
+  public AccessService(final @NotNull OfflinePlayer offlinePlayer) {
+    this.offlinePlayer = offlinePlayer;
+  }
 
-    if (player.hasPermission(permission)) {
+  private PermissionAttachment get() {
+    if (this.player == null) {
+      throw new IllegalStateException("Player is supposed to be initialized");
+    }
+
+    return AccessService.PERMISSION_ATTACHMENTS.computeIfAbsent(
+        this.player.getUniqueId(), key -> this.player.addAttachment(MineAsterisk.getInstance()));
+  }
+
+  public void add(final @NotNull String permission) {
+    final PermissionAttachment permissionAttachment = this.get();
+    final AccessCache accessCache = new AccessCache();
+
+    if (this.player == null) {
+      throw new IllegalStateException("Player is supposed to be initialized");
+    }
+
+    final UUID uuid = this.player.getUniqueId();
+
+    if (this.player.hasPermission(permission)) {
       return;
     }
 
     permissionAttachment.setPermission(permission, true);
-    player.updateCommands();
+    this.player.updateCommands();
 
     accessCache.get(uuid).addAccess(permission);
   }
 
-  public void remove(final @NotNull Player player, final @NotNull String permission) {
-    final PermissionAttachment permissionAttachment = this.get(player);
+  public void remove(final @NotNull String permission) {
+    final PermissionAttachment permissionAttachment = this.get();
     final AccessCache accessCache = new AccessCache();
-    final UUID uuid = player.getUniqueId();
 
-    if (!player.hasPermission(permission)) {
+    if (this.player == null) {
+      throw new IllegalStateException("Player is supposed to be initialized");
+    }
+
+    final UUID uuid = this.player.getUniqueId();
+
+    if (!this.player.hasPermission(permission)) {
       return;
     }
 
     permissionAttachment.unsetPermission(permission);
-    player.updateCommands();
+    this.player.updateCommands();
 
     accessCache.get(uuid).removeAccess(permission);
   }
 
-  public void removeIfOffline(final @NotNull UUID uuid, final @NotNull String permission) {
+  public void removeIfOffline(final @NotNull String permission) {
     final AccessCache accessCache = new AccessCache();
 
-    accessCache.get(uuid).removeAccess(permission);
+    if (this.offlinePlayer == null) {
+      throw new IllegalStateException("Offline Player is supposed to be initialized");
+    }
+
+    accessCache.get(this.offlinePlayer.getUniqueId()).removeAccess(permission);
   }
 
-  private void attach(final @NotNull Player player) {
+  @EventHandler
+  public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
+    this.player = event.getPlayer();
     final AccessCache accessCache = new AccessCache();
-    final Set<String> permissionsCached = accessCache.get(player.getUniqueId()).getAccesses();
+    final Set<String> permissionsCached = accessCache.get(this.player.getUniqueId()).getAccesses();
 
     if (permissionsCached.isEmpty()) {
       return;
     }
 
-    final PermissionAttachment permissionAttachment = this.get(player);
+    final PermissionAttachment permissionAttachment = this.get();
 
     permissionsCached.forEach(
         permissionCached -> permissionAttachment.setPermission(permissionCached, true));
 
-    player.updateCommands();
+    this.player.updateCommands();
 
     MineAsterisk.getInstance()
         .getLogger()
         .info(
             String.format(
-                "Attached Permission(s) to Player %s %s", player.getName(), player.getUniqueId()));
-  }
-
-  private void detach(final @NotNull Player player) {
-    AccessService.PERMISSION_ATTACHMENTS.remove(player.getUniqueId());
-  }
-
-  @EventHandler
-  public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
-    this.attach(event.getPlayer());
+                "Attached Permission(s) to Player %s %s",
+                this.player.getName(), this.player.getUniqueId()));
   }
 
   @EventHandler
   public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
-    this.detach(event.getPlayer());
+    this.player = event.getPlayer();
+
+    AccessService.PERMISSION_ATTACHMENTS.remove(this.player.getUniqueId());
   }
 }

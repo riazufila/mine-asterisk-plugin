@@ -11,6 +11,7 @@ import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.cache.access.AccessCache;
 import net.mineasterisk.mc.constant.PermissionConstant;
 import net.mineasterisk.mc.util.LoaderUtil;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.permissions.PermissionAttachment;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -46,13 +47,13 @@ class AccessServiceTest {
 
   @Test
   void givenPlayerAndPermission_whenPlayerHasNoPermission_thenAdd() {
-    final AccessService accessService = new AccessService();
     final AccessCache accessCache = new AccessCache();
     final PlayerMock player = this.server.addPlayer();
+    final AccessService accessService = new AccessService(player);
     final String permission = PermissionConstant.TEAM_LEADER.toString();
     final Set<String> accesses = accessCache.get(player.getUniqueId()).getAccesses();
 
-    accessService.add(player, permission);
+    accessService.add(permission);
 
     Assertions.assertTrue(player.hasPermission(permission));
     Assertions.assertTrue(accesses.contains(permission));
@@ -60,14 +61,14 @@ class AccessServiceTest {
 
   @Test
   void givenPlayerAndPermission_whenPlayerHasNoPermissionAndAddPermissions_thenAdd() {
-    final AccessService accessService = new AccessService();
     final AccessCache accessCache = new AccessCache();
     final PlayerMock player = this.server.addPlayer();
+    final AccessService accessService = new AccessService(player);
     final String permission0 = PermissionConstant.TEAM_LEADER.toString();
     final String permission1 = PermissionConstant.TEAM_MEMBER.toString();
 
-    accessService.add(player, permission0);
-    accessService.add(player, permission1);
+    accessService.add(permission0);
+    accessService.add(permission1);
 
     final Set<String> accesses = accessCache.get(player.getUniqueId()).getAccesses();
 
@@ -79,19 +80,19 @@ class AccessServiceTest {
 
   @Test
   void givenPlayerAndPermission_whenPlayerHasPermission_thenRemove() {
-    final AccessService accessService = new AccessService();
     final AccessCache accessCache = new AccessCache();
     final PlayerMock player = this.server.addPlayer();
+    final AccessService accessService = new AccessService(player);
     final String permission = PermissionConstant.TEAM_LEADER.toString();
 
-    accessService.add(player, permission);
+    accessService.add(permission);
 
     final Set<String> accesses = accessCache.get(player.getUniqueId()).getAccesses();
 
     Assertions.assertTrue(player.hasPermission(permission));
     Assertions.assertTrue(accesses.contains(permission));
 
-    accessService.remove(player, permission);
+    accessService.remove(permission);
 
     Assertions.assertFalse(player.hasPermission(permission));
     Assertions.assertFalse(accesses.contains(permission));
@@ -99,14 +100,14 @@ class AccessServiceTest {
 
   @Test
   void givenPlayerAndPermission_whenPlayerHasPermissionsAndRemovePermission_thenRemove() {
-    final AccessService accessService = new AccessService();
     final AccessCache accessCache = new AccessCache();
     final PlayerMock player = this.server.addPlayer();
+    final AccessService accessService = new AccessService(player);
     final String permission0 = PermissionConstant.TEAM_LEADER.toString();
     final String permission1 = PermissionConstant.TEAM_MEMBER.toString();
 
-    accessService.add(player, permission0);
-    accessService.add(player, permission1);
+    accessService.add(permission0);
+    accessService.add(permission1);
 
     final Set<String> accesses = accessCache.get(player.getUniqueId()).getAccesses();
 
@@ -115,7 +116,7 @@ class AccessServiceTest {
     Assertions.assertTrue(accesses.contains(permission0));
     Assertions.assertTrue(accesses.contains(permission1));
 
-    accessService.remove(player, permission0);
+    accessService.remove(permission0);
 
     Assertions.assertFalse(player.hasPermission(permission0));
     Assertions.assertTrue(player.hasPermission(permission1));
@@ -125,14 +126,14 @@ class AccessServiceTest {
 
   @Test
   void givenPlayerAndPermission_whenPlayerHasPermissionsAndRemovePermissions_thenRemove() {
-    final AccessService accessService = new AccessService();
     final AccessCache accessCache = new AccessCache();
     final PlayerMock player = this.server.addPlayer();
+    final AccessService accessService = new AccessService(player);
     final String permission0 = PermissionConstant.TEAM_LEADER.toString();
     final String permission1 = PermissionConstant.TEAM_MEMBER.toString();
 
-    accessService.add(player, permission0);
-    accessService.add(player, permission1);
+    accessService.add(permission0);
+    accessService.add(permission1);
 
     final Set<String> accesses = accessCache.get(player.getUniqueId()).getAccesses();
 
@@ -141,8 +142,8 @@ class AccessServiceTest {
     Assertions.assertTrue(accesses.contains(permission0));
     Assertions.assertTrue(accesses.contains(permission1));
 
-    accessService.remove(player, permission0);
-    accessService.remove(player, permission1);
+    accessService.remove(permission0);
+    accessService.remove(permission1);
 
     Assertions.assertFalse(player.hasPermission(permission0));
     Assertions.assertFalse(player.hasPermission(permission1));
@@ -152,18 +153,17 @@ class AccessServiceTest {
 
   @Test
   void givenPlayerAndPermission_whenPlayerHasPermissionAndPlayerIsOffline_thenRemove() {
-    final AccessService accessService = new AccessService();
     final AccessCache accessCache = new AccessCache();
     final PlayerMock player = this.server.addPlayer();
-    final UUID playerUuid = player.getUniqueId();
+    final OfflinePlayer offlinePlayer = this.server.getOfflinePlayer(player.getUniqueId());
     final String permission = PermissionConstant.TEAM_LEADER.toString();
 
-    accessService.add(player, permission);
+    new AccessService(player).add(permission);
 
     final Set<String> accesses = accessCache.get(player.getUniqueId()).getAccesses();
 
     player.disconnect();
-    accessService.removeIfOffline(playerUuid, permission);
+    new AccessService(offlinePlayer).removeIfOffline(permission);
 
     Assertions.assertFalse(player.hasPermission(permission));
     Assertions.assertFalse(accesses.contains(permission));
@@ -172,20 +172,20 @@ class AccessServiceTest {
   @Test
   void
       givenPlayerAndPermission_whenPlayerHasPermissionsAndPlayerIsOfflineAndRemovePermission_thenRemove() {
-    final AccessService accessService = new AccessService();
     final AccessCache accessCache = new AccessCache();
     final PlayerMock player = this.server.addPlayer();
-    final UUID playerUuid = player.getUniqueId();
+    final OfflinePlayer offlinePlayer = this.server.getOfflinePlayer(player.getUniqueId());
+    final AccessService playerAccessService = new AccessService(player);
     final String permission0 = PermissionConstant.TEAM_LEADER.toString();
     final String permission1 = PermissionConstant.TEAM_MEMBER.toString();
 
-    accessService.add(player, permission0);
-    accessService.add(player, permission1);
+    playerAccessService.add(permission0);
+    playerAccessService.add(permission1);
 
     final Set<String> accesses = accessCache.get(player.getUniqueId()).getAccesses();
 
     player.disconnect();
-    accessService.removeIfOffline(playerUuid, permission0);
+    new AccessService(offlinePlayer).removeIfOffline(permission0);
 
     Assertions.assertFalse(accesses.contains(permission0));
     Assertions.assertTrue(accesses.contains(permission1));
@@ -194,21 +194,22 @@ class AccessServiceTest {
   @Test
   void
       givenPlayerAndPermission_whenPlayerHasPermissionsAndPlayerIsOfflineAndRemovePermissions_thenRemove() {
-    final AccessService accessService = new AccessService();
     final AccessCache accessCache = new AccessCache();
     final PlayerMock player = this.server.addPlayer();
-    final UUID playerUuid = player.getUniqueId();
+    final OfflinePlayer offlinePlayer = this.server.getOfflinePlayer(player.getUniqueId());
+    final AccessService playerAccessService = new AccessService(player);
+    final AccessService offlinePlayerAccessService = new AccessService(offlinePlayer);
     final String permission0 = PermissionConstant.TEAM_LEADER.toString();
     final String permission1 = PermissionConstant.TEAM_MEMBER.toString();
 
-    accessService.add(player, permission0);
-    accessService.add(player, permission1);
+    playerAccessService.add(permission0);
+    playerAccessService.add(permission1);
 
     final Set<String> accesses = accessCache.get(player.getUniqueId()).getAccesses();
 
     player.disconnect();
-    accessService.removeIfOffline(playerUuid, permission0);
-    accessService.removeIfOffline(playerUuid, permission1);
+    offlinePlayerAccessService.removeIfOffline(permission0);
+    offlinePlayerAccessService.removeIfOffline(permission1);
 
     Assertions.assertFalse(accesses.contains(permission0));
     Assertions.assertFalse(accesses.contains(permission1));
