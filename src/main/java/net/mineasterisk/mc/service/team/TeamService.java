@@ -241,39 +241,39 @@ public class TeamService {
     TeamService.addInvitationTask(taskId, invitation);
   }
 
-  public void acceptInvitation(final @NotNull Player invitee) {
+  public void acceptInvitation(final @NotNull Player inviter) {
     final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
     final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team inviterTeam = scoreboard.getEntityTeam(this.player);
-    final Team inviteeTeam = scoreboard.getEntityTeam(invitee);
+    final Team inviterTeam = scoreboard.getEntityTeam(inviter);
+    final Team inviteeTeam = scoreboard.getEntityTeam(this.player);
 
-    if (invitee.getUniqueId().equals(this.player.getUniqueId())) {
+    if (this.player.getUniqueId().equals(inviter.getUniqueId())) {
       throw new ValidationException(
           "Not allowed to accept invitation from yourself",
           String.format(
               "Player %s (%s) is trying to accept invitation from itself",
-              invitee.getName(), invitee.getUniqueId()));
+              this.player.getName(), this.player.getUniqueId()));
     }
 
     if (inviterTeam == null) {
       throw new ValidationException(
           "Inviter is not in a Team",
           String.format(
-              "Inviter %s (%s) isn't in a Team", this.player.getName(), this.player.getUniqueId()));
+              "Inviter %s (%s) isn't in a Team", inviter.getName(), inviter.getUniqueId()));
     }
 
     final Map.Entry<Integer, Invitation> invitation =
-        TeamService.getInvitationByInviterAndInviteeAndTeam(this.player, invitee, inviterTeam);
+        TeamService.getInvitationByInviterAndInviteeAndTeam(inviter, this.player, inviterTeam);
 
     if (invitation == null) {
       throw new ValidationException(
           "Invitation doesn't exist",
           String.format(
               "Invitee %s (%s) is trying to accept Team invitation from Inviter %s (%s) but it doesn't exist",
-              invitee.getName(),
-              invitee.getUniqueId(),
               this.player.getName(),
-              this.player.getUniqueId()));
+              this.player.getUniqueId(),
+              inviter.getName(),
+              inviter.getUniqueId()));
     }
 
     final Team team = invitation.getValue().team();
@@ -283,21 +283,18 @@ public class TeamService {
           "Inviter Team has changed since the invitation is sent",
           String.format(
               "Inviter %s (%s) is in Team %s but the invitation Team is %s",
-              this.player.getName(),
-              this.player.getUniqueId(),
-              inviterTeam.getName(),
-              team.getName()));
+              inviter.getName(), inviter.getUniqueId(), inviterTeam.getName(), team.getName()));
     }
 
     if (inviteeTeam != null) {
       throw new ValidationException(
           "Already in a Team",
           String.format(
-              "Invitee %s (%s) is already in a Team", invitee.getName(), invitee.getUniqueId()));
+              "Invitee %s (%s) is already in a Team", inviter.getName(), inviter.getUniqueId()));
     }
 
-    team.addEntity(invitee);
-    new AccessService(invitee).add(PermissionConstant.TEAM_MEMBER.toString());
+    team.addEntity(this.player);
+    new AccessService(this.player).add(PermissionConstant.TEAM_MEMBER.toString());
 
     MineAsterisk.getInstance().getServer().getScheduler().cancelTask(invitation.getKey());
     TeamService.removeInvitationTask(invitation.getKey());

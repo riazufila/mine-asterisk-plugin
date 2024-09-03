@@ -70,18 +70,20 @@ class TeamServiceTest {
     final PlayerMock player0 = this.server.addPlayer();
     final PlayerMock player1 = this.server.addPlayer();
     final PlayerMock player2 = this.server.addPlayer();
-    final TeamService teamService = new TeamService(player0);
+    final TeamService teamService0 = new TeamService(player0);
+    final TeamService teamService1 = new TeamService(player1);
+    final TeamService teamService2 = new TeamService(player2);
 
-    teamService.create("Team0");
+    teamService0.create("Team0");
 
     final Team team = scoreboard.getEntityTeam(player0);
 
     Assertions.assertNotNull(team);
 
-    teamService.sendInvitation(player1);
-    teamService.sendInvitation(player2);
-    teamService.acceptInvitation(player1);
-    teamService.acceptInvitation(player2);
+    teamService0.sendInvitation(player1);
+    teamService0.sendInvitation(player2);
+    teamService1.acceptInvitation(player0);
+    teamService2.acceptInvitation(player0);
 
     final List<TeamMember> expectedResult =
         List.of(
@@ -89,7 +91,7 @@ class TeamServiceTest {
             new TeamMember(player1.getName(), false),
             new TeamMember(player2.getName(), false));
 
-    Assertions.assertTrue(teamService.getMembers().containsAll(expectedResult));
+    Assertions.assertTrue(teamService0.getMembers().containsAll(expectedResult));
   }
 
   @Test
@@ -99,19 +101,21 @@ class TeamServiceTest {
     final PlayerMock player0 = this.server.addPlayer();
     final PlayerMock player1 = this.server.addPlayer();
     final PlayerMock player2 = this.server.addPlayer();
-    final TeamService teamService = new TeamService(player0);
+    final TeamService teamService0 = new TeamService(player0);
+    final TeamService teamService1 = new TeamService(player1);
+    final TeamService teamService2 = new TeamService(player2);
 
-    teamService.create("Team0");
+    teamService0.create("Team0");
 
     final Team team = scoreboard.getEntityTeam(player0);
 
     Assertions.assertNotNull(team);
 
-    teamService.sendInvitation(player1);
-    teamService.sendInvitation(player2);
+    teamService0.sendInvitation(player1);
+    teamService0.sendInvitation(player2);
 
-    teamService.acceptInvitation(player1);
-    teamService.acceptInvitation(player2);
+    teamService1.acceptInvitation(player0);
+    teamService2.acceptInvitation(player0);
 
     player0.disconnect();
     player2.disconnect();
@@ -122,7 +126,7 @@ class TeamServiceTest {
             new TeamMember(player1.getName(), false),
             new TeamMember(player2.getName(), false));
 
-    Assertions.assertTrue(teamService.getMembers().containsAll(expectedResult));
+    Assertions.assertTrue(teamService0.getMembers().containsAll(expectedResult));
   }
 
   @Test
@@ -151,7 +155,7 @@ class TeamServiceTest {
     Assertions.assertNotNull(team);
 
     teamService0.sendInvitation(player1);
-    teamService0.acceptInvitation(player1);
+    teamService1.acceptInvitation(player0);
 
     Assertions.assertThrows(ValidationException.class, () -> teamService1.create("Team1"));
   }
@@ -216,17 +220,19 @@ class TeamServiceTest {
     final PlayerMock player0 = this.server.addPlayer();
     final PlayerMock player1 = this.server.addPlayer();
     final PlayerMock player2 = this.server.addPlayer();
-    final TeamService teamService = new TeamService(player0);
+    final TeamService teamService0 = new TeamService(player0);
+    final TeamService teamService1 = new TeamService(player1);
+    final TeamService teamService2 = new TeamService(player2);
 
-    teamService.create("Team0");
+    teamService0.create("Team0");
 
-    teamService.sendInvitation(player1);
-    teamService.sendInvitation(player2);
+    teamService0.sendInvitation(player1);
+    teamService0.sendInvitation(player2);
 
-    teamService.acceptInvitation(player1);
-    teamService.acceptInvitation(player2);
+    teamService1.acceptInvitation(player0);
+    teamService2.acceptInvitation(player0);
 
-    final List<Player> members = teamService.disband();
+    final List<Player> members = teamService0.disband();
 
     this.assertPlayerHasNoTeam(player0);
     this.assertPlayerHasNoTeam(player1);
@@ -239,19 +245,21 @@ class TeamServiceTest {
     final PlayerMock player0 = this.server.addPlayer();
     final PlayerMock player1 = this.server.addPlayer();
     final PlayerMock player2 = this.server.addPlayer();
-    final TeamService teamService = new TeamService(player0);
+    final TeamService teamService0 = new TeamService(player0);
+    final TeamService teamService1 = new TeamService(player1);
+    final TeamService teamService2 = new TeamService(player2);
 
-    teamService.create("Team0");
+    teamService0.create("Team0");
 
-    teamService.sendInvitation(player1);
-    teamService.sendInvitation(player2);
+    teamService0.sendInvitation(player1);
+    teamService0.sendInvitation(player2);
 
-    teamService.acceptInvitation(player1);
-    teamService.acceptInvitation(player2);
+    teamService1.acceptInvitation(player0);
+    teamService2.acceptInvitation(player0);
 
     player1.disconnect();
 
-    final List<Player> members = teamService.disband();
+    final List<Player> members = teamService0.disband();
 
     this.assertPlayerHasNoTeam(player0);
     this.assertPlayerHasNoTeam(player1);
@@ -310,13 +318,14 @@ class TeamServiceTest {
     final PlayerMock invitee = this.server.addPlayer();
     final PlayerMock otherTeamLeader = this.server.addPlayer();
     final TeamService inviterTeamService = new TeamService(inviter);
+    final TeamService inviteeTeamService = new TeamService(invitee);
     final TeamService otherTeamLeaderTeamService = new TeamService(otherTeamLeader);
 
     inviterTeamService.create("Team0");
     otherTeamLeaderTeamService.create("Team1");
 
     otherTeamLeaderTeamService.sendInvitation(invitee);
-    otherTeamLeaderTeamService.acceptInvitation(invitee);
+    inviteeTeamService.acceptInvitation(otherTeamLeader);
 
     Assertions.assertThrows(
         ValidationException.class, () -> inviterTeamService.sendInvitation(invitee));
@@ -466,13 +475,14 @@ class TeamServiceTest {
     final PlayerMock invitee = this.server.addPlayer();
     final PlayerMock otherTeamLeader = this.server.addPlayer();
     final TeamService inviterTeamService = new TeamService(inviter);
+    final TeamService inviteeTeamService = new TeamService(invitee);
     final TeamService otherTeamLeaderTeamService = new TeamService(otherTeamLeader);
 
     inviterTeamService.create("Team0");
     inviterTeamService.sendInvitation(invitee);
     otherTeamLeaderTeamService.create("Team1");
     otherTeamLeaderTeamService.sendInvitation(invitee);
-    otherTeamLeaderTeamService.acceptInvitation(invitee);
+    inviteeTeamService.acceptInvitation(otherTeamLeader);
 
     Assertions.assertThrows(
         ValidationException.class, () -> inviterTeamService.acceptInvitation(invitee));
@@ -509,13 +519,14 @@ class TeamServiceTest {
     final ScoreboardMock scoreboard = manager.getMainScoreboard();
     final PlayerMock inviter = this.server.addPlayer();
     final PlayerMock invitee = this.server.addPlayer();
-    final TeamService teamService = new TeamService(inviter);
+    final TeamService inviterTeamService = new TeamService(inviter);
+    final TeamService inviteeTeamService = new TeamService(invitee);
     final String teamName = "Team0";
 
-    teamService.create(teamName);
-    teamService.sendInvitation(invitee);
+    inviterTeamService.create(teamName);
+    inviterTeamService.sendInvitation(invitee);
 
-    Assertions.assertDoesNotThrow(() -> teamService.acceptInvitation(invitee));
+    Assertions.assertDoesNotThrow(() -> inviteeTeamService.acceptInvitation(inviter));
 
     final Team team = scoreboard.getEntityTeam(invitee);
 
@@ -537,17 +548,18 @@ class TeamServiceTest {
     final ScoreboardMock scoreboard = manager.getMainScoreboard();
     final PlayerMock inviter = this.server.addPlayer();
     final PlayerMock invitee = this.server.addPlayer();
-    final TeamService teamService = new TeamService(inviter);
+    final TeamService inviterTeamService = new TeamService(inviter);
+    final TeamService inviteeTeamService = new TeamService(invitee);
     final String oldTeamName = "Team0";
     final String newTeamName = "Team1";
 
-    teamService.create(oldTeamName);
-    teamService.sendInvitation(invitee);
-    teamService.disband();
-    teamService.create(newTeamName);
-    teamService.sendInvitation(invitee);
+    inviterTeamService.create(oldTeamName);
+    inviterTeamService.sendInvitation(invitee);
+    inviterTeamService.disband();
+    inviterTeamService.create(newTeamName);
+    inviterTeamService.sendInvitation(invitee);
 
-    Assertions.assertDoesNotThrow(() -> teamService.acceptInvitation(invitee));
+    Assertions.assertDoesNotThrow(() -> inviteeTeamService.acceptInvitation(inviter));
 
     final Team team = scoreboard.getEntityTeam(invitee);
 
@@ -717,6 +729,7 @@ class TeamServiceTest {
     final PlayerMock invitee = this.server.addPlayer();
     final PlayerMock otherTeamLeader = this.server.addPlayer();
     final TeamService inviterTeamService = new TeamService(inviter);
+    final TeamService inviteeTeamService = new TeamService(invitee);
     final TeamService otherTeamLeaderTeamService = new TeamService(otherTeamLeader);
     final String inviterTeamName = "Team0";
 
@@ -724,7 +737,7 @@ class TeamServiceTest {
     otherTeamLeaderTeamService.create("Team1");
     inviterTeamService.sendInvitation(invitee);
     otherTeamLeaderTeamService.sendInvitation(invitee);
-    otherTeamLeaderTeamService.acceptInvitation(invitee);
+    inviteeTeamService.acceptInvitation(otherTeamLeader);
 
     Assertions.assertDoesNotThrow(() -> inviterTeamService.removeInvitation(invitee));
     Assertions.assertTrue(
@@ -808,6 +821,7 @@ class TeamServiceTest {
     final PlayerMock invitee = this.server.addPlayer();
     final PlayerMock otherTeamLeader = this.server.addPlayer();
     final TeamService inviterTeamService = new TeamService(inviter);
+    final TeamService inviteeTeamService = new TeamService(invitee);
     final TeamService otherTeamLeaderTeamService = new TeamService(otherTeamLeader);
     final String oldInviterTeamName = "Team0";
     final String newInviterTeamName = "Team1";
@@ -820,7 +834,7 @@ class TeamServiceTest {
     inviterTeamService.sendInvitation(invitee);
     otherTeamLeaderTeamService.create(otherTeamLeaderTeamName);
     otherTeamLeaderTeamService.sendInvitation(invitee);
-    otherTeamLeaderTeamService.acceptInvitation(invitee);
+    inviteeTeamService.acceptInvitation(otherTeamLeader);
 
     Assertions.assertDoesNotThrow(() -> inviterTeamService.removeInvitation(invitee));
     Assertions.assertTrue(
@@ -942,16 +956,17 @@ class TeamServiceTest {
       givenKickerAndOfflineKicked_whenKickAndOfflineKickedIsOnlineAndTeamIsDisbanded_thenThrowValidationException() {
     final PlayerMock kicker = this.server.addPlayer();
     final PlayerMock kicked = this.server.addPlayer();
-    final TeamService teamService = new TeamService(kicker);
+    final TeamService kickerTeamService = new TeamService(kicker);
+    final TeamService kickedTeamService = new TeamService(kicked);
     final UUID kickedUuid = kicked.getUniqueId();
     final OfflinePlayer offlineKicked = this.server.getOfflinePlayer(kickedUuid);
 
-    teamService.create("Team0");
-    teamService.sendInvitation(kicked);
-    teamService.acceptInvitation(kicked);
-    teamService.disband();
+    kickerTeamService.create("Team0");
+    kickerTeamService.sendInvitation(kicked);
+    kickedTeamService.acceptInvitation(kicker);
+    kickerTeamService.disband();
 
-    Assertions.assertThrows(ValidationException.class, () -> teamService.kick(offlineKicked));
+    Assertions.assertThrows(ValidationException.class, () -> kickerTeamService.kick(offlineKicked));
   }
 
   @Test
@@ -959,19 +974,20 @@ class TeamServiceTest {
       givenKickerAndOfflineKicked_whenKickAndOfflineKickedIsOfflineAndTeamIsDisbanded_thenThrowValidationException() {
     final PlayerMock kicker = this.server.addPlayer();
     final PlayerMock kicked = this.server.addPlayer();
-    final TeamService teamService = new TeamService(kicker);
+    final TeamService kickerTeamService = new TeamService(kicker);
+    final TeamService kickedTeamService = new TeamService(kicked);
 
-    teamService.create("Team0");
-    teamService.sendInvitation(kicked);
-    teamService.acceptInvitation(kicked);
-    teamService.disband();
+    kickerTeamService.create("Team0");
+    kickerTeamService.sendInvitation(kicked);
+    kickedTeamService.acceptInvitation(kicker);
+    kickerTeamService.disband();
 
     kicked.disconnect();
 
     final UUID kickedUuid = kicked.getUniqueId();
     final OfflinePlayer offlineKicked = this.server.getOfflinePlayer(kickedUuid);
 
-    Assertions.assertThrows(ValidationException.class, () -> teamService.kick(offlineKicked));
+    Assertions.assertThrows(ValidationException.class, () -> kickerTeamService.kick(offlineKicked));
   }
 
   @Test
@@ -995,19 +1011,20 @@ class TeamServiceTest {
       givenKickerAndOfflineKicked_whenKickAndOfflineKickedIsOfflineAndTeamIsDifferentAndOfflineKickedIsTeamLeader_thenThrowValidationException() {
     final PlayerMock kicker = this.server.addPlayer();
     final PlayerMock kicked = this.server.addPlayer();
-    final TeamService teamService = new TeamService(kicker);
+    final TeamService kickerTeamService = new TeamService(kicker);
+    final TeamService kickedTeamService = new TeamService(kicked);
 
-    teamService.create("Team0");
-    teamService.sendInvitation(kicked);
-    teamService.acceptInvitation(kicked);
-    teamService.disband();
+    kickerTeamService.create("Team0");
+    kickerTeamService.sendInvitation(kicked);
+    kickedTeamService.acceptInvitation(kicker);
+    kickerTeamService.disband();
 
     kicked.disconnect();
 
     final UUID kickedUuid = kicked.getUniqueId();
     final OfflinePlayer offlineKicked = this.server.getOfflinePlayer(kickedUuid);
 
-    Assertions.assertThrows(ValidationException.class, () -> teamService.kick(offlineKicked));
+    Assertions.assertThrows(ValidationException.class, () -> kickerTeamService.kick(offlineKicked));
   }
 
   @Test
@@ -1017,6 +1034,7 @@ class TeamServiceTest {
     final PlayerMock kicked = this.server.addPlayer();
     final PlayerMock otherTeamLeader = this.server.addPlayer();
     final TeamService kickerTeamService = new TeamService(kicker);
+    final TeamService kickedTeamService = new TeamService(kicked);
     final TeamService otherTeamLeaderTeamService = new TeamService(otherTeamLeader);
     final UUID kickedUuid = kicked.getUniqueId();
     final OfflinePlayer offlineKicked = this.server.getOfflinePlayer(kickedUuid);
@@ -1024,7 +1042,7 @@ class TeamServiceTest {
     kickerTeamService.create("Team0");
     otherTeamLeaderTeamService.create("Team1");
     otherTeamLeaderTeamService.sendInvitation(kicked);
-    otherTeamLeaderTeamService.acceptInvitation(kicked);
+    kickedTeamService.acceptInvitation(otherTeamLeader);
 
     Assertions.assertThrows(ValidationException.class, () -> kickerTeamService.kick(offlineKicked));
   }
@@ -1036,12 +1054,13 @@ class TeamServiceTest {
     final PlayerMock kicked = this.server.addPlayer();
     final PlayerMock otherTeamLeader = this.server.addPlayer();
     final TeamService kickerTeamService = new TeamService(kicker);
+    final TeamService kickedTeamService = new TeamService(kicked);
     final TeamService otherTeamLeaderTeamService = new TeamService(otherTeamLeader);
 
     kickerTeamService.create("Team0");
     otherTeamLeaderTeamService.create("Team1");
     otherTeamLeaderTeamService.sendInvitation(kicked);
-    otherTeamLeaderTeamService.acceptInvitation(kicked);
+    kickedTeamService.acceptInvitation(otherTeamLeader);
 
     kicked.disconnect();
 
@@ -1055,15 +1074,16 @@ class TeamServiceTest {
   void givenKickerAndOfflineKicked_whenKickAndOfflineKickedIsOnline_thenKick() {
     final PlayerMock kicker = this.server.addPlayer();
     final PlayerMock kicked = this.server.addPlayer();
-    final TeamService teamService = new TeamService(kicker);
+    final TeamService kickerTeamService = new TeamService(kicker);
+    final TeamService kickedTeamService = new TeamService(kicked);
     final UUID kickedUuid = kicked.getUniqueId();
     final OfflinePlayer offlineKicked = this.server.getOfflinePlayer(kickedUuid);
 
-    teamService.create("Team0");
-    teamService.sendInvitation(kicked);
-    teamService.acceptInvitation(kicked);
+    kickerTeamService.create("Team0");
+    kickerTeamService.sendInvitation(kicked);
+    kickedTeamService.acceptInvitation(kicker);
 
-    Assertions.assertDoesNotThrow(() -> teamService.kick(offlineKicked));
+    Assertions.assertDoesNotThrow(() -> kickerTeamService.kick(offlineKicked));
     this.assertPlayerHasNoTeam(kicked);
   }
 
@@ -1071,18 +1091,19 @@ class TeamServiceTest {
   void givenKickerAndOfflineKicked_whenKickAndOfflineKickedIsOffline_thenKick() {
     final PlayerMock kicker = this.server.addPlayer();
     final PlayerMock kicked = this.server.addPlayer();
-    final TeamService teamService = new TeamService(kicker);
+    final TeamService kickerTeamService = new TeamService(kicker);
+    final TeamService kickedTeamService = new TeamService(kicked);
 
-    teamService.create("Team0");
-    teamService.sendInvitation(kicked);
-    teamService.acceptInvitation(kicked);
+    kickerTeamService.create("Team0");
+    kickerTeamService.sendInvitation(kicked);
+    kickedTeamService.acceptInvitation(kicker);
 
     kicked.disconnect();
 
     final UUID kickedUuid = kicked.getUniqueId();
     final OfflinePlayer offlineKicked = this.server.getOfflinePlayer(kickedUuid);
 
-    Assertions.assertDoesNotThrow(() -> teamService.kick(offlineKicked));
+    Assertions.assertDoesNotThrow(() -> kickerTeamService.kick(offlineKicked));
     this.assertPlayerHasNoTeam(kicked);
   }
 
@@ -1103,7 +1124,7 @@ class TeamServiceTest {
 
     teamService0.create("Team0");
     teamService0.sendInvitation(player1);
-    teamService0.acceptInvitation(player1);
+    teamService1.acceptInvitation(player0);
 
     final ScoreboardManagerMock manager = this.server.getScoreboardManager();
     final ScoreboardMock scoreboard = manager.getMainScoreboard();

@@ -285,7 +285,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
               .resolve(source)
               .getFirst();
 
-      new TeamService(inviter).acceptInvitation(invitee);
+      new TeamService(invitee).acceptInvitation(inviter);
 
       invitee.sendMessage(
           Component.text(String.format("Accepted Team invitation from %s", inviter.getName()))
