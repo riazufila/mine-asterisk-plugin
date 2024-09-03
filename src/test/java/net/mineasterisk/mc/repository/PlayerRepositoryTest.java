@@ -43,7 +43,7 @@ class PlayerRepositoryTest {
   }
 
   @Test
-  void givenRandomUuid_whenCheckIsPlayerExist_thenReturnFalse() throws SQLException {
+  void givenRandomUuid_whenCheckIsPlayerExist_thenReturnFalse() {
     final PlayerRepository playerRepository = new PlayerRepository(this.connection);
     final UUID randomUuid = UUID.randomUUID();
     final boolean isPlayerExist = playerRepository.isPlayerExist(randomUuid).join();
@@ -69,5 +69,9 @@ class PlayerRepositoryTest {
     final UUID uuid = UUID.randomUUID();
 
     Assertions.assertDoesNotThrow(() -> playerRepository.insert(uuid).join());
+
+    final boolean isPlayerExist = playerRepository.isPlayerExist(uuid).join();
+
+    Assertions.assertTrue(isPlayerExist);
   }
 }
