@@ -118,8 +118,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
 
-      final TeamService teamService = new TeamService();
-      final List<TeamMember> members = teamService.getMembers(player);
+      final List<TeamMember> members = new TeamService(player).getMembers();
       final String leaderName =
           members.stream()
               .filter(TeamMember::isLeader)
@@ -171,10 +170,9 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
 
-      final TeamService teamService = new TeamService();
       final String NAME = context.getArgument("name", String.class);
 
-      teamService.create(player, NAME);
+      new TeamService(player).create(NAME);
 
       player.sendMessage(
           Component.text(String.format("Team %s created", NAME)).color(NamedTextColor.GREEN));
@@ -203,8 +201,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
 
-      final TeamService teamService = new TeamService();
-      final List<Player> members = teamService.disband(player);
+      final List<Player> members = new TeamService(player).disband();
       final Component component = Component.text("Team disbanded");
 
       player.sendMessage(component.color(NamedTextColor.GREEN));
@@ -235,14 +232,13 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
 
-      final TeamService teamService = new TeamService();
       final Player invitee =
           context
               .getArgument("player", PlayerSelectorArgumentResolver.class)
               .resolve(source)
               .getFirst();
 
-      teamService.sendInvitation(inviter, invitee);
+      new TeamService(inviter).sendInvitation(invitee);
 
       inviter.sendMessage(
           Component.text(String.format("Sent Team invitation to %s", invitee.getName()))
@@ -283,14 +279,13 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
 
-      final TeamService teamService = new TeamService();
       final Player inviter =
           context
               .getArgument("player", PlayerSelectorArgumentResolver.class)
               .resolve(source)
               .getFirst();
 
-      teamService.acceptInvitation(inviter, invitee);
+      new TeamService(inviter).acceptInvitation(invitee);
 
       invitee.sendMessage(
           Component.text(String.format("Accepted Team invitation from %s", inviter.getName()))
@@ -331,14 +326,13 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
 
-      final TeamService teamService = new TeamService();
       final Player invitee =
           context
               .getArgument("player", PlayerSelectorArgumentResolver.class)
               .resolve(source)
               .getFirst();
 
-      teamService.removeInvitation(inviter, invitee);
+      new TeamService(inviter).removeInvitation(invitee);
 
       inviter.sendMessage(
           Component.text(String.format("Removed Team invitation to %s", invitee.getName()))
@@ -379,8 +373,6 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
 
-      final TeamService teamService = new TeamService();
-
       @SuppressWarnings("unchecked")
       final OfflinePlayer offlineKicked =
           context
@@ -390,7 +382,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                       (Class<?>) SelectorArgumentResolver.class)
               .resolve(source);
 
-      teamService.kick(kicker, offlineKicked);
+      new TeamService(kicker).kick(offlineKicked);
 
       kicker.sendMessage(
           Component.text(String.format("Kicked %s from the Team", offlineKicked.getName()))
@@ -434,8 +426,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                 "Sender %s isn't a Player and tries to execute command", sender.getName()));
       }
 
-      final TeamService teamService = new TeamService();
-      final Team team = teamService.leave(player);
+      final Team team = new TeamService(player).leave();
 
       player.sendMessage(Component.text("Left Team").color(NamedTextColor.GREEN));
 

@@ -19,13 +19,12 @@ public class InvitationRunnable extends BukkitRunnable {
   @Override
   public void run() {
     if (count == loop) {
-      final TeamService teamService = new TeamService();
       final Component message = Component.text("Team invitation expired").color(NamedTextColor.RED);
 
       this.invitation.invitee().sendMessage(message);
       this.invitation.inviter().sendMessage(message);
       this.cancel();
-      teamService.removeInvitationTask(this.getTaskId());
+      TeamService.removeInvitationTask(this.getTaskId());
     }
 
     count++;

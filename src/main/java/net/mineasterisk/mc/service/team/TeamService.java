@@ -30,15 +30,59 @@ public class TeamService {
   private static final @NotNull HashMap<@NotNull Integer, @NotNull Invitation> INVITATIONS =
       new HashMap<>();
 
-  public @NotNull List<@NotNull TeamMember> getMembers(final @NotNull Player player) {
+  private final @NotNull Player player;
+
+  public TeamService(final @NotNull Player player) {
+    this.player = player;
+  }
+
+  private static @Nullable Map.Entry<Integer, Invitation> getInvitationByInviterAndInviteeAndTeam(
+      final @NotNull Player inviter,
+      final @NotNull Player invitee,
+      final @NotNull Team inviterTeam) {
+    final Optional<Map.Entry<Integer, Invitation>> invitation =
+        TeamService.INVITATIONS.entrySet().stream()
+            .filter(
+                entry -> {
+                  try {
+                    return entry.getValue().inviter().getUniqueId().equals(inviter.getUniqueId())
+                        && entry.getValue().invitee().getUniqueId().equals(invitee.getUniqueId())
+                        && entry.getValue().team().getName().equals(inviterTeam.getName());
+                  } catch (IllegalStateException exception) {
+                    return false;
+                  }
+                })
+            .findFirst();
+
+    return invitation.orElse(null);
+  }
+
+  private static void addInvitationTask(final int taskId, final @NotNull Invitation invitation) {
+    if (TeamService.INVITATIONS.containsKey(taskId)) {
+      return;
+    }
+
+    TeamService.INVITATIONS.put(taskId, invitation);
+  }
+
+  public static void removeInvitationTask(final int taskId) {
+    if (!TeamService.INVITATIONS.containsKey(taskId)) {
+      return;
+    }
+
+    TeamService.INVITATIONS.remove(taskId);
+  }
+
+  public @NotNull List<@NotNull TeamMember> getMembers() {
     final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
     final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team team = scoreboard.getEntityTeam(player);
+    final Team team = scoreboard.getEntityTeam(this.player);
 
     if (team == null) {
       throw new ValidationException(
           "Not in a Team",
-          String.format("Player %s (%s) isn't in a Team", player.getName(), player.getUniqueId()));
+          String.format(
+              "Player %s (%s) isn't in a Team", this.player.getName(), this.player.getUniqueId()));
     }
 
     final AccessCache accessCache = new AccessCache();
@@ -69,16 +113,17 @@ public class TeamService {
     return members;
   }
 
-  public void create(final @NotNull Player player, final @NotNull String name) {
+  public void create(final @NotNull String name) {
     final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
     final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team playerTeam = scoreboard.getEntityTeam(player);
+    final Team playerTeam = scoreboard.getEntityTeam(this.player);
 
     if (playerTeam != null) {
       throw new ValidationException(
           "Already in a Team",
           String.format(
-              "Player %s (%s) is already in a Team", player.getName(), player.getUniqueId()));
+              "Player %s (%s) is already in a Team",
+              this.player.getName(), this.player.getUniqueId()));
     }
 
     if (scoreboard.getTeam(name) != null) {
@@ -86,13 +131,13 @@ public class TeamService {
           "Team name is taken",
           String.format(
               "Player %s (%s) is trying to create a Team but the name is taken",
-              player.getName(), player.getUniqueId()));
+              this.player.getName(), this.player.getUniqueId()));
     }
 
     final Team team = scoreboard.registerNewTeam(name);
-    final AccessService accessService = new AccessService(player);
+    final AccessService accessService = new AccessService(this.player);
 
-    team.addEntity(player);
+    team.addEntity(this.player);
     team.displayName(Component.text(name));
     team.prefix(
         Component.textOfChildren(
@@ -103,18 +148,18 @@ public class TeamService {
     accessService.add(PermissionConstant.TEAM_MEMBER.toString());
   }
 
-  public @NotNull List<@NotNull Player> disband(final @NotNull Player player) {
+  public @NotNull List<@NotNull Player> disband() {
     final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
     final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team team = scoreboard.getEntityTeam(player);
+    final Team team = scoreboard.getEntityTeam(this.player);
 
     if (team == null) {
       throw new ValidationException(
           "Not in a Team",
-          String.format("Player %s (%s) isn't in a Team", player.getName(), player.getUniqueId()));
+          String.format(
+              "Player %s (%s) isn't in a Team", this.player.getName(), this.player.getUniqueId()));
     }
 
-    final AccessService playerAccessService = new AccessService(player);
     final List<Player> members = new ArrayList<>();
 
     //noinspection deprecation
@@ -129,47 +174,50 @@ public class TeamService {
 
       new AccessService(member).remove(PermissionConstant.TEAM_MEMBER.toString());
 
-      if (!member.getUniqueId().equals(player.getUniqueId())) {
+      if (!member.getUniqueId().equals(this.player.getUniqueId())) {
         members.add(member);
       }
     }
 
-    playerAccessService.remove(PermissionConstant.TEAM_LEADER.toString());
+    new AccessService(this.player).remove(PermissionConstant.TEAM_LEADER.toString());
     team.unregister();
 
     return members;
   }
 
-  public void sendInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
+  public void sendInvitation(final @NotNull Player invitee) {
     final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
     final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team inviterTeam = scoreboard.getEntityTeam(inviter);
+    final Team inviterTeam = scoreboard.getEntityTeam(this.player);
     final Team inviteeTeam = scoreboard.getEntityTeam(invitee);
 
-    if (inviter.getUniqueId().equals(invitee.getUniqueId())) {
+    if (this.player.getUniqueId().equals(invitee.getUniqueId())) {
       throw new ValidationException(
           "Not allowed to invite yourself",
           String.format(
               "Player %s (%s) is trying to invite itself",
-              inviter.getName(), inviter.getUniqueId()));
+              this.player.getName(), this.player.getUniqueId()));
     }
 
     if (inviterTeam == null) {
       throw new ValidationException(
           "Not in a Team",
           String.format(
-              "Inviter %s (%s) isn't in a Team", inviter.getName(), inviter.getUniqueId()));
+              "Inviter %s (%s) isn't in a Team", this.player.getName(), this.player.getUniqueId()));
     }
 
     final Map.Entry<Integer, Invitation> existingInvitation =
-        this.getInvitationByInviterAndInviteeAndTeam(inviter, invitee, inviterTeam);
+        TeamService.getInvitationByInviterAndInviteeAndTeam(this.player, invitee, inviterTeam);
 
     if (existingInvitation != null) {
       throw new ValidationException(
           "Invitation exists",
           String.format(
               "Inviter %s (%s) is trying to send invitation to Invitee %s (%s) but it already exist",
-              inviter.getName(), inviter.getUniqueId(), invitee.getName(), invitee.getUniqueId()));
+              this.player.getName(),
+              this.player.getUniqueId(),
+              invitee.getName(),
+              invitee.getUniqueId()));
     }
 
     if (inviteeTeam != null) {
@@ -179,7 +227,7 @@ public class TeamService {
               "Invitee %s (%s) is already in a Team", invitee.getName(), invitee.getUniqueId()));
     }
 
-    final Invitation invitation = new Invitation(inviterTeam, inviter, invitee);
+    final Invitation invitation = new Invitation(inviterTeam, this.player, invitee);
     final InvitationRunnable invitationRunnable = new InvitationRunnable(30, invitation);
 
     final int taskId =
@@ -190,16 +238,16 @@ public class TeamService {
                 Tick.tick().fromDuration(Duration.ofSeconds(1)))
             .getTaskId();
 
-    this.addInvitationTask(taskId, invitation);
+    TeamService.addInvitationTask(taskId, invitation);
   }
 
-  public void acceptInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
+  public void acceptInvitation(final @NotNull Player invitee) {
     final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
     final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team inviterTeam = scoreboard.getEntityTeam(inviter);
+    final Team inviterTeam = scoreboard.getEntityTeam(this.player);
     final Team inviteeTeam = scoreboard.getEntityTeam(invitee);
 
-    if (invitee.getUniqueId().equals(inviter.getUniqueId())) {
+    if (invitee.getUniqueId().equals(this.player.getUniqueId())) {
       throw new ValidationException(
           "Not allowed to accept invitation from yourself",
           String.format(
@@ -211,18 +259,21 @@ public class TeamService {
       throw new ValidationException(
           "Inviter is not in a Team",
           String.format(
-              "Inviter %s (%s) isn't in a Team", inviter.getName(), inviter.getUniqueId()));
+              "Inviter %s (%s) isn't in a Team", this.player.getName(), this.player.getUniqueId()));
     }
 
     final Map.Entry<Integer, Invitation> invitation =
-        this.getInvitationByInviterAndInviteeAndTeam(inviter, invitee, inviterTeam);
+        TeamService.getInvitationByInviterAndInviteeAndTeam(this.player, invitee, inviterTeam);
 
     if (invitation == null) {
       throw new ValidationException(
           "Invitation doesn't exist",
           String.format(
               "Invitee %s (%s) is trying to accept Team invitation from Inviter %s (%s) but it doesn't exist",
-              invitee.getName(), invitee.getUniqueId(), inviter.getName(), inviter.getUniqueId()));
+              invitee.getName(),
+              invitee.getUniqueId(),
+              this.player.getName(),
+              this.player.getUniqueId()));
     }
 
     final Team team = invitation.getValue().team();
@@ -232,7 +283,10 @@ public class TeamService {
           "Inviter Team has changed since the invitation is sent",
           String.format(
               "Inviter %s (%s) is in Team %s but the invitation Team is %s",
-              inviter.getName(), inviter.getUniqueId(), inviterTeam.getName(), team.getName()));
+              this.player.getName(),
+              this.player.getUniqueId(),
+              inviterTeam.getName(),
+              team.getName()));
     }
 
     if (inviteeTeam != null) {
@@ -246,38 +300,41 @@ public class TeamService {
     new AccessService(invitee).add(PermissionConstant.TEAM_MEMBER.toString());
 
     MineAsterisk.getInstance().getServer().getScheduler().cancelTask(invitation.getKey());
-    this.removeInvitationTask(invitation.getKey());
+    TeamService.removeInvitationTask(invitation.getKey());
   }
 
-  public void removeInvitation(final @NotNull Player inviter, final @NotNull Player invitee) {
+  public void removeInvitation(final @NotNull Player invitee) {
     final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
     final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team inviterTeam = scoreboard.getEntityTeam(inviter);
+    final Team inviterTeam = scoreboard.getEntityTeam(this.player);
 
-    if (inviter.getUniqueId().equals(invitee.getUniqueId())) {
+    if (this.player.getUniqueId().equals(invitee.getUniqueId())) {
       throw new ValidationException(
           "Not allowed to remove invitation to yourself",
           String.format(
               "Player %s (%s) is trying to remove invitation to itself",
-              inviter.getName(), inviter.getUniqueId()));
+              this.player.getName(), this.player.getUniqueId()));
     }
 
     if (inviterTeam == null) {
       throw new ValidationException(
           "Not in a Team",
           String.format(
-              "Inviter %s (%s) isn't in a Team", inviter.getName(), inviter.getUniqueId()));
+              "Inviter %s (%s) isn't in a Team", this.player.getName(), this.player.getUniqueId()));
     }
 
     final Map.Entry<Integer, Invitation> invitation =
-        this.getInvitationByInviterAndInviteeAndTeam(inviter, invitee, inviterTeam);
+        TeamService.getInvitationByInviterAndInviteeAndTeam(this.player, invitee, inviterTeam);
 
     if (invitation == null) {
       throw new ValidationException(
           "Invitation doesn't exist",
           String.format(
               "Inviter %s (%s) is trying to remove Team invitation to Invitee %s (%s) but it doesn't exist",
-              inviter.getName(), inviter.getUniqueId(), invitee.getName(), invitee.getUniqueId()));
+              this.player.getName(),
+              this.player.getUniqueId(),
+              invitee.getName(),
+              invitee.getUniqueId()));
     }
 
     final Team team = invitation.getValue().team();
@@ -287,17 +344,20 @@ public class TeamService {
           "Team has changed since the invitation is sent",
           String.format(
               "Inviter %s (%s) is in Team %s but the invitation Team is %s",
-              inviter.getName(), inviter.getUniqueId(), inviterTeam.getName(), team.getName()));
+              this.player.getName(),
+              this.player.getUniqueId(),
+              inviterTeam.getName(),
+              team.getName()));
     }
 
     MineAsterisk.getInstance().getServer().getScheduler().cancelTask(invitation.getKey());
-    this.removeInvitationTask(invitation.getKey());
+    TeamService.removeInvitationTask(invitation.getKey());
   }
 
-  public void kick(final @NotNull Player kicker, final @NotNull OfflinePlayer offlineKicked) {
+  public void kick(final @NotNull OfflinePlayer offlineKicked) {
     final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
     final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team kickerTeam = scoreboard.getEntityTeam(kicker);
+    final Team kickerTeam = scoreboard.getEntityTeam(this.player);
     final Player kicked = offlineKicked.getPlayer();
     Team kickedTeam = null;
 
@@ -329,7 +389,8 @@ public class TeamService {
     if (kickerTeam == null) {
       throw new ValidationException(
           "Not in a Team",
-          String.format("Player %s (%s) isn't in a Team", kicker.getName(), kicker.getUniqueId()));
+          String.format(
+              "Player %s (%s) isn't in a Team", this.player.getName(), this.player.getUniqueId()));
     }
 
     if (kickedTeam == null) {
@@ -345,17 +406,18 @@ public class TeamService {
           "Not in the same Team",
           String.format(
               "Player %s (%s) is trying to kick out Player %s (%s) but isn't in the Team",
-              kicker.getName(),
-              kicker.getUniqueId(),
+              this.player.getName(),
+              this.player.getUniqueId(),
               offlineKicked.getName(),
               offlineKicked.getUniqueId()));
     }
 
-    if (kicker.getName().equals(offlineKicked.getName())) {
+    if (this.player.getName().equals(offlineKicked.getName())) {
       throw new ValidationException(
           "Not allowed to kick yourself",
           String.format(
-              "Player %s (%s) is trying to kick itself", kicker.getName(), kicker.getUniqueId()));
+              "Player %s (%s) is trying to kick itself",
+              this.player.getName(), this.player.getUniqueId()));
     }
 
     if (kicked != null) {
@@ -367,57 +429,21 @@ public class TeamService {
     }
   }
 
-  public @NotNull Team leave(final @NotNull Player player) {
+  public @NotNull Team leave() {
     final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
     final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team team = scoreboard.getEntityTeam(player);
+    final Team team = scoreboard.getEntityTeam(this.player);
 
     if (team == null) {
       throw new ValidationException(
           "Not in a Team",
-          String.format("Player %s (%s) isn't in a Team", player.getName(), player.getUniqueId()));
+          String.format(
+              "Player %s (%s) isn't in a Team", this.player.getName(), this.player.getUniqueId()));
     }
 
-    team.removeEntity(player);
-    new AccessService(player).remove(PermissionConstant.TEAM_MEMBER.toString());
+    team.removeEntity(this.player);
+    new AccessService(this.player).remove(PermissionConstant.TEAM_MEMBER.toString());
 
     return team;
-  }
-
-  private @Nullable Map.Entry<Integer, Invitation> getInvitationByInviterAndInviteeAndTeam(
-      final @NotNull Player inviter,
-      final @NotNull Player invitee,
-      final @NotNull Team inviterTeam) {
-    final Optional<Map.Entry<Integer, Invitation>> invitation =
-        TeamService.INVITATIONS.entrySet().stream()
-            .filter(
-                entry -> {
-                  try {
-                    return entry.getValue().inviter().getUniqueId().equals(inviter.getUniqueId())
-                        && entry.getValue().invitee().getUniqueId().equals(invitee.getUniqueId())
-                        && entry.getValue().team().getName().equals(inviterTeam.getName());
-                  } catch (IllegalStateException exception) {
-                    return false;
-                  }
-                })
-            .findFirst();
-
-    return invitation.orElse(null);
-  }
-
-  private void addInvitationTask(final int taskId, final @NotNull Invitation invitation) {
-    if (TeamService.INVITATIONS.containsKey(taskId)) {
-      return;
-    }
-
-    TeamService.INVITATIONS.put(taskId, invitation);
-  }
-
-  public void removeInvitationTask(final int taskId) {
-    if (!TeamService.INVITATIONS.containsKey(taskId)) {
-      return;
-    }
-
-    TeamService.INVITATIONS.remove(taskId);
   }
 }
