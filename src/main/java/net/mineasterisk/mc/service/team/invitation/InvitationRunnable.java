@@ -2,7 +2,7 @@ package net.mineasterisk.mc.service.team.invitation;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.mineasterisk.mc.service.team.TeamService;
+import net.mineasterisk.mc.service.team.TeamServiceManager;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,7 +24,7 @@ public class InvitationRunnable extends BukkitRunnable {
       this.invitation.invitee().sendMessage(message);
       this.invitation.inviter().sendMessage(message);
       this.cancel();
-      TeamService.removeInvitationTask(this.getTaskId());
+      TeamServiceManager.removeInvitation(this.getTaskId());
     }
 
     count++;

@@ -38,7 +38,7 @@ class TeamServiceTest {
 
   @BeforeEach
   public void setUp() throws NoSuchFieldException, IllegalAccessException {
-    final Field field = TeamService.class.getDeclaredField("INVITATIONS");
+    final Field field = TeamServiceManager.class.getDeclaredField("INVITATIONS");
 
     field.setAccessible(true);
 

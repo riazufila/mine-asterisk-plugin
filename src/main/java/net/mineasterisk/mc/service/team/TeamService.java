@@ -3,10 +3,8 @@ package net.mineasterisk.mc.service.team;
 import io.papermc.paper.util.Tick;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -24,53 +22,12 @@ import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class TeamService {
-  private static final @NotNull HashMap<@NotNull Integer, @NotNull Invitation> INVITATIONS =
-      new HashMap<>();
-
   private final @NotNull Player player;
 
   public TeamService(final @NotNull Player player) {
     this.player = player;
-  }
-
-  private static @Nullable Map.Entry<Integer, Invitation> getInvitationByInviterAndInviteeAndTeam(
-      final @NotNull Player inviter,
-      final @NotNull Player invitee,
-      final @NotNull Team inviterTeam) {
-    final Optional<Map.Entry<Integer, Invitation>> invitation =
-        TeamService.INVITATIONS.entrySet().stream()
-            .filter(
-                entry -> {
-                  try {
-                    return entry.getValue().inviter().getUniqueId().equals(inviter.getUniqueId())
-                        && entry.getValue().invitee().getUniqueId().equals(invitee.getUniqueId())
-                        && entry.getValue().team().getName().equals(inviterTeam.getName());
-                  } catch (IllegalStateException exception) {
-                    return false;
-                  }
-                })
-            .findFirst();
-
-    return invitation.orElse(null);
-  }
-
-  private static void addInvitationTask(final int taskId, final @NotNull Invitation invitation) {
-    if (TeamService.INVITATIONS.containsKey(taskId)) {
-      return;
-    }
-
-    TeamService.INVITATIONS.put(taskId, invitation);
-  }
-
-  public static void removeInvitationTask(final int taskId) {
-    if (!TeamService.INVITATIONS.containsKey(taskId)) {
-      return;
-    }
-
-    TeamService.INVITATIONS.remove(taskId);
   }
 
   public @NotNull List<@NotNull TeamMember> getMembers() {
@@ -207,7 +164,7 @@ public class TeamService {
     }
 
     final Map.Entry<Integer, Invitation> existingInvitation =
-        TeamService.getInvitationByInviterAndInviteeAndTeam(this.player, invitee, inviterTeam);
+        TeamServiceManager.getInvitation(this.player, invitee, inviterTeam);
 
     if (existingInvitation != null) {
       throw new ValidationException(
@@ -238,7 +195,7 @@ public class TeamService {
                 Tick.tick().fromDuration(Duration.ofSeconds(1)))
             .getTaskId();
 
-    TeamService.addInvitationTask(taskId, invitation);
+    TeamServiceManager.addInvitation(taskId, invitation);
   }
 
   public void acceptInvitation(final @NotNull Player inviter) {
@@ -263,7 +220,7 @@ public class TeamService {
     }
 
     final Map.Entry<Integer, Invitation> invitation =
-        TeamService.getInvitationByInviterAndInviteeAndTeam(inviter, this.player, inviterTeam);
+        TeamServiceManager.getInvitation(inviter, this.player, inviterTeam);
 
     if (invitation == null) {
       throw new ValidationException(
@@ -297,7 +254,7 @@ public class TeamService {
     new AccessService(this.player).add(PermissionConstant.TEAM_MEMBER.toString());
 
     MineAsterisk.getInstance().getServer().getScheduler().cancelTask(invitation.getKey());
-    TeamService.removeInvitationTask(invitation.getKey());
+    TeamServiceManager.removeInvitation(invitation.getKey());
   }
 
   public void removeInvitation(final @NotNull Player invitee) {
@@ -321,7 +278,7 @@ public class TeamService {
     }
 
     final Map.Entry<Integer, Invitation> invitation =
-        TeamService.getInvitationByInviterAndInviteeAndTeam(this.player, invitee, inviterTeam);
+        TeamServiceManager.getInvitation(this.player, invitee, inviterTeam);
 
     if (invitation == null) {
       throw new ValidationException(
@@ -348,7 +305,7 @@ public class TeamService {
     }
 
     MineAsterisk.getInstance().getServer().getScheduler().cancelTask(invitation.getKey());
-    TeamService.removeInvitationTask(invitation.getKey());
+    TeamServiceManager.removeInvitation(invitation.getKey());
   }
 
   public void kick(final @NotNull OfflinePlayer offlineKicked) {
