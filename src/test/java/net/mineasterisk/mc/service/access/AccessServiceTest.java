@@ -28,7 +28,7 @@ class AccessServiceTest {
 
   @BeforeEach
   public void setUp() throws NoSuchFieldException, IllegalAccessException {
-    final Field field = AccessService.class.getDeclaredField("PERMISSION_ATTACHMENTS");
+    final Field field = AccessServiceManager.class.getDeclaredField("PERMISSION_ATTACHMENTS");
 
     field.setAccessible(true);
 

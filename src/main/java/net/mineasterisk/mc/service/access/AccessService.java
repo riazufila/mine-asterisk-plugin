@@ -1,28 +1,18 @@
 package net.mineasterisk.mc.service.access;
 
-import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
 import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.cache.access.AccessCache;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.permissions.PermissionAttachment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AccessService implements Listener {
-  private static final @NotNull HashMap<@NotNull UUID, @NotNull PermissionAttachment>
-      PERMISSION_ATTACHMENTS = new HashMap<>();
-
+public class AccessService {
   private @Nullable Player player = null;
   private @Nullable OfflinePlayer offlinePlayer = null;
-
-  public AccessService() {}
 
   public AccessService(final @NotNull Player player) {
     this.player = player;
@@ -32,22 +22,14 @@ public class AccessService implements Listener {
     this.offlinePlayer = offlinePlayer;
   }
 
-  private PermissionAttachment get() {
-    if (this.player == null) {
-      throw new IllegalStateException("Player is supposed to be initialized");
-    }
-
-    return AccessService.PERMISSION_ATTACHMENTS.computeIfAbsent(
-        this.player.getUniqueId(), key -> this.player.addAttachment(MineAsterisk.getInstance()));
-  }
-
   public void add(final @NotNull String permission) {
-    final PermissionAttachment permissionAttachment = this.get();
-    final AccessCache accessCache = new AccessCache();
-
     if (this.player == null) {
       throw new IllegalStateException("Player is supposed to be initialized");
     }
+
+    final AccessCache accessCache = new AccessCache();
+    final PermissionAttachment permissionAttachment =
+        AccessServiceManager.getPermissionAttachment(this.player);
 
     final UUID uuid = this.player.getUniqueId();
 
@@ -62,14 +44,14 @@ public class AccessService implements Listener {
   }
 
   public void remove(final @NotNull String permission) {
-    final PermissionAttachment permissionAttachment = this.get();
-    final AccessCache accessCache = new AccessCache();
-
     if (this.player == null) {
       throw new IllegalStateException("Player is supposed to be initialized");
     }
 
     final UUID uuid = this.player.getUniqueId();
+    final AccessCache accessCache = new AccessCache();
+    final PermissionAttachment permissionAttachment =
+        AccessServiceManager.getPermissionAttachment(this.player);
 
     if (!this.player.hasPermission(permission)) {
       return;
@@ -91,9 +73,11 @@ public class AccessService implements Listener {
     accessCache.get(this.offlinePlayer.getUniqueId()).removeAccess(permission);
   }
 
-  @EventHandler
-  public void onPlayerJoin(@NotNull PlayerJoinEvent event) {
-    this.player = event.getPlayer();
+  protected void attach() {
+    if (this.player == null) {
+      throw new IllegalStateException("Player is supposed to be initialized");
+    }
+
     final AccessCache accessCache = new AccessCache();
     final Set<String> permissionsCached = accessCache.get(this.player.getUniqueId()).getAccesses();
 
@@ -101,7 +85,8 @@ public class AccessService implements Listener {
       return;
     }
 
-    final PermissionAttachment permissionAttachment = this.get();
+    final PermissionAttachment permissionAttachment =
+        AccessServiceManager.getPermissionAttachment(this.player);
 
     permissionsCached.forEach(
         permissionCached -> permissionAttachment.setPermission(permissionCached, true));
@@ -116,10 +101,11 @@ public class AccessService implements Listener {
                 this.player.getName(), this.player.getUniqueId()));
   }
 
-  @EventHandler
-  public void onPlayerQuit(@NotNull PlayerQuitEvent event) {
-    this.player = event.getPlayer();
+  protected void detach() {
+    if (this.player == null) {
+      throw new IllegalStateException("Player is supposed to be initialized");
+    }
 
-    AccessService.PERMISSION_ATTACHMENTS.remove(this.player.getUniqueId());
+    AccessServiceManager.removePermissionAttachment(this.player);
   }
 }
