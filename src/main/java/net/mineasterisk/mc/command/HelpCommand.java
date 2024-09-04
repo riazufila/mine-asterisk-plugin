@@ -58,7 +58,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
           this.getAllUsagesExceptHelp(this.dispatcher.getRoot(), source, null, true);
 
       if (!usages.isEmpty()) {
-        player.sendMessage(Component.text(String.join("\n", usages)).color(NamedTextColor.YELLOW));
+        player.sendMessage(Component.text(String.join("\n", usages)));
         MineAsterisk.getInstance()
             .getLogger()
             .info(
@@ -112,7 +112,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
           this.getAllUsagesExceptHelp(this.dispatcher.getRoot(), source, COMMAND, true);
 
       if (!usages.isEmpty()) {
-        player.sendMessage(Component.text(String.join("\n", usages)).color(NamedTextColor.YELLOW));
+        player.sendMessage(Component.text(String.join("\n", usages)));
         MineAsterisk.getInstance()
             .getLogger()
             .info(
