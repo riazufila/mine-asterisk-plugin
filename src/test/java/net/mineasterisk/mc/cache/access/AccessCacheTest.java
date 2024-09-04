@@ -31,6 +31,7 @@ class AccessCacheTest {
     MockBukkit.mock();
     //noinspection unchecked
     cache = (ConcurrentHashMap<UUID, Access>) field.get(null);
+    cache.clear();
     MockBukkit.load(MineAsterisk.class);
   }
 

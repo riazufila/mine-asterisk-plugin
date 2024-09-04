@@ -35,6 +35,7 @@ class AccessServiceTest {
     this.server = MockBukkit.mock();
     //noinspection unchecked
     permissionAttachments = (HashMap<UUID, PermissionAttachment>) field.get(null);
+    permissionAttachments.clear();
     MockBukkit.load(MineAsterisk.class);
   }
 

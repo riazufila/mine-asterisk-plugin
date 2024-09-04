@@ -45,6 +45,7 @@ class TeamServiceTest {
     this.server = MockBukkit.mock();
     //noinspection unchecked
     invitations = (HashMap<Integer, Invitation>) field.get(null);
+    invitations.clear();
     MockBukkit.load(MineAsterisk.class);
   }
 
