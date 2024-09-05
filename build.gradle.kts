@@ -13,15 +13,13 @@ repositories {
 }
 
 dependencies {
-    // Paper API.
     compileOnly("io.papermc.paper:paper-api:1.21-R0.1-SNAPSHOT")
-
-    // Hibernate.
-    implementation("org.hibernate.orm:hibernate-core:6.5.2.Final")
-    implementation("org.hibernate.orm:hibernate-hikaricp:6.5.2.Final")
-
-    // HikariCP.
     implementation("com.zaxxer:HikariCP:5.1.0")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
+    testImplementation("org.mockito:mockito-core:5.13.0")
+    testImplementation("com.github.seeseemelk:MockBukkit-v1.21:3.118.1")
+    testImplementation("com.mysql:mysql-connector-j:9.0.0")
 }
 
 java {
@@ -31,5 +29,12 @@ java {
 tasks {
     runServer {
         minecraftVersion("1.21")
+    }
+
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events("passed", "skipped", "failed")
+        }
     }
 }
