@@ -82,11 +82,12 @@ public class AccessService {
     final Set<PermissionAttachmentInfo> effectivePermissions =
         this.player.getEffectivePermissions();
 
+    final PermissionAttachment permissionAttachment =
+        AccessServiceManager.getPermissionAttachment(this.player);
+
     effectivePermissions.forEach(
         effectivePermission -> {
           final String permission = effectivePermission.getPermission();
-          final PermissionAttachment permissionAttachment =
-              AccessServiceManager.getPermissionAttachment(this.player);
 
           if (!this.player.hasPermission(permission)) {
             return;
@@ -96,6 +97,13 @@ public class AccessService {
         });
 
     this.player.updateCommands();
+
+    MineAsterisk.getInstance()
+        .getLogger()
+        .info(
+            String.format(
+                "Negated all default permissions for Player %s (%s)",
+                this.player.getName(), this.player.getUniqueId()));
   }
 
   protected void attach() {
@@ -122,7 +130,7 @@ public class AccessService {
         .getLogger()
         .info(
             String.format(
-                "Attached Permission(s) to Player %s %s",
+                "Attached Permission(s) to Player %s (%s)",
                 this.player.getName(), this.player.getUniqueId()));
   }
 
