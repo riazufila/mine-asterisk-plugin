@@ -1136,6 +1136,43 @@ class TeamServiceTest {
     this.assertPlayerHasNoTeam(player1);
   }
 
+  @Test
+  void givenPlayerAndMessage_whenMessageAndPlayerHasNoTeam_thenThrowValidationException() {
+    final PlayerMock player = this.server.addPlayer();
+    final TeamService teamService = new TeamService(player);
+    final String MESSAGE = "message0";
+
+    Assertions.assertThrows(ValidationException.class, () -> teamService.message(MESSAGE));
+  }
+
+  @Test
+  void givenPlayerAndMessage_whenMessageAndPlayerHasTeamAndPlayerTeamLeader_thenMessage() {
+    final PlayerMock player = this.server.addPlayer();
+    final TeamService teamService = new TeamService(player);
+    final String MESSAGE = "message0";
+
+    teamService.create("Team0");
+
+    Assertions.assertDoesNotThrow(
+        () -> teamService.message(MESSAGE)); // TeamMock#sendMessage(Component) unimplemented.
+  }
+
+  @Test
+  void givenPlayerAndMessage_whenMessageAndPlayerHasTeamAndPlayerTeamMember_thenMessage() {
+    final PlayerMock player0 = this.server.addPlayer();
+    final PlayerMock player1 = this.server.addPlayer();
+    final TeamService teamService0 = new TeamService(player0);
+    final TeamService teamService1 = new TeamService(player1);
+    final String MESSAGE = "message0";
+
+    teamService0.create("Team0");
+    teamService0.sendInvitation(player1);
+    teamService1.acceptInvitation(player0);
+
+    Assertions.assertDoesNotThrow(
+        () -> teamService1.message(MESSAGE)); // TeamMock#sendMessage(Component) unimplemented.
+  }
+
   private void assertPlayerInTeamAndIsTeamLeader(
       final @NotNull PlayerMock player, final @NotNull Team team) {
     final ScoreboardManagerMock manager = this.server.getScoreboardManager();
