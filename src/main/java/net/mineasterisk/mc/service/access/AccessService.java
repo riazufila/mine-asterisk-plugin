@@ -7,6 +7,7 @@ import net.mineasterisk.mc.cache.access.AccessCache;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.PermissionAttachment;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -71,6 +72,30 @@ public class AccessService {
     }
 
     accessCache.get(this.offlinePlayer.getUniqueId()).removeAccess(permission);
+  }
+
+  public void negateAllDefaultPermissions() {
+    if (this.player == null) {
+      throw new IllegalStateException("Player is supposed to be initialized");
+    }
+
+    final Set<PermissionAttachmentInfo> effectivePermissions =
+        this.player.getEffectivePermissions();
+
+    effectivePermissions.forEach(
+        effectivePermission -> {
+          final String permission = effectivePermission.getPermission();
+          final PermissionAttachment permissionAttachment =
+              AccessServiceManager.getPermissionAttachment(this.player);
+
+          if (!this.player.hasPermission(permission)) {
+            return;
+          }
+
+          permissionAttachment.setPermission(permission, false);
+        });
+
+    this.player.updateCommands();
   }
 
   protected void attach() {

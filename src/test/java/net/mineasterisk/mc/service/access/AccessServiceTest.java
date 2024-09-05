@@ -24,6 +24,7 @@ import org.mockito.Mockito;
 class AccessServiceTest {
   private final @NotNull MockedStatic<LoaderUtil> loaderUtil = Mockito.mockStatic(LoaderUtil.class);
   private @NotNull ServerMock server;
+  private @NotNull MineAsterisk plugin;
   private HashMap<UUID, PermissionAttachment> permissionAttachments;
 
   @BeforeEach
@@ -36,7 +37,8 @@ class AccessServiceTest {
     //noinspection unchecked
     permissionAttachments = (HashMap<UUID, PermissionAttachment>) field.get(null);
     permissionAttachments.clear();
-    MockBukkit.load(MineAsterisk.class);
+
+    this.plugin = MockBukkit.load(MineAsterisk.class);
   }
 
   @AfterEach
@@ -214,5 +216,41 @@ class AccessServiceTest {
 
     Assertions.assertFalse(accesses.contains(permission0));
     Assertions.assertFalse(accesses.contains(permission1));
+  }
+
+  @Test
+  void
+      givenPlayerHasDefaultPermission_whenNegateAllDefaultPermissions_thenNegateWithoutPersistence() {
+    final PlayerMock player = this.server.addPlayer();
+    final AccessService accessService = new AccessService(player);
+    final String permission = "plugin.command.any";
+
+    player.addAttachment(this.plugin).setPermission(permission, true);
+
+    Assertions.assertTrue(player.hasPermission(permission));
+
+    accessService.negateAllDefaultPermissions();
+
+    Assertions.assertFalse(player.hasPermission(permission));
+  }
+
+  @Test
+  void
+      givenPlayerHasDefaultPermissions_whenNegateAllDefaultPermissions_thenNegateWithoutPersistence() {
+    final PlayerMock player = this.server.addPlayer();
+    final AccessService accessService = new AccessService(player);
+    final String permission0 = "plugin.command.zero";
+    final String permission1 = "plugin.command.one";
+
+    player.addAttachment(this.plugin).setPermission(permission0, true);
+    player.addAttachment(this.plugin).setPermission(permission1, true);
+
+    Assertions.assertTrue(player.hasPermission(permission0));
+    Assertions.assertTrue(player.hasPermission(permission1));
+
+    accessService.negateAllDefaultPermissions();
+
+    Assertions.assertFalse(player.hasPermission(permission0));
+    Assertions.assertFalse(player.hasPermission(permission1));
   }
 }

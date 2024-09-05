@@ -13,6 +13,7 @@ public class AccessServiceListener implements Listener {
     final Player player = event.getPlayer();
     final AccessService accessService = new AccessService(player);
 
+    accessService.negateAllDefaultPermissions();
     accessService.attach();
   }
 
