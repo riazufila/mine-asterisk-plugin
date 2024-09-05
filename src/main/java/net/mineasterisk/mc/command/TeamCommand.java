@@ -69,6 +69,12 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                         .executes(this::kick))
                 .requires(this::canUpdateTeamMember))
         .then(Commands.literal("leave").requires(this::canLeave).executes(this::leave))
+        .then(
+            Commands.literal("message")
+                .then(
+                    Commands.argument("message", StringArgumentType.greedyString())
+                        .executes(this::message))
+                .requires(this::canRead))
         .requires(
             source ->
                 this.canCreate(source)
@@ -441,6 +447,29 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                   "Player %s (%s) left its Team", player.getName(), player.getUniqueId()));
     } catch (Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "leave Team");
+    }
+
+    return Command.SINGLE_SUCCESS;
+  }
+
+  @SuppressWarnings("SameReturnValue")
+  private int message(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
+    final CommandSourceStack source = context.getSource();
+    final CommandSender sender = source.getSender();
+
+    try {
+      if (!(sender instanceof Player player)) {
+        throw new IllegalStateException(
+            String.format(
+                "Sender %s isn't a Player and tries to execute command", sender.getName()));
+      }
+
+      final String MESSAGE = context.getArgument("message", String.class);
+      final TeamService teamService = new TeamService(player);
+
+      teamService.message(MESSAGE);
+    } catch (Exception exception) {
+      ExceptionUtil.handleCommand(exception, sender, "message Team");
     }
 
     return Command.SINGLE_SUCCESS;

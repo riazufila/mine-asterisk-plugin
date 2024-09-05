@@ -400,4 +400,33 @@ public class TeamService {
 
     return team;
   }
+
+  public void message(final @NotNull String message) {
+    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
+    final Scoreboard scoreboard = manager.getMainScoreboard();
+    final Team team = scoreboard.getEntityTeam(this.player);
+
+    if (team == null) {
+      throw new ValidationException(
+          "Not in a Team",
+          String.format(
+              "Player %s (%s) isn't in a Team", this.player.getName(), this.player.getUniqueId()));
+    }
+
+    final Component teamMessageComponent =
+        Component.textOfChildren(
+            Component.text("<"),
+            Component.text(team.getName()).color(NamedTextColor.GRAY),
+            Component.text('.').color(NamedTextColor.GRAY),
+            Component.text(this.player.getName()),
+            Component.text(">"),
+            Component.space(),
+            Component.text("tells the team,"),
+            Component.space(),
+            Component.text("\""),
+            Component.text(message),
+            Component.text("\""));
+
+    team.sendMessage(teamMessageComponent.color(NamedTextColor.BLUE));
+  }
 }
