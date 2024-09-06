@@ -19,21 +19,20 @@ import net.mineasterisk.mc.service.team.invitation.InvitationRunnable;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
 public class TeamService {
   private final @NotNull Player player;
+  private final Scoreboard scoreboard =
+      MineAsterisk.getInstance().getServer().getScoreboardManager().getMainScoreboard();
 
   public TeamService(final @NotNull Player player) {
     this.player = player;
   }
 
   public @NotNull List<@NotNull TeamMember> getMembers() {
-    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
-    final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team team = scoreboard.getEntityTeam(this.player);
+    final Team team = this.scoreboard.getEntityTeam(this.player);
 
     if (team == null) {
       throw new ValidationException(
@@ -71,9 +70,7 @@ public class TeamService {
   }
 
   public void create(final @NotNull String name) {
-    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
-    final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team playerTeam = scoreboard.getEntityTeam(this.player);
+    final Team playerTeam = this.scoreboard.getEntityTeam(this.player);
 
     if (playerTeam != null) {
       throw new ValidationException(
@@ -83,7 +80,7 @@ public class TeamService {
               this.player.getName(), this.player.getUniqueId()));
     }
 
-    if (scoreboard.getTeam(name) != null) {
+    if (this.scoreboard.getTeam(name) != null) {
       throw new ValidationException(
           "Team name is taken",
           String.format(
@@ -91,7 +88,7 @@ public class TeamService {
               this.player.getName(), this.player.getUniqueId()));
     }
 
-    final Team team = scoreboard.registerNewTeam(name);
+    final Team team = this.scoreboard.registerNewTeam(name);
     final AccessService accessService = new AccessService(this.player);
 
     team.addEntity(this.player);
@@ -106,9 +103,7 @@ public class TeamService {
   }
 
   public @NotNull List<@NotNull Player> disband() {
-    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
-    final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team team = scoreboard.getEntityTeam(this.player);
+    final Team team = this.scoreboard.getEntityTeam(this.player);
 
     if (team == null) {
       throw new ValidationException(
@@ -143,10 +138,8 @@ public class TeamService {
   }
 
   public void sendInvitation(final @NotNull Player invitee) {
-    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
-    final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team inviterTeam = scoreboard.getEntityTeam(this.player);
-    final Team inviteeTeam = scoreboard.getEntityTeam(invitee);
+    final Team inviterTeam = this.scoreboard.getEntityTeam(this.player);
+    final Team inviteeTeam = this.scoreboard.getEntityTeam(invitee);
 
     if (this.player.getUniqueId().equals(invitee.getUniqueId())) {
       throw new ValidationException(
@@ -199,10 +192,8 @@ public class TeamService {
   }
 
   public void acceptInvitation(final @NotNull Player inviter) {
-    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
-    final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team inviterTeam = scoreboard.getEntityTeam(inviter);
-    final Team inviteeTeam = scoreboard.getEntityTeam(this.player);
+    final Team inviterTeam = this.scoreboard.getEntityTeam(inviter);
+    final Team inviteeTeam = this.scoreboard.getEntityTeam(this.player);
 
     if (this.player.getUniqueId().equals(inviter.getUniqueId())) {
       throw new ValidationException(
@@ -258,9 +249,7 @@ public class TeamService {
   }
 
   public void removeInvitation(final @NotNull Player invitee) {
-    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
-    final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team inviterTeam = scoreboard.getEntityTeam(this.player);
+    final Team inviterTeam = this.scoreboard.getEntityTeam(this.player);
 
     if (this.player.getUniqueId().equals(invitee.getUniqueId())) {
       throw new ValidationException(
@@ -309,9 +298,7 @@ public class TeamService {
   }
 
   public void kick(final @NotNull OfflinePlayer offlineKicked) {
-    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
-    final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team kickerTeam = scoreboard.getEntityTeam(this.player);
+    final Team kickerTeam = this.scoreboard.getEntityTeam(this.player);
     final Player kicked = offlineKicked.getPlayer();
     Team kickedTeam = null;
 
@@ -329,9 +316,9 @@ public class TeamService {
     }
 
     if (kicked != null) {
-      kickedTeam = scoreboard.getEntityTeam(kicked);
+      kickedTeam = this.scoreboard.getEntityTeam(kicked);
     } else {
-      for (final Team team : scoreboard.getTeams()) {
+      for (final Team team : this.scoreboard.getTeams()) {
         if (team.hasEntry(offlineKicked.getName())) {
           kickedTeam = team;
 
@@ -384,9 +371,7 @@ public class TeamService {
   }
 
   public @NotNull Team leave() {
-    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
-    final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team team = scoreboard.getEntityTeam(this.player);
+    final Team team = this.scoreboard.getEntityTeam(this.player);
 
     if (team == null) {
       throw new ValidationException(
@@ -402,9 +387,7 @@ public class TeamService {
   }
 
   public void message(final @NotNull String message) {
-    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
-    final Scoreboard scoreboard = manager.getMainScoreboard();
-    final Team team = scoreboard.getEntityTeam(this.player);
+    final Team team = this.scoreboard.getEntityTeam(this.player);
 
     if (team == null) {
       throw new ValidationException(
