@@ -22,10 +22,12 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 class AccessServiceTest {
-  private final @NotNull MockedStatic<LoaderUtil> loaderUtil = Mockito.mockStatic(LoaderUtil.class);
+  private final @NotNull MockedStatic<@NotNull LoaderUtil> loaderUtil =
+      Mockito.mockStatic(LoaderUtil.class);
+
   private @NotNull ServerMock server;
   private @NotNull MineAsterisk plugin;
-  private HashMap<UUID, PermissionAttachment> permissionAttachments;
+  private @NotNull HashMap<@NotNull UUID, @NotNull PermissionAttachment> permissionAttachments;
 
   @BeforeEach
   public void setUp() throws NoSuchFieldException, IllegalAccessException {
@@ -35,15 +37,16 @@ class AccessServiceTest {
 
     this.server = MockBukkit.mock();
     //noinspection unchecked
-    permissionAttachments = (HashMap<UUID, PermissionAttachment>) field.get(null);
-    permissionAttachments.clear();
+    this.permissionAttachments = (HashMap<UUID, PermissionAttachment>) field.get(null);
+
+    this.permissionAttachments.clear();
 
     this.plugin = MockBukkit.load(MineAsterisk.class);
   }
 
   @AfterEach
   public void tearDown() {
-    permissionAttachments.clear();
+    this.permissionAttachments.clear();
     MockBukkit.unmock();
     loaderUtil.close();
   }

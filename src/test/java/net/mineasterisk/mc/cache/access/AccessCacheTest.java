@@ -19,8 +19,10 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 class AccessCacheTest {
-  private final @NotNull MockedStatic<LoaderUtil> loaderUtil = Mockito.mockStatic(LoaderUtil.class);
-  private ConcurrentHashMap<UUID, Access> cache;
+  private final @NotNull MockedStatic<@NotNull LoaderUtil> loaderUtil =
+      Mockito.mockStatic(LoaderUtil.class);
+
+  private @NotNull ConcurrentHashMap<@NotNull UUID, @NotNull Access> cache;
 
   @BeforeEach
   public void setUp() throws NoSuchFieldException, IllegalAccessException {
@@ -29,15 +31,17 @@ class AccessCacheTest {
     field.setAccessible(true);
 
     MockBukkit.mock();
+
     //noinspection unchecked
-    cache = (ConcurrentHashMap<UUID, Access>) field.get(null);
-    cache.clear();
+    this.cache = (ConcurrentHashMap<UUID, Access>) field.get(null);
+
+    this.cache.clear();
     MockBukkit.load(MineAsterisk.class);
   }
 
   @AfterEach
   public void tearDown() {
-    cache.clear();
+    this.cache.clear();
     MockBukkit.unmock();
     loaderUtil.close();
   }

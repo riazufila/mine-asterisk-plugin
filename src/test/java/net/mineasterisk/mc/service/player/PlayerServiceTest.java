@@ -15,7 +15,9 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 class PlayerServiceTest {
-  private final @NotNull MockedStatic<LoaderUtil> loaderUtil = Mockito.mockStatic(LoaderUtil.class);
+  private final @NotNull MockedStatic<@NotNull LoaderUtil> loaderUtil =
+      Mockito.mockStatic(LoaderUtil.class);
+
   private @NotNull ServerMock server;
 
   @BeforeEach

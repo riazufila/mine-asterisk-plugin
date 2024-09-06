@@ -22,8 +22,10 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 class AccessRepositoryTest {
-  private final @NotNull MockedStatic<LoaderUtil> loaderUtil = Mockito.mockStatic(LoaderUtil.class);
-  private Connection connection;
+  private final @NotNull MockedStatic<@NotNull LoaderUtil> loaderUtil =
+      Mockito.mockStatic(LoaderUtil.class);
+
+  private @NotNull Connection connection;
 
   @BeforeEach
   public void setUp() throws SQLException {

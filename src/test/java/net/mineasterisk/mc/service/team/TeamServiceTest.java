@@ -3,8 +3,6 @@ package net.mineasterisk.mc.service.team;
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.entity.PlayerMock;
-import be.seeseemelk.mockbukkit.scoreboard.ScoreboardManagerMock;
-import be.seeseemelk.mockbukkit.scoreboard.ScoreboardMock;
 import io.papermc.paper.util.Tick;
 import java.lang.reflect.Field;
 import java.time.Duration;
@@ -22,6 +20,7 @@ import net.mineasterisk.mc.service.team.invitation.Invitation;
 import net.mineasterisk.mc.util.LoaderUtil;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
@@ -32,9 +31,12 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 class TeamServiceTest {
-  private final @NotNull MockedStatic<LoaderUtil> loaderUtil = Mockito.mockStatic(LoaderUtil.class);
+  private final @NotNull MockedStatic<@NotNull LoaderUtil> loaderUtil =
+      Mockito.mockStatic(LoaderUtil.class);
+
   private @NotNull ServerMock server;
-  private HashMap<Integer, Invitation> invitations;
+  private @NotNull HashMap<@NotNull Integer, @NotNull Invitation> invitations;
+  private @NotNull Scoreboard scoreboard;
 
   @BeforeEach
   public void setUp() throws NoSuchFieldException, IllegalAccessException {
@@ -43,15 +45,17 @@ class TeamServiceTest {
     field.setAccessible(true);
 
     this.server = MockBukkit.mock();
+    this.scoreboard = this.server.getScoreboardManager().getMainScoreboard();
     //noinspection unchecked
-    invitations = (HashMap<Integer, Invitation>) field.get(null);
-    invitations.clear();
+    this.invitations = (HashMap<Integer, Invitation>) field.get(null);
+
+    this.invitations.clear();
     MockBukkit.load(MineAsterisk.class);
   }
 
   @AfterEach
   public void tearDown() {
-    invitations.clear();
+    this.invitations.clear();
     MockBukkit.unmock();
     loaderUtil.close();
   }
@@ -66,8 +70,6 @@ class TeamServiceTest {
 
   @Test
   void givenPlayer_whenGetMembersAndNoneOfflineAndHasTeam_thenReturnMembers() {
-    final ScoreboardManagerMock manager = this.server.getScoreboardManager();
-    final ScoreboardMock scoreboard = manager.getMainScoreboard();
     final PlayerMock player0 = this.server.addPlayer();
     final PlayerMock player1 = this.server.addPlayer();
     final PlayerMock player2 = this.server.addPlayer();
@@ -77,7 +79,7 @@ class TeamServiceTest {
 
     teamService0.create("Team0");
 
-    final Team team = scoreboard.getEntityTeam(player0);
+    final Team team = this.scoreboard.getEntityTeam(player0);
 
     Assertions.assertNotNull(team);
 
@@ -97,8 +99,6 @@ class TeamServiceTest {
 
   @Test
   void givenPlayer_whenGetMembersAndSomeOfflineAndHasTeam_thenReturnMembers() {
-    final ScoreboardManagerMock manager = this.server.getScoreboardManager();
-    final ScoreboardMock scoreboard = manager.getMainScoreboard();
     final PlayerMock player0 = this.server.addPlayer();
     final PlayerMock player1 = this.server.addPlayer();
     final PlayerMock player2 = this.server.addPlayer();
@@ -108,7 +108,7 @@ class TeamServiceTest {
 
     teamService0.create("Team0");
 
-    final Team team = scoreboard.getEntityTeam(player0);
+    final Team team = this.scoreboard.getEntityTeam(player0);
 
     Assertions.assertNotNull(team);
 
@@ -142,8 +142,6 @@ class TeamServiceTest {
 
   @Test
   void givenPlayerAndName_whenCreateAndHasTeamAndIsTeamMember_thenThrowValidationException() {
-    final ScoreboardManagerMock manager = this.server.getScoreboardManager();
-    final ScoreboardMock scoreboard = manager.getMainScoreboard();
     final PlayerMock player0 = this.server.addPlayer();
     final PlayerMock player1 = this.server.addPlayer();
     final TeamService teamService0 = new TeamService(player0);
@@ -151,7 +149,7 @@ class TeamServiceTest {
 
     teamService0.create("Team0");
 
-    final Team team = scoreboard.getEntityTeam(player0);
+    final Team team = this.scoreboard.getEntityTeam(player0);
 
     Assertions.assertNotNull(team);
 
@@ -176,15 +174,13 @@ class TeamServiceTest {
 
   @Test
   void givenPlayerAndName_whenCreateAndPlayerHasNoTeamAndNameIsNotTaken_thenCreate() {
-    final ScoreboardManagerMock manager = this.server.getScoreboardManager();
-    final ScoreboardMock scoreboard = manager.getMainScoreboard();
     final PlayerMock player = this.server.addPlayer();
     final TeamService teamService = new TeamService(player);
     final String name = "Team0";
 
     teamService.create(name);
 
-    final Team team = scoreboard.getEntityTeam(player);
+    final Team team = this.scoreboard.getEntityTeam(player);
     final Component expectedPrefixComponent =
         Component.textOfChildren(
             Component.text(name).color(NamedTextColor.GRAY),
@@ -516,8 +512,6 @@ class TeamServiceTest {
   @Test
   void
       givenInviterAndInvitee_whenAcceptInvitationAndInviterHasSameTeamAndInviteeHasNoTeam_thenAcceptInvitation() {
-    final ScoreboardManagerMock manager = this.server.getScoreboardManager();
-    final ScoreboardMock scoreboard = manager.getMainScoreboard();
     final PlayerMock inviter = this.server.addPlayer();
     final PlayerMock invitee = this.server.addPlayer();
     final TeamService inviterTeamService = new TeamService(inviter);
@@ -529,7 +523,7 @@ class TeamServiceTest {
 
     Assertions.assertDoesNotThrow(() -> inviteeTeamService.acceptInvitation(inviter));
 
-    final Team team = scoreboard.getEntityTeam(invitee);
+    final Team team = this.scoreboard.getEntityTeam(invitee);
 
     Assertions.assertNotNull(team);
     this.assertPlayerInTeamAndIsTeamMember(invitee, team);
@@ -545,8 +539,6 @@ class TeamServiceTest {
   @Test
   void
       givenInviterAndInvitee_whenAcceptInvitationAndInviterDifferentTeamAndInviterResentInvitationAndInviteeHasNoTeam_thenAcceptNewInvitation() {
-    final ScoreboardManagerMock manager = this.server.getScoreboardManager();
-    final ScoreboardMock scoreboard = manager.getMainScoreboard();
     final PlayerMock inviter = this.server.addPlayer();
     final PlayerMock invitee = this.server.addPlayer();
     final TeamService inviterTeamService = new TeamService(inviter);
@@ -562,7 +554,7 @@ class TeamServiceTest {
 
     Assertions.assertDoesNotThrow(() -> inviteeTeamService.acceptInvitation(inviter));
 
-    final Team team = scoreboard.getEntityTeam(invitee);
+    final Team team = this.scoreboard.getEntityTeam(invitee);
 
     Assertions.assertNotNull(team);
     this.assertPlayerInTeamAndIsTeamMember(invitee, team);
@@ -1127,9 +1119,7 @@ class TeamServiceTest {
     teamService0.sendInvitation(player1);
     teamService1.acceptInvitation(player0);
 
-    final ScoreboardManagerMock manager = this.server.getScoreboardManager();
-    final ScoreboardMock scoreboard = manager.getMainScoreboard();
-    final Team team = scoreboard.getEntityTeam(player0);
+    final Team team = this.scoreboard.getEntityTeam(player0);
 
     Assertions.assertNotNull(team);
     Assertions.assertEquals(team.getName(), teamService1.leave().getName());
@@ -1175,9 +1165,7 @@ class TeamServiceTest {
 
   private void assertPlayerInTeamAndIsTeamLeader(
       final @NotNull PlayerMock player, final @NotNull Team team) {
-    final ScoreboardManagerMock manager = this.server.getScoreboardManager();
-    final ScoreboardMock scoreboard = manager.getMainScoreboard();
-    final Team playerTeam = scoreboard.getEntityTeam(player);
+    final Team playerTeam = this.scoreboard.getEntityTeam(player);
     final AccessCache accessCache = new AccessCache();
 
     Assertions.assertNotNull(playerTeam);
@@ -1196,9 +1184,7 @@ class TeamServiceTest {
 
   private void assertPlayerInTeamAndIsTeamMember(
       final @NotNull PlayerMock player, final @NotNull Team team) {
-    final ScoreboardManagerMock manager = this.server.getScoreboardManager();
-    final ScoreboardMock scoreboard = manager.getMainScoreboard();
-    final Team playerTeam = scoreboard.getEntityTeam(player);
+    final Team playerTeam = this.scoreboard.getEntityTeam(player);
     final AccessCache accessCache = new AccessCache();
 
     Assertions.assertNotNull(playerTeam);
@@ -1220,9 +1206,7 @@ class TeamServiceTest {
   }
 
   private void assertPlayerHasNoTeam(final @NotNull PlayerMock player) {
-    final ScoreboardManagerMock manager = this.server.getScoreboardManager();
-    final ScoreboardMock scoreboard = manager.getMainScoreboard();
-    final Team playerTeam = scoreboard.getEntityTeam(player);
+    final Team playerTeam = this.scoreboard.getEntityTeam(player);
 
     Assertions.assertNull(playerTeam);
   }
