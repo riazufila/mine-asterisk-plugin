@@ -82,18 +82,17 @@ public class AccessService {
     final Set<PermissionAttachmentInfo> effectivePermissions =
         this.player.getEffectivePermissions();
 
-    final PermissionAttachment permissionAttachment =
-        AccessServiceManager.getPermissionAttachment(this.player);
-
     effectivePermissions.forEach(
         effectivePermission -> {
           final String permission = effectivePermission.getPermission();
+          final PermissionAttachment attachment =
+              this.player.addAttachment(MineAsterisk.getInstance());
 
           if (!this.player.hasPermission(permission)) {
             return;
           }
 
-          permissionAttachment.setPermission(permission, false);
+          attachment.setPermission(permission, false);
         });
 
     this.player.updateCommands();
