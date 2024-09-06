@@ -1,8 +1,18 @@
 package net.mineasterisk.mc.util;
 
 import net.mineasterisk.mc.MineAsterisk;
+import net.mineasterisk.mc.MineAsteriskBootstrap;
 
 public class LoaderUtil {
+  @SuppressWarnings("UnstableApiUsage")
+  public static void bootstrapLoad() {
+    EnchantmentUtil.register();
+
+    MineAsteriskBootstrap.getContext()
+        .getLogger()
+        .info("Bootstrap loaded configuration(s) and resource(s)");
+  }
+
   public static void preLoad() {
     DatabaseUtil.initialize();
     CommandUtil.register();

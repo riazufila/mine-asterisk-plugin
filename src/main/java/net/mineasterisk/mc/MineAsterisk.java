@@ -8,6 +8,10 @@ import org.jetbrains.annotations.Nullable;
 public class MineAsterisk extends JavaPlugin {
   private static @Nullable MineAsterisk instance;
 
+  public static @NotNull String getNamespace() {
+    return MineAsterisk.getInstance().getName().toLowerCase();
+  }
+
   public static @NotNull MineAsterisk getInstance() {
     if (MineAsterisk.instance == null) {
       throw new IllegalStateException("Plugin instance is not initialized");

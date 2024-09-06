@@ -142,7 +142,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
       final boolean isStrict) {
     final List<String> results = new ArrayList<>();
     final String[] usages = this.dispatcher.getAllUsage(root, source, true);
-    final String NAMESPACE = MineAsterisk.getInstance().getName().toLowerCase();
+    final String NAMESPACE = MineAsterisk.getNamespace();
 
     Arrays.stream(usages)
         .filter(
