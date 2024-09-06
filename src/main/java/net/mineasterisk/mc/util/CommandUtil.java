@@ -5,6 +5,7 @@ import io.papermc.paper.plugin.lifecycle.event.LifecycleEventManager;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.command.HelpCommand;
+import net.mineasterisk.mc.command.MessageCommand;
 import net.mineasterisk.mc.command.TeamCommand;
 import org.bukkit.plugin.Plugin;
 
@@ -19,6 +20,7 @@ class CommandUtil {
           final Commands commands = event.registrar();
 
           commands.register(new TeamCommand().build());
+          commands.register(new MessageCommand().build());
           commands.register(new HelpCommand(commands.getDispatcher()).build());
         });
 

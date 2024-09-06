@@ -1140,7 +1140,7 @@ class TeamServiceTest {
   void givenPlayerAndMessage_whenMessageAndPlayerHasNoTeam_thenThrowValidationException() {
     final PlayerMock player = this.server.addPlayer();
     final TeamService teamService = new TeamService(player);
-    final String MESSAGE = "message0";
+    final String MESSAGE = "Message0";
 
     Assertions.assertThrows(ValidationException.class, () -> teamService.message(MESSAGE));
   }
@@ -1149,7 +1149,7 @@ class TeamServiceTest {
   void givenPlayerAndMessage_whenMessageAndPlayerHasTeamAndPlayerTeamLeader_thenMessage() {
     final PlayerMock player = this.server.addPlayer();
     final TeamService teamService = new TeamService(player);
-    final String MESSAGE = "message0";
+    final String MESSAGE = "Message0";
 
     teamService.create("Team0");
 
@@ -1163,7 +1163,7 @@ class TeamServiceTest {
     final PlayerMock player1 = this.server.addPlayer();
     final TeamService teamService0 = new TeamService(player0);
     final TeamService teamService1 = new TeamService(player1);
-    final String MESSAGE = "message0";
+    final String MESSAGE = "Message0";
 
     teamService0.create("Team0");
     teamService0.sendInvitation(player1);

@@ -1,73 +1,43 @@
 package net.mineasterisk.mc.service.player;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.UUID;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.MineAsterisk;
-import net.mineasterisk.mc.repository.PlayerRepository;
-import net.mineasterisk.mc.util.DatabaseUtil;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result;
+import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 import org.jetbrains.annotations.NotNull;
 
-public class PlayerService implements Listener {
-  @EventHandler
-  public void onAsyncPlayerPreLogin(@NotNull AsyncPlayerPreLoginEvent event) {
-    final Connection connection = DatabaseUtil.getConnection();
-    final String name = event.getName();
-    final UUID uuid = event.getUniqueId();
-    final Result result = event.getLoginResult();
-    final Component component = Component.text("Encountered error").color(NamedTextColor.RED);
+public class PlayerService {
+  private final @NotNull Player player;
 
-    try {
-      final PlayerRepository playerRepository = new PlayerRepository(connection);
-      final boolean isPlayerExist = playerRepository.isPlayerExist(uuid).join();
+  public PlayerService(final @NotNull Player player) {
+    this.player = player;
+  }
 
-      if (!isPlayerExist) {
-        playerRepository.insert(uuid).join();
-        connection.commit();
-      }
+  public void message(final @NotNull Player recipient, final @NotNull String message) {
+    final ScoreboardManager manager = MineAsterisk.getInstance().getServer().getScoreboardManager();
+    final Scoreboard scoreboard = manager.getMainScoreboard();
+    final Team team = scoreboard.getEntityTeam(this.player);
 
-      event.allow();
-    } catch (SQLException exception) {
-      try {
-        connection.rollback();
-      } catch (SQLException innerException) {
-        event.disallow(result, component);
+    final Component messageComponent =
+        Component.textOfChildren(
+            Component.text("<"),
+            team != null
+                ? Component.textOfChildren(
+                    Component.text(team.getName()).color(NamedTextColor.GRAY),
+                    Component.text('.').color(NamedTextColor.GRAY),
+                    Component.text(this.player.getName()))
+                : Component.text(this.player.getName()),
+            Component.text(">"),
+            Component.space(),
+            Component.text("whispers,"),
+            Component.space(),
+            Component.text("\""),
+            Component.text(message),
+            Component.text("\""));
 
-        MineAsterisk.getInstance()
-            .getLogger()
-            .severe(
-                String.format(
-                    "Encountered error while rolling back transaction during inserting Player %s (%s) into database: %s",
-                    name, uuid, exception));
-
-        return;
-      }
-
-      event.disallow(result, component);
-
-      MineAsterisk.getInstance()
-          .getLogger()
-          .severe(
-              String.format(
-                  "Encountered error while inserting Player %s (%s) into database: %s",
-                  name, uuid, exception));
-    } finally {
-      try {
-        connection.close();
-      } catch (SQLException exception) {
-        MineAsterisk.getInstance()
-            .getLogger()
-            .severe(
-                String.format(
-                    "Encountered error while closing connection during inserting Player %s (%s) into database: %s",
-                    name, uuid, exception));
-      }
-    }
+    recipient.sendMessage(messageComponent.color(NamedTextColor.LIGHT_PURPLE));
   }
 }
