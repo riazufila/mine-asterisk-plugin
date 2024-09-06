@@ -1,5 +1,6 @@
 name: mine-asterisk
-version: 1.0.0-SNAPSHOT
+version: '1.0.0-SNAPSHOT'
 main: net.mineasterisk.mc.MineAsterisk
 author: riazufila
 api-version: '1.21.1'
+bootstrapper: net.mineasterisk.mc.MineAsteriskBootstrap
