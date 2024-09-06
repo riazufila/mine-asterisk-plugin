@@ -31,9 +31,11 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 
 class TeamServiceTest {
-  private final @NotNull MockedStatic<LoaderUtil> loaderUtil = Mockito.mockStatic(LoaderUtil.class);
+  private final @NotNull MockedStatic<@NotNull LoaderUtil> loaderUtil =
+      Mockito.mockStatic(LoaderUtil.class);
+
   private @NotNull ServerMock server;
-  private @NotNull HashMap<Integer, Invitation> invitations;
+  private @NotNull HashMap<@NotNull Integer, @NotNull Invitation> invitations;
   private @NotNull Scoreboard scoreboard;
 
   @BeforeEach
@@ -47,13 +49,13 @@ class TeamServiceTest {
     //noinspection unchecked
     this.invitations = (HashMap<Integer, Invitation>) field.get(null);
 
-    invitations.clear();
+    this.invitations.clear();
     MockBukkit.load(MineAsterisk.class);
   }
 
   @AfterEach
   public void tearDown() {
-    invitations.clear();
+    this.invitations.clear();
     MockBukkit.unmock();
     loaderUtil.close();
   }
