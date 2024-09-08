@@ -3,6 +3,7 @@ package net.mineasterisk.mc;
 import io.papermc.paper.plugin.bootstrap.BootstrapContext;
 import io.papermc.paper.plugin.bootstrap.PluginBootstrap;
 import net.mineasterisk.mc.util.LoaderUtil;
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public class MineAsteriskBootstrap implements PluginBootstrap {
   private static @Nullable BootstrapContext context;
 
+  @Subst("mine-asterisk")
   public static @NotNull String getNamespace() {
     return MineAsteriskBootstrap.getContext().getPluginMeta().getName().toLowerCase();
   }

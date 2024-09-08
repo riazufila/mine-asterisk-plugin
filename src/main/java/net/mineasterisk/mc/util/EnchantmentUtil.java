@@ -6,6 +6,7 @@ import io.papermc.paper.registry.data.EnchantmentRegistryEntry.Builder;
 import io.papermc.paper.registry.event.RegistryEvents;
 import io.papermc.paper.registry.event.WritableRegistry;
 import net.mineasterisk.mc.MineAsteriskBootstrap;
+import net.mineasterisk.mc.enchantment.FrostbiteEnchantment;
 import org.bukkit.enchantments.Enchantment;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -20,8 +21,10 @@ public class EnchantmentUtil {
             .newHandler(
                 event -> {
                   final WritableRegistry<Enchantment, Builder> registry = event.registry();
+                  final FrostbiteEnchantment frostbiteEnchantment = new FrostbiteEnchantment(event);
 
-                  // registry.register(..., ...);
+                  registry.register(
+                      frostbiteEnchantment.getKey(), frostbiteEnchantment.getBuilder());
                 }));
   }
 }
