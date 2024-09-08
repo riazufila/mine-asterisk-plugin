@@ -306,13 +306,13 @@ public class TeamService {
       throw new ValidationException(
           "Encountered error",
           String.format(
-              "Offline Player (%s) haven't played in the server.", offlineKicked.getUniqueId()));
+              "Offline Player (%s) haven't played in the server", offlineKicked.getUniqueId()));
     }
 
     if (offlineKicked.getName() == null) {
       throw new ValidationException(
           "Encountered error",
-          String.format("Offline Player (%s) doesn't have a name.", offlineKicked.getUniqueId()));
+          String.format("Offline Player (%s) doesn't have a name", offlineKicked.getUniqueId()));
     }
 
     if (kicked != null) {
