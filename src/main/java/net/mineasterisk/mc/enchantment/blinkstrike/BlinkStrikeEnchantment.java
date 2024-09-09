@@ -10,13 +10,11 @@ import io.papermc.paper.registry.keys.tags.ItemTypeTagKeys;
 import io.papermc.paper.registry.set.RegistrySet;
 import java.util.function.Consumer;
 import net.kyori.adventure.key.Key;
-import net.kyori.adventure.sound.Sound;
-import net.kyori.adventure.sound.Sound.Source;
 import net.kyori.adventure.text.Component;
 import net.mineasterisk.mc.MineAsteriskBootstrap;
+import net.mineasterisk.mc.service.LivingEntity.LivingEntityService;
 import net.mineasterisk.mc.util.MathUtil;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
@@ -71,7 +69,7 @@ public class BlinkStrikeEnchantment extends net.mineasterisk.mc.enchantment.Ench
     final double MIN_THETA_SPREAD = MIN_DEFAULT_THETA * 0.1 * (level - 1);
     final double MAX_THETA_SPREAD = MAX_DEFAULT_THETA * 0.1 * (level - 1);
     final Location attackedLocation = attacked.getLocation();
-    final float YAW = attackedLocation.clone().getYaw();
+    final float YAW = attackedLocation.getYaw();
     final double MIN_RADIUS = 2;
     final double MAX_RADIUS = 4;
     final double MIN_THETA = Math.toRadians(MIN_DEFAULT_THETA + MIN_THETA_SPREAD + YAW);
@@ -109,14 +107,9 @@ public class BlinkStrikeEnchantment extends net.mineasterisk.mc.enchantment.Ench
     }
 
     final Vector facingAttacked = attackedLocation.clone().subtract(teleportLocation).toVector();
+    final LivingEntityService livingEntityService = new LivingEntityService(attacker);
 
     teleportLocation.setDirection(facingAttacked);
-    attacker.teleport(teleportLocation);
-    attacker.playSound(
-        Sound.sound(Key.key("minecraft:entity.enderman.teleport"), Source.PLAYER, 1f, 1f));
-
-    teleportLocation
-        .getWorld()
-        .spawnParticle(Particle.PORTAL, teleportLocation, 5, 0.5, 0.5, 0.5, 0.1);
+    livingEntityService.teleport(teleportLocation);
   }
 }
