@@ -1,6 +1,7 @@
 package net.mineasterisk.mc.util;
 
 import net.mineasterisk.mc.MineAsterisk;
+import net.mineasterisk.mc.enchantment.blinkstrike.BlinkStrikeEnchantmentListener;
 import net.mineasterisk.mc.enchantment.frostbite.FrostbiteEnchantmentListener;
 import net.mineasterisk.mc.service.access.AccessServiceListener;
 import net.mineasterisk.mc.service.player.PlayerServiceListener;
@@ -13,8 +14,8 @@ class EventUtil {
 
     manager.registerEvents(new AccessServiceListener(), plugin);
     manager.registerEvents(new PlayerServiceListener(), plugin);
-
     manager.registerEvents(new FrostbiteEnchantmentListener(), plugin);
+    manager.registerEvents(new BlinkStrikeEnchantmentListener(), plugin);
 
     plugin.getLogger().info("Registered event(s)");
   }
