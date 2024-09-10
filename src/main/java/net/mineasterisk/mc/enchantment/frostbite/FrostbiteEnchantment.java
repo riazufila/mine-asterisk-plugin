@@ -14,34 +14,44 @@ import java.util.function.Consumer;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.mineasterisk.mc.MineAsteriskBootstrap;
+import net.mineasterisk.mc.util.EnchantmentUtil;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EquipmentSlotGroup;
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("UnstableApiUsage")
 public class FrostbiteEnchantment extends net.mineasterisk.mc.enchantment.Enchantment {
-  private static final Key KEY = Key.key(MineAsteriskBootstrap.getNamespace() + ":frostbite");
+  private static final String NAME = "Frostbite";
+  private static final Key NAMESPACED_KEY =
+      Key.key(MineAsteriskBootstrap.getNamespace() + ":" + FrostbiteEnchantment.getKey());
+
   private final @NotNull LivingEntity attacked;
 
   public FrostbiteEnchantment(final @NotNull LivingEntity attacked) {
     this.attacked = attacked;
   }
 
-  public static @NotNull Key getKey() {
-    return FrostbiteEnchantment.KEY;
+  @Subst("frostbite")
+  private static @NotNull String getKey() {
+    return EnchantmentUtil.getKeyFromName(FrostbiteEnchantment.NAME);
+  }
+
+  public static @NotNull Key getNamespacedKey() {
+    return FrostbiteEnchantment.NAMESPACED_KEY;
   }
 
   public static @NotNull TypedKey<@NotNull Enchantment> getTypedKey() {
-    return TypedKey.create(RegistryKey.ENCHANTMENT, FrostbiteEnchantment.KEY);
+    return TypedKey.create(RegistryKey.ENCHANTMENT, FrostbiteEnchantment.NAMESPACED_KEY);
   }
 
   public static @NotNull Consumer<@NotNull Builder> getBuilder(
       final @NotNull RegistryFreezeEvent<@NotNull Enchantment, @NotNull Builder> event) {
     return builder ->
         builder
-            .description(Component.text("Frostbite"))
-            .supportedItems(event.getOrCreateTag(ItemTypeTagKeys.SWORDS))
+            .description(Component.text(FrostbiteEnchantment.NAME))
+            .supportedItems(event.getOrCreateTag(ItemTypeTagKeys.ENCHANTABLE_SWORD))
             .anvilCost(4)
             .maxLevel(2)
             .weight(1)

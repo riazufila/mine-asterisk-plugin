@@ -11,7 +11,7 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 public class FrostbiteEnchantmentListener implements Listener {
   @EventHandler
   public void onEntityDamageByEntity(final EntityDamageByEntityEvent event) {
-    final Enchantment enchantment = EnchantmentUtil.get(FrostbiteEnchantment.getKey());
+    final Enchantment enchantment = EnchantmentUtil.get(FrostbiteEnchantment.getNamespacedKey());
     final Entity attacker = event.getDamager();
     final Entity attacked = event.getEntity();
     final boolean isAttackerLiving = attacker instanceof LivingEntity;
