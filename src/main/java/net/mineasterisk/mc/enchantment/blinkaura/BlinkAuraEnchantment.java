@@ -67,8 +67,8 @@ public class BlinkAuraEnchantment extends net.mineasterisk.mc.enchantment.Enchan
                     EnchantmentKeys.SOUL_SPEED,
                     EnchantmentKeys.DEPTH_STRIDER,
                     EnchantmentKeys.FROST_WALKER))
-            .minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(50, 20))
-            .maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(70, 20))
+            .minimumCost(EnchantmentRegistryEntry.EnchantmentCost.of(55, 25))
+            .maximumCost(EnchantmentRegistryEntry.EnchantmentCost.of(75, 25))
             .activeSlots(EquipmentSlotGroup.ARMOR);
   }
 
