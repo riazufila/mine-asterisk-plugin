@@ -11,6 +11,7 @@ import io.papermc.paper.registry.event.WritableRegistry;
 import java.util.Set;
 import net.kyori.adventure.key.Key;
 import net.mineasterisk.mc.MineAsteriskBootstrap;
+import net.mineasterisk.mc.enchantment.blinkaura.BlinkAuraEnchantment;
 import net.mineasterisk.mc.enchantment.blinkstrike.BlinkStrikeEnchantment;
 import net.mineasterisk.mc.enchantment.frostbite.FrostbiteEnchantment;
 import org.bukkit.Registry;
@@ -39,6 +40,9 @@ public class EnchantmentUtil {
                   registry.register(
                       BlinkStrikeEnchantment.getTypedKey(),
                       BlinkStrikeEnchantment.getBuilder(event));
+
+                  registry.register(
+                      BlinkAuraEnchantment.getTypedKey(), BlinkAuraEnchantment.getBuilder(event));
                 }));
   }
 
