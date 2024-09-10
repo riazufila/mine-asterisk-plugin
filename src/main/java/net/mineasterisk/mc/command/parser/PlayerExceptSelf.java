@@ -14,7 +14,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import net.mineasterisk.mc.MineAsterisk;
+import net.mineasterisk.mc.util.CommandUtil;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,10 +30,12 @@ public class PlayerExceptSelf
 
     return source -> {
       final List<Player> players = resolver.resolve(source);
+      final CommandSender sender = source.getSender();
+      final Entity executor = source.getExecutor();
+      final Player player = CommandUtil.getPlayer(sender, executor);
       final Optional<Player> self =
           players.stream()
-              .filter(
-                  resolvedPlayer -> resolvedPlayer.getName().equals(source.getSender().getName()))
+              .filter(resolvedPlayer -> resolvedPlayer.getUniqueId().equals(player.getUniqueId()))
               .findFirst();
 
       if (self.isPresent()) {
@@ -55,10 +59,12 @@ public class PlayerExceptSelf
       final @NotNull SuggestionsBuilder builder) {
     final CommandSourceStack source = (CommandSourceStack) context.getSource();
     final CommandSender sender = source.getSender();
+    final Entity executor = source.getExecutor();
+    final Player player = CommandUtil.getPlayer(sender, executor);
 
     MineAsterisk.getInstance().getServer().getOnlinePlayers().stream()
-        .filter(player -> !player.getName().equals(sender.getName()))
-        .forEach(player -> builder.suggest(player.getName()));
+        .filter(onlinePlayer -> !onlinePlayer.getUniqueId().equals(player.getUniqueId()))
+        .forEach(onlinePlayer -> builder.suggest(onlinePlayer.getName()));
 
     return builder.buildFuture();
   }

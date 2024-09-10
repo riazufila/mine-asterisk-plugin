@@ -8,8 +8,10 @@ import io.papermc.paper.command.brigadier.Commands;
 import io.papermc.paper.command.brigadier.argument.resolvers.selector.PlayerSelectorArgumentResolver;
 import net.mineasterisk.mc.command.parser.PlayerExceptSelf;
 import net.mineasterisk.mc.service.player.PlayerService;
+import net.mineasterisk.mc.util.CommandUtil;
 import net.mineasterisk.mc.util.ExceptionUtil;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,14 +32,10 @@ public class MessageCommand implements net.mineasterisk.mc.command.Command {
   private int message(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
+    final Entity executor = source.getExecutor();
 
     try {
-      if (!(sender instanceof Player player)) {
-        throw new IllegalStateException(
-            String.format(
-                "Sender %s isn't a Player and tries to execute command", sender.getName()));
-      }
-
+      final Player player = CommandUtil.getPlayer(sender, executor);
       final String MESSAGE = context.getArgument("message", String.class);
       final PlayerService playerService = new PlayerService(player);
       final Player recipient =
