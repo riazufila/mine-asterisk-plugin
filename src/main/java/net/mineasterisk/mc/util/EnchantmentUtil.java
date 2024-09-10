@@ -42,11 +42,15 @@ public class EnchantmentUtil {
                 }));
   }
 
-  public static Enchantment get(final @NotNull Key key) {
+  public static @NotNull Enchantment get(final @NotNull Key key) {
     final Registry<Enchantment> enchantmentRegistry =
         RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT);
 
     return enchantmentRegistry.getOrThrow(TypedKey.create(RegistryKey.ENCHANTMENT, key));
+  }
+
+  public static @NotNull String getKeyFromName(final @NotNull String name) {
+    return name.toLowerCase().replace(" ", "_");
   }
 
   public static int getTotalEnchantmentLevel(

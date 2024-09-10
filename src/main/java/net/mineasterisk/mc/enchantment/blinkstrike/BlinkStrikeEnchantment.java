@@ -13,6 +13,7 @@ import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.mineasterisk.mc.MineAsteriskBootstrap;
 import net.mineasterisk.mc.service.livingentity.LivingEntityService;
+import net.mineasterisk.mc.util.EnchantmentUtil;
 import net.mineasterisk.mc.util.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -20,11 +21,15 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.util.Vector;
+import org.intellij.lang.annotations.Subst;
 import org.jetbrains.annotations.NotNull;
 
 @SuppressWarnings("UnstableApiUsage")
 public class BlinkStrikeEnchantment extends net.mineasterisk.mc.enchantment.Enchantment {
-  private static final Key KEY = Key.key(MineAsteriskBootstrap.getNamespace() + ":blink_strike");
+  private static final String NAME = "Blink Strike";
+  private static final Key NAMESPACED_KEY =
+      Key.key(MineAsteriskBootstrap.getNamespace() + ":" + BlinkStrikeEnchantment.getKey());
+
   private final @NotNull LivingEntity attacker;
   private final @NotNull LivingEntity attacked;
 
@@ -34,20 +39,25 @@ public class BlinkStrikeEnchantment extends net.mineasterisk.mc.enchantment.Ench
     this.attacked = attacked;
   }
 
-  public static @NotNull Key getKey() {
-    return BlinkStrikeEnchantment.KEY;
+  @Subst("blink_strike")
+  private static @NotNull String getKey() {
+    return EnchantmentUtil.getKeyFromName(BlinkStrikeEnchantment.NAME);
+  }
+
+  public static @NotNull Key getNamedspacedKey() {
+    return BlinkStrikeEnchantment.NAMESPACED_KEY;
   }
 
   public static @NotNull TypedKey<@NotNull Enchantment> getTypedKey() {
-    return TypedKey.create(RegistryKey.ENCHANTMENT, BlinkStrikeEnchantment.KEY);
+    return TypedKey.create(RegistryKey.ENCHANTMENT, BlinkStrikeEnchantment.NAMESPACED_KEY);
   }
 
   public static @NotNull Consumer<@NotNull Builder> getBuilder(
       final @NotNull RegistryFreezeEvent<@NotNull Enchantment, @NotNull Builder> event) {
     return builder ->
         builder
-            .description(Component.text("Blink Strike"))
-            .supportedItems(event.getOrCreateTag(ItemTypeTagKeys.SWORDS))
+            .description(Component.text(BlinkStrikeEnchantment.NAME))
+            .supportedItems(event.getOrCreateTag(ItemTypeTagKeys.ENCHANTABLE_SWORD))
             .anvilCost(10)
             .maxLevel(41)
             .weight(1)
