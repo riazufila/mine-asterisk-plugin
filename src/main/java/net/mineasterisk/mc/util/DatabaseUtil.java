@@ -26,7 +26,7 @@ public class DatabaseUtil {
 
     try {
       return DatabaseUtil.dataSource.getConnection();
-    } catch (SQLException exception) {
+    } catch (final SQLException exception) {
       MineAsterisk.getInstance()
           .getLogger()
           .severe(String.format("Encountered error while getting connection: %s", exception));
@@ -50,7 +50,7 @@ public class DatabaseUtil {
 
         return new HikariConfig(properties);
       }
-    } catch (IOException exception) {
+    } catch (final IOException exception) {
       MineAsterisk.getInstance()
           .getLogger()
           .severe(String.format("Encountered error while configuring HikariCP: %s", exception));

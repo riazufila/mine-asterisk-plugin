@@ -372,7 +372,7 @@ class TeamServiceTest {
                     return invitation.invitee().getUniqueId().equals(invitee.getUniqueId())
                         && invitation.inviter().getUniqueId().equals(inviter.getUniqueId())
                         && invitation.team().getName().equals(newTeamName);
-                  } catch (IllegalStateException exception) {
+                  } catch (final IllegalStateException exception) {
                     return false;
                   }
                 }));
@@ -567,7 +567,7 @@ class TeamServiceTest {
                     return invitation.invitee().getUniqueId().equals(invitee.getUniqueId())
                         && invitation.inviter().getUniqueId().equals(inviter.getUniqueId())
                         && invitation.team().getName().equals(newTeamName);
-                  } catch (IllegalStateException exception) {
+                  } catch (final IllegalStateException exception) {
                     return false;
                   }
                 }));
@@ -767,7 +767,7 @@ class TeamServiceTest {
                     return invitation.invitee().getUniqueId().equals(invitee.getUniqueId())
                         && invitation.inviter().getUniqueId().equals(inviter.getUniqueId())
                         && invitation.team().getName().equals(newInviterTeamName);
-                  } catch (IllegalStateException exception) {
+                  } catch (final IllegalStateException exception) {
                     return false;
                   }
                 }));
@@ -801,7 +801,7 @@ class TeamServiceTest {
                     return invitation.invitee().getUniqueId().equals(invitee.getUniqueId())
                         && invitation.inviter().getUniqueId().equals(inviter.getUniqueId())
                         && invitation.team().getName().equals(newInviterTeamName);
-                  } catch (IllegalStateException exception) {
+                  } catch (final IllegalStateException exception) {
                     return false;
                   }
                 }));
@@ -839,7 +839,7 @@ class TeamServiceTest {
                     return invitation.invitee().getUniqueId().equals(invitee.getUniqueId())
                         && invitation.inviter().getUniqueId().equals(inviter.getUniqueId())
                         && invitation.team().getName().equals(newInviterTeamName);
-                  } catch (IllegalStateException exception) {
+                  } catch (final IllegalStateException exception) {
                     return false;
                   }
                 }));

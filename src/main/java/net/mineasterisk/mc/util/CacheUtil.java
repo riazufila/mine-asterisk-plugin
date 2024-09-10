@@ -52,7 +52,7 @@ public class CacheUtil {
 
         CacheUtil.SYNCERS.add(accessCacheRunnableTaskId);
       }
-    } catch (SQLException exception) {
+    } catch (final SQLException exception) {
       MineAsterisk.getInstance()
           .getLogger()
           .severe(String.format("Encountered error while loading cache: %s", exception));
@@ -87,7 +87,7 @@ public class CacheUtil {
               .getLogger()
               .info("Sleeping thread for a minute, as at least one syncer is still running");
           Thread.sleep(Duration.ofMinutes(1));
-        } catch (InterruptedException exception) {
+        } catch (final InterruptedException exception) {
           MineAsterisk.getInstance()
               .getLogger()
               .severe("Encountered error while making thread sleep on finishing all cache syncer");
@@ -124,14 +124,14 @@ public class CacheUtil {
       }
 
       connection.commit();
-    } catch (SQLException exception) {
+    } catch (final SQLException exception) {
       try {
         if (isClearDirty && !dirtyAccesses.isEmpty()) {
           accessCache.setDirty(true, dirtyAccesses);
         }
 
         connection.rollback();
-      } catch (SQLException innerException) {
+      } catch (final SQLException innerException) {
         MineAsterisk.getInstance()
             .getLogger()
             .severe(
@@ -150,7 +150,7 @@ public class CacheUtil {
     } finally {
       try {
         connection.close();
-      } catch (SQLException exception) {
+      } catch (final SQLException exception) {
         MineAsterisk.getInstance()
             .getLogger()
             .severe(

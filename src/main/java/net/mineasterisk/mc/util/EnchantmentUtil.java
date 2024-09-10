@@ -118,7 +118,7 @@ public class EnchantmentUtil {
       final @NotNull Enchantment enchantment) {
     try {
       return equipment.getItem(equipmentSlot).getEnchantmentLevel(enchantment);
-    } catch (IllegalArgumentException exception) {
+    } catch (final IllegalArgumentException exception) {
       return 0;
     }
   }

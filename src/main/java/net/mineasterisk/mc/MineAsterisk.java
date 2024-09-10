@@ -28,7 +28,7 @@ public class MineAsterisk extends JavaPlugin {
       LoaderUtil.preLoad();
 
       this.getLogger().info("Plugin enabled");
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       this.getServer().getPluginManager().disablePlugin(this);
 
       this.getLogger()
@@ -42,7 +42,7 @@ public class MineAsterisk extends JavaPlugin {
       LoaderUtil.postLoad();
 
       this.getLogger().info("Plugin disabled");
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       this.getLogger()
           .severe(String.format("Encountered error while disabling Plugin: %s", exception));
     }

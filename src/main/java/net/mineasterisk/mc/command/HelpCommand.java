@@ -74,7 +74,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
                     "Player %s (%s) retrieved general help but there's nothing to display",
                     player.getName(), player.getUniqueId()));
       }
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "general help");
     }
 
@@ -128,7 +128,7 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
                     "Player %s (%s) retrieved filtered help but there's nothing to display",
                     player.getName(), player.getUniqueId()));
       }
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "filtered help");
     }
 

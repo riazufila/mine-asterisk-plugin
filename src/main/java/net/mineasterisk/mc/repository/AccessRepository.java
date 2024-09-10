@@ -50,7 +50,7 @@ public class AccessRepository extends Repository {
             }
 
             return playersAccesses;
-          } catch (SQLException exception) {
+          } catch (final SQLException exception) {
             MineAsterisk.getInstance()
                 .getLogger()
                 .severe(
@@ -123,7 +123,7 @@ public class AccessRepository extends Repository {
             }
 
             return playersAccesses.keySet().stream().toList();
-          } catch (SQLException exception) {
+          } catch (final SQLException exception) {
             MineAsterisk.getInstance()
                 .getLogger()
                 .severe(

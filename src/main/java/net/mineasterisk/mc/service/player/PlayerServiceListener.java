@@ -33,10 +33,10 @@ public class PlayerServiceListener implements Listener {
       }
 
       event.allow();
-    } catch (SQLException exception) {
+    } catch (final SQLException exception) {
       try {
         connection.rollback();
-      } catch (SQLException innerException) {
+      } catch (final SQLException innerException) {
         event.disallow(result, component);
 
         MineAsterisk.getInstance()
@@ -60,7 +60,7 @@ public class PlayerServiceListener implements Listener {
     } finally {
       try {
         connection.close();
-      } catch (SQLException exception) {
+      } catch (final SQLException exception) {
         MineAsterisk.getInstance()
             .getLogger()
             .severe(

@@ -157,7 +157,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
               String.format(
                   "Player %s (%s) retrieved its Team information",
                   player.getName(), player.getUniqueId()));
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "Team information");
     }
 
@@ -188,7 +188,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
           .info(
               String.format(
                   "Player %s (%s) created Team %s", player.getName(), player.getUniqueId(), NAME));
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "create Team");
     }
 
@@ -218,7 +218,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
           .info(
               String.format(
                   "Player %s (%s) disbanded its Team", player.getName(), player.getUniqueId()));
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "disband Team");
     }
 
@@ -263,9 +263,9 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                   inviter.getUniqueId(),
                   invitee.getName(),
                   invitee.getUniqueId()));
-    } catch (CommandSyntaxException exception) {
+    } catch (final CommandSyntaxException exception) {
       throw exception;
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "send Team invitation");
     }
 
@@ -310,9 +310,9 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                   invitee.getUniqueId(),
                   inviter.getName(),
                   inviter.getUniqueId()));
-    } catch (CommandSyntaxException exception) {
+    } catch (final CommandSyntaxException exception) {
       throw exception;
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "accept Team invitation");
     }
 
@@ -357,9 +357,9 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                   inviter.getUniqueId(),
                   invitee.getName(),
                   invitee.getUniqueId()));
-    } catch (CommandSyntaxException exception) {
+    } catch (final CommandSyntaxException exception) {
       throw exception;
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "remove Team invitation");
     }
 
@@ -411,9 +411,9 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
                   kicker.getUniqueId(),
                   offlineKicked.getName(),
                   offlineKicked.getUniqueId()));
-    } catch (CommandSyntaxException exception) {
+    } catch (final CommandSyntaxException exception) {
       throw exception;
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "Team kick");
     }
 
@@ -445,7 +445,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
           .info(
               String.format(
                   "Player %s (%s) left its Team", player.getName(), player.getUniqueId()));
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "leave Team");
     }
 
@@ -468,7 +468,7 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
       final TeamService teamService = new TeamService(player);
 
       teamService.message(MESSAGE);
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "message Team");
     }
 

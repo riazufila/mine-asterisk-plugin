@@ -32,7 +32,7 @@ public class MineAsteriskBootstrap implements PluginBootstrap {
       LoaderUtil.bootstrapLoad();
 
       context.getLogger().info("Bootstrap finished");
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       context
           .getLogger()
           .error(String.format("Encountered error while in bootstrap phase: %s", exception));
