@@ -1,4 +1,4 @@
-package net.mineasterisk.mc.service.LivingEntity;
+package net.mineasterisk.mc.service.livingentity;
 
 import net.mineasterisk.mc.util.ParticleUtil;
 import org.bukkit.Color;

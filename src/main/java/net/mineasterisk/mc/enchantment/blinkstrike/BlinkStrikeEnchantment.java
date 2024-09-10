@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.mineasterisk.mc.MineAsteriskBootstrap;
-import net.mineasterisk.mc.service.LivingEntity.LivingEntityService;
+import net.mineasterisk.mc.service.livingentity.LivingEntityService;
 import net.mineasterisk.mc.util.MathUtil;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
