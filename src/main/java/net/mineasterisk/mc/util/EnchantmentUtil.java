@@ -60,39 +60,62 @@ public class EnchantmentUtil {
 
     for (final EquipmentSlotGroup activeSlotGroup : activeSlotGroups) {
       if (activeSlotGroup.equals(EquipmentSlotGroup.MAINHAND)) {
-        totalLevel += equipment.getItem(EquipmentSlot.HAND).getEnchantmentLevel(enchantment);
+        totalLevel +=
+            EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.HAND, enchantment);
       } else if (activeSlotGroup.equals(EquipmentSlotGroup.OFFHAND)) {
-        totalLevel += equipment.getItem(EquipmentSlot.OFF_HAND).getEnchantmentLevel(enchantment);
+        totalLevel +=
+            EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.OFF_HAND, enchantment);
       } else if (activeSlotGroup == EquipmentSlotGroup.HAND) {
-        totalLevel += equipment.getItem(EquipmentSlot.HAND).getEnchantmentLevel(enchantment);
-        totalLevel += equipment.getItem(EquipmentSlot.OFF_HAND).getEnchantmentLevel(enchantment);
+        totalLevel +=
+            EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.HAND, enchantment);
+        totalLevel +=
+            EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.OFF_HAND, enchantment);
       } else if (activeSlotGroup == EquipmentSlotGroup.HEAD) {
-        totalLevel += equipment.getItem(EquipmentSlot.HEAD).getEnchantmentLevel(enchantment);
+        totalLevel +=
+            EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.HEAD, enchantment);
       } else if (activeSlotGroup == EquipmentSlotGroup.CHEST) {
-        totalLevel += equipment.getItem(EquipmentSlot.CHEST).getEnchantmentLevel(enchantment);
+        totalLevel +=
+            EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.CHEST, enchantment);
       } else if (activeSlotGroup == EquipmentSlotGroup.LEGS) {
-        totalLevel += equipment.getItem(EquipmentSlot.LEGS).getEnchantmentLevel(enchantment);
+        totalLevel +=
+            EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.LEGS, enchantment);
       } else if (activeSlotGroup == EquipmentSlotGroup.FEET) {
-        totalLevel += equipment.getItem(EquipmentSlot.FEET).getEnchantmentLevel(enchantment);
+        totalLevel +=
+            EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.FEET, enchantment);
       } else if (activeSlotGroup == EquipmentSlotGroup.ARMOR) {
-        totalLevel += equipment.getItem(EquipmentSlot.HEAD).getEnchantmentLevel(enchantment);
-        totalLevel += equipment.getItem(EquipmentSlot.CHEST).getEnchantmentLevel(enchantment);
-        totalLevel += equipment.getItem(EquipmentSlot.LEGS).getEnchantmentLevel(enchantment);
-        totalLevel += equipment.getItem(EquipmentSlot.FEET).getEnchantmentLevel(enchantment);
-        totalLevel += equipment.getItem(EquipmentSlot.BODY).getEnchantmentLevel(enchantment);
+        totalLevel +=
+            EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.HEAD, enchantment)
+                + EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.CHEST, enchantment)
+                + EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.LEGS, enchantment)
+                + EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.FEET, enchantment)
+                + EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.BODY, enchantment);
       } else if (activeSlotGroup == EquipmentSlotGroup.BODY) {
-        totalLevel += equipment.getItem(EquipmentSlot.BODY).getEnchantmentLevel(enchantment);
+        totalLevel +=
+            EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.BODY, enchantment);
       } else if (activeSlotGroup == EquipmentSlotGroup.ANY) {
-        totalLevel += equipment.getItem(EquipmentSlot.HAND).getEnchantmentLevel(enchantment);
-        totalLevel += equipment.getItem(EquipmentSlot.OFF_HAND).getEnchantmentLevel(enchantment);
-        totalLevel += equipment.getItem(EquipmentSlot.HEAD).getEnchantmentLevel(enchantment);
-        totalLevel += equipment.getItem(EquipmentSlot.CHEST).getEnchantmentLevel(enchantment);
-        totalLevel += equipment.getItem(EquipmentSlot.LEGS).getEnchantmentLevel(enchantment);
-        totalLevel += equipment.getItem(EquipmentSlot.FEET).getEnchantmentLevel(enchantment);
-        totalLevel += equipment.getItem(EquipmentSlot.BODY).getEnchantmentLevel(enchantment);
+        totalLevel +=
+            EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.HAND, enchantment)
+                + EnchantmentUtil.getEnchantmentLevel(
+                    equipment, EquipmentSlot.OFF_HAND, enchantment)
+                + EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.HEAD, enchantment)
+                + EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.CHEST, enchantment)
+                + EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.LEGS, enchantment)
+                + EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.FEET, enchantment)
+                + EnchantmentUtil.getEnchantmentLevel(equipment, EquipmentSlot.BODY, enchantment);
       }
     }
 
     return totalLevel;
+  }
+
+  private static int getEnchantmentLevel(
+      final @NotNull EntityEquipment equipment,
+      final @NotNull EquipmentSlot equipmentSlot,
+      final @NotNull Enchantment enchantment) {
+    try {
+      return equipment.getItem(equipmentSlot).getEnchantmentLevel(enchantment);
+    } catch (IllegalArgumentException exception) {
+      return 0;
+    }
   }
 }
