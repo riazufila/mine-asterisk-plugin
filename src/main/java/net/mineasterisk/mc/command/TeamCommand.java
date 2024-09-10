@@ -90,30 +90,42 @@ public class TeamCommand implements net.mineasterisk.mc.command.Command {
   private boolean canCreate(final @NotNull CommandSourceStack source) {
     CommandSender sender = source.getSender();
 
-    return !(sender.hasPermission(PermissionConstant.TEAM_LEADER.toString())
-        || sender.hasPermission(PermissionConstant.TEAM_MEMBER.toString()));
+    return CommandUtil.isPermissible(
+        sender,
+        !(sender.hasPermission(PermissionConstant.TEAM_LEADER.toString())
+            || sender.hasPermission(PermissionConstant.TEAM_MEMBER.toString())));
   }
 
   private boolean canRead(final @NotNull CommandSourceStack source) {
     CommandSender sender = source.getSender();
 
-    return sender.hasPermission(PermissionConstant.TEAM_LEADER.toString())
-        || sender.hasPermission(PermissionConstant.TEAM_MEMBER.toString());
+    return CommandUtil.isPermissible(
+        sender,
+        sender.hasPermission(PermissionConstant.TEAM_LEADER.toString()),
+        sender.hasPermission(PermissionConstant.TEAM_MEMBER.toString()));
   }
 
   private boolean canUpdateTeamMember(final @NotNull CommandSourceStack source) {
-    return source.getSender().hasPermission(PermissionConstant.TEAM_LEADER.toString());
+    CommandSender sender = source.getSender();
+
+    return CommandUtil.isPermissible(
+        sender, sender.hasPermission(PermissionConstant.TEAM_LEADER.toString()));
   }
 
   private boolean canDisband(final @NotNull CommandSourceStack source) {
-    return source.getSender().hasPermission(PermissionConstant.TEAM_LEADER.toString());
+    CommandSender sender = source.getSender();
+
+    return CommandUtil.isPermissible(
+        sender, sender.hasPermission(PermissionConstant.TEAM_LEADER.toString()));
   }
 
   private boolean canLeave(final @NotNull CommandSourceStack source) {
     CommandSender sender = source.getSender();
 
-    return !sender.hasPermission(PermissionConstant.TEAM_LEADER.toString())
-        && sender.hasPermission(PermissionConstant.TEAM_MEMBER.toString());
+    return CommandUtil.isPermissible(
+        sender,
+        !sender.hasPermission(PermissionConstant.TEAM_LEADER.toString()),
+        sender.hasPermission(PermissionConstant.TEAM_MEMBER.toString()));
   }
 
   @SuppressWarnings("SameReturnValue")

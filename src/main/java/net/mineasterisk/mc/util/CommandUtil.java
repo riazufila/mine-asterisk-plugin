@@ -59,4 +59,19 @@ public class CommandUtil {
 
     return (Player) executor;
   }
+
+  public static boolean isPermissible(
+      final @NotNull CommandSender sender, final boolean... conditions) {
+    boolean isAllTrue = true;
+
+    for (boolean condition : conditions) {
+      if (!condition) {
+        isAllTrue = false;
+
+        break;
+      }
+    }
+
+    return sender.isOp() || isAllTrue;
+  }
 }
