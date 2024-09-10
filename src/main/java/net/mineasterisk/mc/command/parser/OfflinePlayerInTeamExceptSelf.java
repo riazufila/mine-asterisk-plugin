@@ -14,8 +14,10 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import net.mineasterisk.mc.MineAsterisk;
 import net.mineasterisk.mc.exception.ValidationException;
+import net.mineasterisk.mc.util.CommandUtil;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
@@ -31,13 +33,8 @@ public class OfflinePlayerInTeamExceptSelf
 
     return source -> {
       final CommandSender sender = source.getSender();
-
-      if (!(sender instanceof Player player)) {
-        throw new IllegalStateException(
-            String.format(
-                "Sender %s isn't a Player and tries to execute command", sender.getName()));
-      }
-
+      final Entity executor = source.getExecutor();
+      final Player player = CommandUtil.getPlayer(sender, executor);
       final Scoreboard scoreboard =
           MineAsterisk.getInstance().getServer().getScoreboardManager().getMainScoreboard();
 
@@ -82,12 +79,8 @@ public class OfflinePlayerInTeamExceptSelf
       final @NotNull SuggestionsBuilder builder) {
     final CommandSourceStack source = (CommandSourceStack) context.getSource();
     final CommandSender sender = source.getSender();
-
-    if (!(sender instanceof Player player)) {
-      throw new IllegalStateException(
-          String.format("Sender %s isn't a Player and tries to execute command", sender.getName()));
-    }
-
+    final Entity executor = source.getExecutor();
+    final Player player = CommandUtil.getPlayer(sender, executor);
     final Scoreboard scoreboard =
         MineAsterisk.getInstance().getServer().getScoreboardManager().getMainScoreboard();
 

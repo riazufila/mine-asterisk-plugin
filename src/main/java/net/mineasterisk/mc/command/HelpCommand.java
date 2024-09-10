@@ -17,8 +17,10 @@ import java.util.concurrent.CompletableFuture;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.mineasterisk.mc.MineAsterisk;
+import net.mineasterisk.mc.util.CommandUtil;
 import net.mineasterisk.mc.util.ExceptionUtil;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,14 +48,10 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
   private int generalHelp(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
+    final Entity executor = source.getExecutor();
 
     try {
-      if (!(sender instanceof Player player)) {
-        throw new IllegalStateException(
-            String.format(
-                "Sender %s isn't a Player and tries to execute command", sender.getName()));
-      }
-
+      final Player player = CommandUtil.getPlayer(sender, executor);
       final List<String> usages =
           this.getAllUsagesExceptHelp(this.dispatcher.getRoot(), source, null, true);
 
@@ -99,14 +97,10 @@ public class HelpCommand implements net.mineasterisk.mc.command.Command {
   private int filteredHelp(final @NotNull CommandContext<@NotNull CommandSourceStack> context) {
     final CommandSourceStack source = context.getSource();
     final CommandSender sender = source.getSender();
+    final Entity executor = source.getExecutor();
 
     try {
-      if (!(sender instanceof Player player)) {
-        throw new IllegalStateException(
-            String.format(
-                "Sender %s is not a Player and tries to execute command", sender.getName()));
-      }
-
+      final Player player = CommandUtil.getPlayer(sender, executor);
       final String COMMAND = context.getArgument("command", String.class);
       final List<String> usages =
           this.getAllUsagesExceptHelp(this.dispatcher.getRoot(), source, COMMAND, true);
