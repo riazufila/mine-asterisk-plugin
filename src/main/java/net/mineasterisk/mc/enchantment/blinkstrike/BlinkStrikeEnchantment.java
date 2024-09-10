@@ -55,7 +55,7 @@ public class BlinkStrikeEnchantment extends net.mineasterisk.mc.enchantment.Ench
             .description(Component.text(BlinkStrikeEnchantment.NAME))
             .supportedItems(event.getOrCreateTag(ItemTypeTagKeys.ENCHANTABLE_SWORD))
             .anvilCost(10)
-            .maxLevel(41)
+            .maxLevel(40)
             .weight(1)
             .exclusiveWith(
                 RegistrySet.keySet(RegistryKey.ENCHANTMENT, EnchantmentKeys.SWEEPING_EDGE))
@@ -70,6 +70,6 @@ public class BlinkStrikeEnchantment extends net.mineasterisk.mc.enchantment.Ench
       throw new IllegalStateException("Enchantment level cannot be zero or lower");
     }
 
-    new LivingEntityService(this.attacker).teleportAround(this.attacked, level - 1);
+    new LivingEntityService(this.attacker).teleportAround(this.attacked, level);
   }
 }
