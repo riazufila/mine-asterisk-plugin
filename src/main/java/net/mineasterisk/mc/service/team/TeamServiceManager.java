@@ -26,7 +26,7 @@ public class TeamServiceManager {
                     return entry.getValue().inviter().getUniqueId().equals(inviter.getUniqueId())
                         && entry.getValue().invitee().getUniqueId().equals(invitee.getUniqueId())
                         && entry.getValue().team().getName().equals(inviterTeam.getName());
-                  } catch (IllegalStateException exception) {
+                  } catch (final IllegalStateException exception) {
                     return false;
                   }
                 })

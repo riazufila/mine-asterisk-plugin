@@ -47,7 +47,7 @@ public class MessageCommand implements net.mineasterisk.mc.command.Command {
               .getFirst();
 
       playerService.message(recipient, MESSAGE);
-    } catch (Exception exception) {
+    } catch (final Exception exception) {
       ExceptionUtil.handleCommand(exception, sender, "message Player");
     }
 

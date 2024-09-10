@@ -28,7 +28,7 @@ public class PlayerRepository extends Repository {
                 return result.next();
               }
             }
-          } catch (SQLException exception) {
+          } catch (final SQLException exception) {
             MineAsterisk.getInstance()
                 .getLogger()
                 .severe(
@@ -50,7 +50,7 @@ public class PlayerRepository extends Repository {
               statement.setString(1, String.valueOf(uuid));
               statement.executeUpdate();
             }
-          } catch (SQLException exception) {
+          } catch (final SQLException exception) {
             MineAsterisk.getInstance()
                 .getLogger()
                 .severe(String.format("Encountered error while inserting Player: %s", exception));
