@@ -1,1 +1,1 @@
-rootProject.name = "mine-asterisk"
+rootProject.name = "mine-asterisk-plugin"
