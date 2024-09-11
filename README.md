@@ -14,4 +14,4 @@ Enhances vanilla Minecraft server with additional opiniated features.
 None.
 
 ## Disclaimer
-This plugin is intended to be used only with plugins listed in the Plugin dependencies. Compatibility with other plugins not guranteed.
+This plugin is intended to be used only with plugins listed in the Plugin dependencies.
