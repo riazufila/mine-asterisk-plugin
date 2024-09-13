@@ -26,6 +26,9 @@ public class LivingEntityService {
     final double MAX_THETA_SPREAD = MAX_DEFAULT_THETA * 0.1 * spread;
     final Location targetLivingEntityLocation = targetLivingEntity.getLocation();
     final float YAW = targetLivingEntityLocation.getYaw();
+    final double TARGET_LIVING_ENTITY_X = targetLivingEntity.getX();
+    final double TARGET_LIVING_ENTITY_Y = targetLivingEntity.getY();
+    final double TARGET_LIVING_ENTITY_Z = targetLivingEntity.getZ();
     final double MIN_RADIUS = 2;
     final double MAX_RADIUS = 4;
     final double MIN_THETA = Math.toRadians(MIN_DEFAULT_THETA + MIN_THETA_SPREAD + YAW);
@@ -39,17 +42,11 @@ public class LivingEntityService {
       final double RADIUS = MathUtil.getRandomDouble(MIN_RADIUS, MAX_RADIUS);
       final double THETA = MathUtil.getRandomDouble(MIN_THETA, MAX_THETA);
       final double PHI = MathUtil.getRandomDouble(MIN_PHI, MAX_PHI);
-      final double OFFSET_X = RADIUS * Math.sin(THETA) * Math.cos(PHI);
-      final double OFFSET_Y = RADIUS * Math.sin(THETA) * Math.sin(PHI);
-      final double OFFSET_Z = RADIUS * Math.cos(THETA);
+      final double X = TARGET_LIVING_ENTITY_X + (RADIUS * Math.sin(THETA) * Math.cos(PHI));
+      final double Y = TARGET_LIVING_ENTITY_Y + RADIUS * Math.sin(THETA) * Math.sin(PHI);
+      final double Z = TARGET_LIVING_ENTITY_Z + (RADIUS * Math.cos(THETA));
 
-      teleportLocation =
-          new Location(
-              targetLivingEntity.getWorld(),
-              targetLivingEntity.getX() + OFFSET_X,
-              targetLivingEntity.getY() + OFFSET_Y,
-              targetLivingEntity.getZ() + OFFSET_Z);
-
+      teleportLocation = new Location(targetLivingEntity.getWorld(), X, Y, Z);
       isSafeLocationFound = LocationUtil.isLocationAbleToFitPlayer(teleportLocation);
     }
 
