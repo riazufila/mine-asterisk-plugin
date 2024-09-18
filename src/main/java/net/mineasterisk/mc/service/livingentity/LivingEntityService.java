@@ -35,10 +35,12 @@ public class LivingEntityService {
     final double MAX_THETA = Math.toRadians(MAX_DEFAULT_THETA + MAX_THETA_SPREAD + YAW);
     final double MIN_PHI = Math.toRadians(0);
     final double MAX_PHI = Math.toRadians(180);
+    final int MAX_ATTEMPT_GET_SAFE_LOCATION = 10;
     boolean isSafeLocationFound = false;
     Location teleportLocation = null;
+    int count = 0;
 
-    while (!isSafeLocationFound) {
+    while (!(isSafeLocationFound || count >= MAX_ATTEMPT_GET_SAFE_LOCATION)) {
       final double RADIUS = MathUtil.getRandomDouble(MIN_RADIUS, MAX_RADIUS);
       final double THETA = MathUtil.getRandomDouble(MIN_THETA, MAX_THETA);
       final double PHI = MathUtil.getRandomDouble(MIN_PHI, MAX_PHI);
@@ -48,6 +50,12 @@ public class LivingEntityService {
 
       teleportLocation = new Location(targetLivingEntity.getWorld(), X, Y, Z);
       isSafeLocationFound = LocationUtil.isLocationAbleToFitPlayer(teleportLocation);
+
+      count++;
+    }
+
+    if (!isSafeLocationFound) {
+      return;
     }
 
     final Vector facingAttacked =
