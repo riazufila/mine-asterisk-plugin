@@ -42,7 +42,3 @@ None.
 
 This plugin is intended to be used only with the plugins listed under Plugin
 Dependencies.
-
-## License
-
-GPL-3.0
